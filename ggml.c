@@ -9248,7 +9248,9 @@ typedef pthread_t ggml_thread_t;
 
 #endif
 
-//#define GGML_COMPUTE_PAUSE_USLEEP 1
+#define GGML_COMPUTE_ENERGY_SAVING 1
+// 0: none, 1: low, 2: medium, 3: high
+#define GGML_COMPUTE_ENERGY_SAVING_LEVEL 3
 
 // Experimental spin hint(pause).
 static inline void spin_hint(void) {
@@ -9303,8 +9305,10 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
             }
         } else if (flag < 0) { // pause hint
             if (state->worker_idx >= -flag) {
-#ifdef GGML_COMPUTE_PAUSE_USLEEP
-                usleep(10);
+#ifdef GGML_COMPUTE_ENERGY_SAVING
+                if (GGML_COMPUTE_ENERGY_SAVING_LEVEL > 0) {
+                    usleep(GGML_COMPUTE_ENERGY_SAVING_LEVEL*10);
+                }
 #else
                 for (int i = 0; i < 5; i++) {
                     spin_hint();
@@ -9571,6 +9575,18 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
         GGML_PRINT_DEBUG_5("%s: %d/%d\n", __func__, i, cgraph->n_nodes);
 
         struct ggml_tensor * node = cgraph->nodes[i];
+
+#ifdef GGML_COMPUTE_ENERGY_SAVING
+        if (GGML_COMPUTE_ENERGY_SAVING_LEVEL == 1) {
+            // only parallel top 3.
+            if (node->op != GGML_OP_MUL_MAT && node->op != GGML_OP_ROPE && node->op != GGML_OP_RMS_NORM) {
+                node->n_tasks = 1;
+            }
+        } else if (GGML_COMPUTE_ENERGY_SAVING_LEVEL >= 2) {
+            // no parallel
+            node->n_tasks = 1;
+        }
+#endif
 
         int n_slaves = node->n_tasks - 1; // number of workers to run.    
         atomic_store(&state_shared.flag, -n_slaves);
