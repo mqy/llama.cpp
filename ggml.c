@@ -8797,7 +8797,7 @@ static void ggml_compute_forward(struct ggml_compute_params * params, struct ggm
 
     int64_t perf_cycles_cur  = ggml_perf_cycles()  - perf_node_start_cycles;
     int64_t perf_time_us_cur = ggml_perf_time_us() - perf_node_start_time_us;
-    tensor->perf_runs++;
+
     tensor->perf_cycles  += perf_cycles_cur;
     tensor->perf_time_us += perf_time_us_cur;
 }
@@ -9645,7 +9645,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
             // int64_t perf_cycles_cur  = ggml_perf_cycles()  - perf_node_start_cycles;
             // int64_t perf_time_us_cur = ggml_perf_time_us() - perf_node_start_time_us;
 
-            // node->perf_runs++;
+            node->perf_runs++;
             // node->perf_cycles  += perf_cycles_cur;
             // node->perf_time_us += perf_time_us_cur;
         }
