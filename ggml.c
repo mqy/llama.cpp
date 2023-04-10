@@ -9248,14 +9248,15 @@ typedef pthread_t ggml_thread_t;
 
 #endif
 
-#define GGML_COMPUTE_ENERGY_SAVING 1
-// 0: none, 1: low, 2: medium, 3: high
-#define GGML_COMPUTE_ENERGY_SAVING_LEVEL 3
+// 0: default (best perf), 1: normal saving, 2: max saving.
+const int GGML_ENERGY_SAVING_LEVEL = 0;
 
-// Experimental spin hint(pause).
+// Experimental spin hint (pause).
+// Discussions: https://github.com/ggerganov/llama.cpp/pull/816
 static inline void spin_hint(void) {
 #if defined(__x86_64__)
-    __asm__ __volatile__ ("pause");
+#include <emmintrin.h>
+    _mm_pause();
 #elif defined(__aarch64__)
     __asm__ __volatile__ ("wfe");
 #endif
@@ -9265,10 +9266,10 @@ struct ggml_compute_state_shared {
     int n_threads;
 
     // synchronization primitives
-    // The `flag` works as work counter + stop indicator.
-    // - compute: [1,0xFF], main thread stores initial value (n_tasks - 1).
-    //   every worker decreases it by 1.
-    // - pause: negative number (1 - n_tasks).
+    // The `flag` works as cmd + data combinitor.
+    // - work: [1, 0xFF], main thread stores initial value (n_tasks - 1).
+    //         every worker decreases it by 1 when done.
+    // - wait: main thread stores ((1 - n_tasks) << 8) | wait_us
     // - stop: 0x100.
     atomic_int flag;
 };
@@ -9303,35 +9304,54 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
             } else {
                 GGML_ASSERT(false);
             }
-        } else if (flag < 0) { // pause hint
-            if (state->worker_idx >= -flag) {
-#ifdef GGML_COMPUTE_ENERGY_SAVING
-                if (GGML_COMPUTE_ENERGY_SAVING_LEVEL > 0) {
-                    usleep(GGML_COMPUTE_ENERGY_SAVING_LEVEL*10);
-                }
-#else
-                for (int i = 0; i < 5; i++) {
-                    spin_hint();
-                }
-#endif
+        } else if (flag < 0) { // wait
+            flag = -flag;
+            if (state->worker_idx >= (flag >> 8)) { // num slave workers.
+                usleep(flag & 0xFF); // num us.
             }
         }
+
         spin_hint();
     }
 
     return 0;
 }
 
-// (mqy): observations on 2.6 GHz 6-Core Intel Core i7, macOS, 7B model.
-// 1. INIT time: 0 ~ 5 us per node.
-// 2. COMPUTE/FINALIZE time:
-//    - main thread:   runs: 2376, total duration: 185470 us, 78 us per node.
-//    - worker thread: runs: 1156, total duration: 182381 us, 157 us per node.
-// 3. 675 nodes of (n_tasks=1), 578 nodes of (n_tasks==n_threads)
+// Predicate wait time for incoming idle workers.
+// TODO: improve
+static inline int ggml_worker_wait_us(struct ggml_tensor * node) {
+    if (GGML_ENERGY_SAVING_LEVEL > 0) {
+        return node->perf_time_us;
+    }
+    return 0;
+}
 
+// Shinrk n_tasks according to last perf.
+// TODO: improve
+static inline void ggml_adjust_n_tasks(struct ggml_tensor * node) {
+    if (node->n_tasks == 1 || GGML_ENERGY_SAVING_LEVEL == 0) {
+        return;
+    }
+
+    if (node->perf_time_us < 100) {
+        node->n_tasks /= 2;
+        if (node->n_tasks == 0) {
+            node->n_tasks = 1;
+        }
+    }
+}
+
+// 7B LLaMa: 675 nodes of (n_tasks==1), 578 nodes of (n_tasks==n_threads)
 void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) {
-    const int n_threads = cgraph->n_threads;
-    GGML_ASSERT(n_threads <= 0xFF);
+    int n_threads = cgraph->n_threads;
+    GGML_ASSERT(n_threads < 0x100);
+
+    if (GGML_ENERGY_SAVING_LEVEL == 2) {
+        n_threads /= 2;
+        if (n_threads == 0) {
+            n_threads = 1;
+        }
+    }
 
     struct ggml_compute_state_shared state_shared = {
         .n_threads = n_threads,
@@ -9354,6 +9374,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                 case GGML_OP_ADD:
                     {
                         node->n_tasks = n_threads;
+                        ggml_adjust_n_tasks(node);
                     } break;
                 case GGML_OP_SUB:
                 case GGML_OP_MUL:
@@ -9374,19 +9395,23 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                 case GGML_OP_GELU:
                     {
                         node->n_tasks = n_threads;
+                        ggml_adjust_n_tasks(node);
                     } break;
                 case GGML_OP_SILU:
                     {
                         node->n_tasks = n_threads;
+                        ggml_adjust_n_tasks(node);
                     } break;
                 case GGML_OP_NORM:
                 case GGML_OP_RMS_NORM:
                     {
                         node->n_tasks = n_threads;
+                        ggml_adjust_n_tasks(node);
                     } break;
                 case GGML_OP_MUL_MAT:
                     {
                         node->n_tasks = n_threads;
+                        ggml_adjust_n_tasks(node);
 
                         // TODO: use different scheduling for different matrix sizes
                         //const int nr0 = ggml_nrows(node->src0);
@@ -9433,6 +9458,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                 case GGML_OP_SCALE:
                     {
                         node->n_tasks = n_threads;
+                        ggml_adjust_n_tasks(node);
                     } break;
                 case GGML_OP_CPY:
                 case GGML_OP_RESHAPE:
@@ -9447,15 +9473,18 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                 case GGML_OP_SOFT_MAX:
                     {
                         node->n_tasks = n_threads;
+                        ggml_adjust_n_tasks(node);
                     } break;
                 case GGML_OP_ROPE:
                     {
                         node->n_tasks = n_threads;
+                        ggml_adjust_n_tasks(node);
                     } break;
                 case GGML_OP_CONV_1D_1S:
                 case GGML_OP_CONV_1D_2S:
                     {
                         node->n_tasks = n_threads;
+                        ggml_adjust_n_tasks(node);
 
                         GGML_ASSERT(node->src0->ne[3] == 1);
                         GGML_ASSERT(node->src1->ne[2] == 1);
@@ -9485,6 +9514,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                 case GGML_OP_FLASH_ATTN:
                     {
                         node->n_tasks = n_threads;
+                        ggml_adjust_n_tasks(node);
 
                         size_t cur = 0;
 
@@ -9505,6 +9535,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                 case GGML_OP_FLASH_FF:
                     {
                         node->n_tasks = n_threads;
+                        ggml_adjust_n_tasks(node);
 
                         size_t cur = 0;
 
@@ -9576,20 +9607,12 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
 
         struct ggml_tensor * node = cgraph->nodes[i];
 
-#ifdef GGML_COMPUTE_ENERGY_SAVING
-        if (GGML_COMPUTE_ENERGY_SAVING_LEVEL == 1) {
-            // only parallel top 3.
-            if (node->op != GGML_OP_MUL_MAT && node->op != GGML_OP_ROPE && node->op != GGML_OP_RMS_NORM) {
-                node->n_tasks = 1;
-            }
-        } else if (GGML_COMPUTE_ENERGY_SAVING_LEVEL >= 2) {
-            // no parallel
-            node->n_tasks = 1;
-        }
-#endif
+        int n_slaves = node->n_tasks - 1; // number of workers to run.
 
-        int n_slaves = node->n_tasks - 1; // number of workers to run.    
-        atomic_store(&state_shared.flag, -n_slaves);
+        if (n_slaves > 0 && GGML_ENERGY_SAVING_LEVEL > 0) {
+            int us = ggml_worker_wait_us(node);
+            atomic_store(&state_shared.flag, -((n_slaves << 8) | us));
+        }
 
         // TODO: this if be used to avoid unnecessary computations, but it needs to be improved
         //if (node->grad == NULL && node->perf_runs > 0) {
@@ -9660,7 +9683,6 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
         {
             // int64_t perf_cycles_cur  = ggml_perf_cycles()  - perf_node_start_cycles;
             // int64_t perf_time_us_cur = ggml_perf_time_us() - perf_node_start_time_us;
-
             node->perf_runs++;
             // node->perf_cycles  += perf_cycles_cur;
             // node->perf_time_us += perf_time_us_cur;
@@ -9695,8 +9717,10 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
         //         (double) cgraph->perf_time_us / 1000.0 / cgraph->perf_runs);
     }
 
-    ggml_graph_print(cgraph);
-    abort();
+    if (false) { // MUST define GGML_PERF.
+        ggml_graph_print(cgraph);
+        abort();
+    }
 }
 
 void ggml_graph_reset(struct ggml_cgraph * cgraph) {
