@@ -108,7 +108,7 @@ typedef void* thread_ret_t;
 #endif
 
 
-/*#define GGML_PERF*/
+#define GGML_PERF
 #define GGML_DEBUG 0
 #define GGML_GELU_FP16
 #define GGML_SILU_FP16
@@ -8642,6 +8642,9 @@ static void ggml_compute_forward_flash_ff(
 static void ggml_compute_forward(struct ggml_compute_params * params, struct ggml_tensor * tensor) {
     GGML_ASSERT(params);
 
+    const int64_t perf_node_start_cycles  = ggml_perf_cycles();
+    const int64_t perf_node_start_time_us = ggml_perf_time_us();
+
     switch (tensor->op) {
         case GGML_OP_DUP:
             {
@@ -8791,6 +8794,12 @@ static void ggml_compute_forward(struct ggml_compute_params * params, struct ggm
                 GGML_ASSERT(false);
             } break;
     }
+
+    int64_t perf_cycles_cur  = ggml_perf_cycles()  - perf_node_start_cycles;
+    int64_t perf_time_us_cur = ggml_perf_time_us() - perf_node_start_time_us;
+    tensor->perf_runs++;
+    tensor->perf_cycles  += perf_cycles_cur;
+    tensor->perf_time_us += perf_time_us_cur;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -9554,8 +9563,8 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
         }
     }
 
-    const int64_t perf_start_cycles  = ggml_perf_cycles();
-    const int64_t perf_start_time_us = ggml_perf_time_us();
+    // const int64_t perf_start_cycles  = ggml_perf_cycles();
+    // const int64_t perf_start_time_us = ggml_perf_time_us();
 
     for (int i = 0; i < cgraph->n_nodes; i++) {
         GGML_PRINT_DEBUG_5("%s: %d/%d\n", __func__, i, cgraph->n_nodes);
@@ -9570,8 +9579,8 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
         //    continue;
         //}
 
-        const int64_t perf_node_start_cycles  = ggml_perf_cycles();
-        const int64_t perf_node_start_time_us = ggml_perf_time_us();
+        // const int64_t perf_node_start_cycles  = ggml_perf_cycles();
+        // const int64_t perf_node_start_time_us = ggml_perf_time_us();
 
         // INIT
         struct ggml_compute_params params = {
@@ -9632,12 +9641,12 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
 
         // performance stats (node)
         {
-            int64_t perf_cycles_cur  = ggml_perf_cycles()  - perf_node_start_cycles;
-            int64_t perf_time_us_cur = ggml_perf_time_us() - perf_node_start_time_us;
+            // int64_t perf_cycles_cur  = ggml_perf_cycles()  - perf_node_start_cycles;
+            // int64_t perf_time_us_cur = ggml_perf_time_us() - perf_node_start_time_us;
 
-            node->perf_runs++;
-            node->perf_cycles  += perf_cycles_cur;
-            node->perf_time_us += perf_time_us_cur;
+            // node->perf_runs++;
+            // node->perf_cycles  += perf_cycles_cur;
+            // node->perf_time_us += perf_time_us_cur;
         }
     }
 
@@ -9654,20 +9663,23 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
 
     // performance stats (graph)
     {
-        int64_t perf_cycles_cur  = ggml_perf_cycles()  - perf_start_cycles;
-        int64_t perf_time_us_cur = ggml_perf_time_us() - perf_start_time_us;
+        // int64_t perf_cycles_cur  = ggml_perf_cycles()  - perf_start_cycles;
+        // int64_t perf_time_us_cur = ggml_perf_time_us() - perf_start_time_us;
 
-        cgraph->perf_runs++;
-        cgraph->perf_cycles  += perf_cycles_cur;
-        cgraph->perf_time_us += perf_time_us_cur;
+        // cgraph->perf_runs++;
+        // cgraph->perf_cycles  += perf_cycles_cur;
+        // cgraph->perf_time_us += perf_time_us_cur;
 
-        GGML_PRINT_DEBUG("%s: perf (%d) - cpu = %.3f / %.3f ms, wall = %.3f / %.3f ms\n",
-                __func__, cgraph->perf_runs,
-                (double) perf_cycles_cur      / (double) ggml_cycles_per_ms(),
-                (double) cgraph->perf_cycles  / (double) ggml_cycles_per_ms() / (double) cgraph->perf_runs,
-                (double) perf_time_us_cur     / 1000.0,
-                (double) cgraph->perf_time_us / 1000.0 / cgraph->perf_runs);
+        // GGML_PRINT_DEBUG("%s: perf (%d) - cpu = %.3f / %.3f ms, wall = %.3f / %.3f ms\n",
+        //         __func__, cgraph->perf_runs,
+        //         (double) perf_cycles_cur      / (double) ggml_cycles_per_ms(),
+        //         (double) cgraph->perf_cycles  / (double) ggml_cycles_per_ms() / (double) cgraph->perf_runs,
+        //         (double) perf_time_us_cur     / 1000.0,
+        //         (double) cgraph->perf_time_us / 1000.0 / cgraph->perf_runs);
     }
+
+    ggml_graph_print(cgraph);
+    abort();
 }
 
 void ggml_graph_reset(struct ggml_cgraph * cgraph) {
