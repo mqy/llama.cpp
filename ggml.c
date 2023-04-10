@@ -9264,10 +9264,10 @@ struct ggml_compute_state_shared {
 
     // synchronization primitives
     // The `flag` works as work counter + stop indicator.
-    // - compute: [1,255],  main thread stores initial value (n_tasks - 1).
+    // - compute: [1,0xFF], main thread stores initial value (n_tasks - 1).
     //   every worker decreases it by 1.
     // - pause: negative number (1 - n_tasks).
-    // - stop: 0xFF.
+    // - stop: 0x100.
     atomic_int flag;
 };
 
@@ -9290,13 +9290,13 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
     while (true) {
         int flag = atomic_load(&state_shared->flag);
         if (flag > 0) {
-            if (flag < 0xFF) { // assign works
+            if (flag < 0x100) { // assign works
                 if (state->node) { // my work
                     ggml_compute_forward(&state->params, state->node);
                     state->node = NULL;
                     atomic_fetch_sub(&state_shared->flag, 1); // done
                 }
-            } else if (flag == 0xFF) {
+            } else if (flag == 0x100) {
                 return NULL;
             } else {
                 GGML_ASSERT(false);
@@ -9327,6 +9327,7 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
 
 void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) {
     const int n_threads = cgraph->n_threads;
+    GGML_ASSERT(n_threads <= 0xFF);
 
     struct ggml_compute_state_shared state_shared = {
         .n_threads = n_threads,
@@ -9652,7 +9653,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
 
     // join thread pool
     if (n_threads > 1) {
-        atomic_store(&state_shared.flag, 0xFF);
+        atomic_store(&state_shared.flag, 0x100);
 
         for (int j = 0; j < n_threads - 1; j++) {
             int rc = ggml_thread_join(workers[j].thrd, NULL);
