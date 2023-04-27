@@ -196,6 +196,7 @@
 #define GGML_MAX_CONTEXTS      64
 #define GGML_MAX_OPT           4
 #define GGML_DEFAULT_N_THREADS 4
+#define GGML_MAX_N_THREADS     32
 
 #ifdef  __cplusplus
 extern "C" {
@@ -294,6 +295,36 @@ extern "C" {
 
     static const size_t GGML_OBJECT_SIZE = sizeof(struct ggml_object);
 
+    enum ggml_device_type {
+        GGML_DEVICE_AUTO = 0,
+        GGML_DEVICE_CPU,
+        GGML_DEVICE_GPU,
+    };
+
+    // config for one of the tensor computing stages.
+    struct gml_compute_stage {
+        // `n_tasks` is the number of parallel for a stage, allowed range.
+        // * 0 means no such stage;
+        // * 1 means run by main thread only;
+        // * > 1 means at least one worker threads involve in. It's allowed to set
+        //   a value bigger than n_threads.
+        int8_t n_tasks;
+
+        // `idle_wait` controls whether or not put all worker threads into cond wait.
+        // This SHOULD be enabled for any stage that cannot be paralleled but often
+        // run for hundreds of us.
+        // idle_wait[i] is valid only when n_tasks[i] == 1.
+        // true: wait on idle, false: keep spinning.
+        bool idle_wait;
+    };
+
+    struct gml_compute_schedule {
+        enum ggml_device_type    device;
+        int                      n_threads;
+        struct gml_compute_stage stages[3];
+        size_t                   work_size;
+    };
+
     // n-dimensional tensor
     struct ggml_tensor {
         enum ggml_type type;
@@ -316,7 +347,8 @@ extern "C" {
         struct ggml_tensor * opt[GGML_MAX_OPT];
 
         // thread scheduling
-        int n_tasks;
+
+        struct gml_compute_schedule sched;
 
         // performance
         int     perf_runs;
@@ -324,7 +356,7 @@ extern "C" {
         int64_t perf_time_us;
 
         void * data;
-        char padding[8];
+        char padding[14];
     };
 
     // computation graph
@@ -332,6 +364,7 @@ extern "C" {
         int n_nodes;
         int n_leafs;
         int n_threads;
+        enum ggml_device_type device;
 
         size_t work_size;
         struct ggml_tensor * work;

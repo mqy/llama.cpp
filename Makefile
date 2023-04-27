@@ -1,5 +1,5 @@
 # Define the default target now so that it is always the first target
-default: main quantize quantize-stats perplexity embedding vdot
+default: main quantize quantize-stats perplexity embedding vdot mulmat-q4_0-device-bench
 
 ifndef UNAME_S
 UNAME_S := $(shell uname -s)
@@ -34,7 +34,7 @@ endif
 #
 
 # keep standard at C11 and C++11
-CFLAGS   = -I.              -O3 -DNDEBUG -std=c11   -fPIC
+CFLAGS   = -I.              -O3 -DNDEBUG -std=c11   -fPIC #-DGGML_IDLE_COND_WAIT -DGGML_AUTO_DEVICE_PERF  # -DGGML_GLOBAL_THREADS # -DGGML_AUTO_DIVICE_MAX
 CXXFLAGS = -I. -I./examples -O3 -DNDEBUG -std=c++11 -fPIC
 LDFLAGS  =
 
@@ -93,8 +93,7 @@ ifneq ($(filter ppc64%,$(UNAME_M)),)
 	endif
 endif
 ifndef LLAMA_NO_ACCELERATE
-	# Mac M1 - include Accelerate framework.
-	# `-framework Accelerate` works on Mac Intel as well, with negliable performance boost (as of the predict time).
+	# Mac Intel & M1 - include Accelerate framework.
 	ifeq ($(UNAME_S),Darwin)
 		CFLAGS  += -DGGML_USE_ACCELERATE
 		LDFLAGS += -framework Accelerate
@@ -200,6 +199,9 @@ libllama.so: llama.o ggml.o $(OBJS)
 benchmark: examples/benchmark/benchmark-q4_0-matmult.c ggml.o $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ -o benchmark-q4_0-matmult $(LDFLAGS)
 	./benchmark-q4_0-matmult
+
+mulmat-q4_0-device-bench: examples/benchmark/mulmat-q4_0-device.cpp ggml.o $(OBJS)
+	$(CXX) $(CXXFLAGS) $^ -o mulmat-q4_0-device-bench $(LDFLAGS)
 
 .PHONY: tests
 tests:
