@@ -321,6 +321,7 @@ extern "C" {
     struct gml_compute_schedule {
         enum ggml_device_type    device;
         int                      n_threads;
+        bool                     mulmat_can_use_blas;
         struct gml_compute_stage stages[3];
         size_t                   work_size;
     };
@@ -356,7 +357,7 @@ extern "C" {
         int64_t perf_time_us;
 
         void * data;
-        char padding[14];
+        char padding[10];
     };
 
     // computation graph

@@ -32,8 +32,8 @@ void print_usage(char **argv) {
 }
 
 int main(int argc, char **argv) {
-  int n_threads = 4;
-  const int n_benches = 20;
+  int n_threads = 2;
+  const int n_benches = 3;
 
   // parse args.
   if (argc >= 2) {
