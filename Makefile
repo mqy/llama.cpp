@@ -1,5 +1,5 @@
 # Define the default target now so that it is always the first target
-default: main quantize quantize-stats perplexity embedding vdot mulmat-q4_0-device-bench
+default: main quantize quantize-stats perplexity embedding vdot q4_0-mulmat-bench
 
 ifndef UNAME_S
 UNAME_S := $(shell uname -s)
@@ -200,8 +200,8 @@ benchmark: examples/benchmark/benchmark-q4_0-matmult.c ggml.o $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ -o benchmark-q4_0-matmult $(LDFLAGS)
 	./benchmark-q4_0-matmult
 
-mulmat-q4_0-device-bench: examples/benchmark/mulmat-q4_0-device.cpp ggml.o $(OBJS)
-	$(CXX) $(CXXFLAGS) $^ -o mulmat-q4_0-device-bench $(LDFLAGS)
+q4_0-mulmat-bench: examples/benchmark/q4_0-mulmat-bench.c ggml.o $(OBJS)
+	$(CC) $(CFLAGS) $^ -o q4_0-mulmat-bench $(LDFLAGS)
 
 .PHONY: tests
 tests:

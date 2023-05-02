@@ -9222,15 +9222,7 @@ static void ggml_compute_forward_mul_mat(
         case GGML_TYPE_Q8_0:
         case GGML_TYPE_Q8_1:
             {
-                // TODO: remove.
-                if (params->type != GGML_TASK_PLAN) {
-                    dst->sched.device = GGML_DEVICE_CPU;
-                    ggml_compute_forward_mul_mat_q_f32(params, src0, src1, dst);
-                    dst->sched.device = GGML_DEVICE_GPU;
-                    ggml_compute_forward_mul_mat_q_f32(params, src0, src1, dst);
-                } else {
-                    ggml_compute_forward_mul_mat_q_f32(params, src0, src1, dst);
-                }
+                ggml_compute_forward_mul_mat_q_f32(params, src0, src1, dst);
             } break;
         case GGML_TYPE_F16:
             {

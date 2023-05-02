@@ -1,0 +1,3840 @@
+M:    1, N:  5120, K:  5120, blas_init:  55.923 ms, blas_compute:   4.466 ms, cpu_compute:   1.866 ms
+	1 thread: cPU win! cPU/gPU: 0.03
+	2 thread: cPU win! cPU/gPU: 0.03
+	3 thread: cPU win! cPU/gPU: 0.03
+	4 thread: cPU win! cPU/gPU: 0.03
+M:    2, N:  5120, K:  5120, blas_init:   9.905 ms, blas_compute:   8.996 ms, cpu_compute:   3.696 ms
+	1 thread: cPU win! cPU/gPU: 0.20
+	2 thread: cPU win! cPU/gPU: 0.13
+	3 thread: cPU win! cPU/gPU: 0.10
+	4 thread: cPU win! cPU/gPU: 0.08
+M:    3, N:  5120, K:  5120, blas_init:   9.887 ms, blas_compute:   9.918 ms, cpu_compute:   5.491 ms
+	1 thread: cPU win! cPU/gPU: 0.28
+	2 thread: cPU win! cPU/gPU: 0.18
+	3 thread: cPU win! cPU/gPU: 0.14
+	4 thread: cPU win! cPU/gPU: 0.11
+M:    4, N:  5120, K:  5120, blas_init:   9.892 ms, blas_compute:   7.796 ms, cpu_compute:   7.335 ms
+	1 thread: cPU win! cPU/gPU: 0.41
+	2 thread: cPU win! cPU/gPU: 0.29
+	3 thread: cPU win! cPU/gPU: 0.22
+	4 thread: cPU win! cPU/gPU: 0.18
+M:    5, N:  5120, K:  5120, blas_init:  10.036 ms, blas_compute:   9.733 ms, cpu_compute:   9.187 ms
+	1 thread: cPU win! cPU/gPU: 0.46
+	2 thread: cPU win! cPU/gPU: 0.31
+	3 thread: cPU win! cPU/gPU: 0.23
+	4 thread: cPU win! cPU/gPU: 0.19
+M:    6, N:  5120, K:  5120, blas_init:  10.102 ms, blas_compute:   9.559 ms, cpu_compute:  10.940 ms
+	1 thread: cPU win! cPU/gPU: 0.56
+	2 thread: cPU win! cPU/gPU: 0.37
+	3 thread: cPU win! cPU/gPU: 0.28
+	4 thread: cPU win! cPU/gPU: 0.23
+M:    7, N:  5120, K:  5120, blas_init:   9.946 ms, blas_compute:   9.926 ms, cpu_compute:  12.643 ms
+	1 thread: cPU win! cPU/gPU: 0.64
+	2 thread: cPU win! cPU/gPU: 0.42
+	3 thread: cPU win! cPU/gPU: 0.32
+	4 thread: cPU win! cPU/gPU: 0.25
+M:    8, N:  5120, K:  5120, blas_init:   9.832 ms, blas_compute:  10.501 ms, cpu_compute:  14.591 ms
+	1 thread: cPU win! cPU/gPU: 0.72
+	2 thread: cPU win! cPU/gPU: 0.47
+	3 thread: cPU win! cPU/gPU: 0.35
+	4 thread: cPU win! cPU/gPU: 0.28
+M:    9, N:  5120, K:  5120, blas_init:   9.943 ms, blas_compute:   9.107 ms, cpu_compute:  16.269 ms
+	1 thread: cPU win! cPU/gPU: 0.85
+	2 thread: cPU win! cPU/gPU: 0.58
+	3 thread: cPU win! cPU/gPU: 0.44
+	4 thread: cPU win! cPU/gPU: 0.35
+M:   10, N:  5120, K:  5120, blas_init:   9.901 ms, blas_compute:  10.708 ms, cpu_compute:  18.048 ms
+	1 thread: cPU win! cPU/gPU: 0.88
+	2 thread: cPU win! cPU/gPU: 0.58
+	3 thread: cPU win! cPU/gPU: 0.43
+	4 thread: cPU win! cPU/gPU: 0.34
+M:   11, N:  5120, K:  5120, blas_init:   9.771 ms, blas_compute:   9.438 ms, cpu_compute:  19.547 ms
+	1 thread: gPU win! cPU/gPU: 1.02
+	2 thread: cPU win! cPU/gPU: 0.68
+	3 thread: cPU win! cPU/gPU: 0.51
+	4 thread: cPU win! cPU/gPU: 0.41
+M:   12, N:  5120, K:  5120, blas_init:   9.786 ms, blas_compute:   8.156 ms, cpu_compute:  21.214 ms
+	1 thread: gPU win! cPU/gPU: 1.18
+	2 thread: cPU win! cPU/gPU: 0.81
+	3 thread: cPU win! cPU/gPU: 0.62
+	4 thread: cPU win! cPU/gPU: 0.50
+M:   13, N:  5120, K:  5120, blas_init:   9.794 ms, blas_compute:  10.909 ms, cpu_compute:  23.251 ms
+	1 thread: gPU win! cPU/gPU: 1.12
+	2 thread: cPU win! cPU/gPU: 0.74
+	3 thread: cPU win! cPU/gPU: 0.55
+	4 thread: cPU win! cPU/gPU: 0.44
+M:   14, N:  5120, K:  5120, blas_init:   9.834 ms, blas_compute:   8.364 ms, cpu_compute:  24.337 ms
+	1 thread: gPU win! cPU/gPU: 1.34
+	2 thread: cPU win! cPU/gPU: 0.92
+	3 thread: cPU win! cPU/gPU: 0.70
+	4 thread: cPU win! cPU/gPU: 0.56
+M:   15, N:  5120, K:  5120, blas_init:   9.566 ms, blas_compute:   9.521 ms, cpu_compute:  25.902 ms
+	1 thread: gPU win! cPU/gPU: 1.36
+	2 thread: cPU win! cPU/gPU: 0.91
+	3 thread: cPU win! cPU/gPU: 0.68
+	4 thread: cPU win! cPU/gPU: 0.54
+M:   16, N:  5120, K:  5120, blas_init:   9.656 ms, blas_compute:  10.414 ms, cpu_compute:  27.774 ms
+	1 thread: gPU win! cPU/gPU: 1.38
+	2 thread: cPU win! cPU/gPU: 0.91
+	3 thread: cPU win! cPU/gPU: 0.68
+	4 thread: cPU win! cPU/gPU: 0.54
+M:   17, N:  5120, K:  5120, blas_init:   9.614 ms, blas_compute:  10.503 ms, cpu_compute:  29.057 ms
+	1 thread: gPU win! cPU/gPU: 1.44
+	2 thread: cPU win! cPU/gPU: 0.95
+	3 thread: cPU win! cPU/gPU: 0.71
+	4 thread: cPU win! cPU/gPU: 0.56
+M:   18, N:  5120, K:  5120, blas_init:   9.572 ms, blas_compute:  10.717 ms, cpu_compute:  30.811 ms
+	1 thread: gPU win! cPU/gPU: 1.52
+	2 thread: cPU win! cPU/gPU: 0.99
+	3 thread: cPU win! cPU/gPU: 0.74
+	4 thread: cPU win! cPU/gPU: 0.59
+M:   19, N:  5120, K:  5120, blas_init:   9.881 ms, blas_compute:  10.492 ms, cpu_compute:  31.752 ms
+	1 thread: gPU win! cPU/gPU: 1.56
+	2 thread: gPU win! cPU/gPU: 1.03
+	3 thread: cPU win! cPU/gPU: 0.77
+	4 thread: cPU win! cPU/gPU: 0.61
+M:   20, N:  5120, K:  5120, blas_init:   9.616 ms, blas_compute:  10.941 ms, cpu_compute:  33.679 ms
+	1 thread: gPU win! cPU/gPU: 1.64
+	2 thread: gPU win! cPU/gPU: 1.07
+	3 thread: cPU win! cPU/gPU: 0.79
+	4 thread: cPU win! cPU/gPU: 0.63
+M:   21, N:  5120, K:  5120, blas_init:   9.896 ms, blas_compute:   9.697 ms, cpu_compute:  34.835 ms
+	1 thread: gPU win! cPU/gPU: 1.78
+	2 thread: gPU win! cPU/gPU: 1.19
+	3 thread: cPU win! cPU/gPU: 0.89
+	4 thread: cPU win! cPU/gPU: 0.72
+M:   22, N:  5120, K:  5120, blas_init:   9.607 ms, blas_compute:  10.904 ms, cpu_compute:  36.785 ms
+	1 thread: gPU win! cPU/gPU: 1.79
+	2 thread: gPU win! cPU/gPU: 1.17
+	3 thread: cPU win! cPU/gPU: 0.87
+	4 thread: cPU win! cPU/gPU: 0.69
+M:   23, N:  5120, K:  5120, blas_init:   9.684 ms, blas_compute:   9.906 ms, cpu_compute:  37.980 ms
+	1 thread: gPU win! cPU/gPU: 1.94
+	2 thread: gPU win! cPU/gPU: 1.29
+	3 thread: cPU win! cPU/gPU: 0.96
+	4 thread: cPU win! cPU/gPU: 0.77
+M:   24, N:  5120, K:  5120, blas_init:   9.933 ms, blas_compute:  10.077 ms, cpu_compute:  39.507 ms
+	1 thread: gPU win! cPU/gPU: 1.97
+	2 thread: gPU win! cPU/gPU: 1.31
+	3 thread: cPU win! cPU/gPU: 0.98
+	4 thread: cPU win! cPU/gPU: 0.79
+M:   25, N:  5120, K:  5120, blas_init:  10.189 ms, blas_compute:  11.268 ms, cpu_compute:  44.738 ms
+	1 thread: gPU win! cPU/gPU: 2.09
+	2 thread: gPU win! cPU/gPU: 1.37
+	3 thread: gPU win! cPU/gPU: 1.02
+	4 thread: cPU win! cPU/gPU: 0.81
+M:   26, N:  5120, K:  5120, blas_init:  10.538 ms, blas_compute:  11.258 ms, cpu_compute:  43.229 ms
+	1 thread: gPU win! cPU/gPU: 1.98
+	2 thread: gPU win! cPU/gPU: 1.31
+	3 thread: cPU win! cPU/gPU: 0.98
+	4 thread: cPU win! cPU/gPU: 0.78
+M:   27, N:  5120, K:  5120, blas_init:   9.526 ms, blas_compute:  11.510 ms, cpu_compute:  43.610 ms
+	1 thread: gPU win! cPU/gPU: 2.07
+	2 thread: gPU win! cPU/gPU: 1.34
+	3 thread: cPU win! cPU/gPU: 0.99
+	4 thread: cPU win! cPU/gPU: 0.78
+M:   28, N:  5120, K:  5120, blas_init:   9.616 ms, blas_compute:   9.658 ms, cpu_compute:  43.375 ms
+	1 thread: gPU win! cPU/gPU: 2.25
+	2 thread: gPU win! cPU/gPU: 1.50
+	3 thread: gPU win! cPU/gPU: 1.12
+	4 thread: cPU win! cPU/gPU: 0.90
+M:   29, N:  5120, K:  5120, blas_init:   9.697 ms, blas_compute:  10.693 ms, cpu_compute:  44.960 ms
+	1 thread: gPU win! cPU/gPU: 2.21
+	2 thread: gPU win! cPU/gPU: 1.45
+	3 thread: gPU win! cPU/gPU: 1.08
+	4 thread: cPU win! cPU/gPU: 0.86
+M:   30, N:  5120, K:  5120, blas_init:   9.694 ms, blas_compute:  10.623 ms, cpu_compute:  46.388 ms
+	1 thread: gPU win! cPU/gPU: 2.28
+	2 thread: gPU win! cPU/gPU: 1.50
+	3 thread: gPU win! cPU/gPU: 1.12
+	4 thread: cPU win! cPU/gPU: 0.89
+M:   31, N:  5120, K:  5120, blas_init:   9.624 ms, blas_compute:  10.507 ms, cpu_compute:  48.088 ms
+	1 thread: gPU win! cPU/gPU: 2.39
+	2 thread: gPU win! cPU/gPU: 1.57
+	3 thread: gPU win! cPU/gPU: 1.17
+	4 thread: cPU win! cPU/gPU: 0.93
+M:   32, N:  5120, K:  5120, blas_init:   9.532 ms, blas_compute:  11.532 ms, cpu_compute:  49.617 ms
+	1 thread: gPU win! cPU/gPU: 2.36
+	2 thread: gPU win! cPU/gPU: 1.52
+	3 thread: gPU win! cPU/gPU: 1.12
+	4 thread: cPU win! cPU/gPU: 0.89
+M:   33, N:  5120, K:  5120, blas_init:   9.710 ms, blas_compute:  11.133 ms, cpu_compute:  50.582 ms
+	1 thread: gPU win! cPU/gPU: 2.43
+	2 thread: gPU win! cPU/gPU: 1.58
+	3 thread: gPU win! cPU/gPU: 1.17
+	4 thread: cPU win! cPU/gPU: 0.93
+M:   34, N:  5120, K:  5120, blas_init:   9.618 ms, blas_compute:  11.328 ms, cpu_compute:  51.649 ms
+	1 thread: gPU win! cPU/gPU: 2.47
+	2 thread: gPU win! cPU/gPU: 1.60
+	3 thread: gPU win! cPU/gPU: 1.18
+	4 thread: cPU win! cPU/gPU: 0.94
+M:   35, N:  5120, K:  5120, blas_init:   9.570 ms, blas_compute:  11.215 ms, cpu_compute:  52.356 ms
+	1 thread: gPU win! cPU/gPU: 2.52
+	2 thread: gPU win! cPU/gPU: 1.64
+	3 thread: gPU win! cPU/gPU: 1.21
+	4 thread: cPU win! cPU/gPU: 0.96
+M:   36, N:  5120, K:  5120, blas_init:   9.490 ms, blas_compute:  11.848 ms, cpu_compute:  54.838 ms
+	1 thread: gPU win! cPU/gPU: 2.57
+	2 thread: gPU win! cPU/gPU: 1.65
+	3 thread: gPU win! cPU/gPU: 1.22
+	4 thread: cPU win! cPU/gPU: 0.96
+M:   37, N:  5120, K:  5120, blas_init:   9.721 ms, blas_compute:  11.406 ms, cpu_compute:  56.194 ms
+	1 thread: gPU win! cPU/gPU: 2.66
+	2 thread: gPU win! cPU/gPU: 1.73
+	3 thread: gPU win! cPU/gPU: 1.28
+	4 thread: gPU win! cPU/gPU: 1.02
+M:   38, N:  5120, K:  5120, blas_init:   9.780 ms, blas_compute:   9.954 ms, cpu_compute:  56.040 ms
+	1 thread: gPU win! cPU/gPU: 2.84
+	2 thread: gPU win! cPU/gPU: 1.89
+	3 thread: gPU win! cPU/gPU: 1.41
+	4 thread: gPU win! cPU/gPU: 1.13
+M:   39, N:  5120, K:  5120, blas_init:   9.678 ms, blas_compute:  10.171 ms, cpu_compute:  58.497 ms
+	1 thread: gPU win! cPU/gPU: 2.95
+	2 thread: gPU win! cPU/gPU: 1.95
+	3 thread: gPU win! cPU/gPU: 1.46
+	4 thread: gPU win! cPU/gPU: 1.16
+M:   40, N:  5120, K:  5120, blas_init:   9.705 ms, blas_compute:  11.931 ms, cpu_compute:  59.652 ms
+	1 thread: gPU win! cPU/gPU: 2.76
+	2 thread: gPU win! cPU/gPU: 1.78
+	3 thread: gPU win! cPU/gPU: 1.31
+	4 thread: gPU win! cPU/gPU: 1.04
+M:   41, N:  5120, K:  5120, blas_init:   9.662 ms, blas_compute:  11.544 ms, cpu_compute:  59.983 ms
+	1 thread: gPU win! cPU/gPU: 2.83
+	2 thread: gPU win! cPU/gPU: 1.83
+	3 thread: gPU win! cPU/gPU: 1.35
+	4 thread: gPU win! cPU/gPU: 1.07
+M:   42, N:  5120, K:  5120, blas_init:   9.746 ms, blas_compute:  10.382 ms, cpu_compute:  60.909 ms
+	1 thread: gPU win! cPU/gPU: 3.03
+	2 thread: gPU win! cPU/gPU: 2.00
+	3 thread: gPU win! cPU/gPU: 1.49
+	4 thread: gPU win! cPU/gPU: 1.19
+M:   43, N:  5120, K:  5120, blas_init:   9.653 ms, blas_compute:  10.303 ms, cpu_compute:  62.754 ms
+	1 thread: gPU win! cPU/gPU: 3.14
+	2 thread: gPU win! cPU/gPU: 2.07
+	3 thread: gPU win! cPU/gPU: 1.55
+	4 thread: gPU win! cPU/gPU: 1.23
+M:   44, N:  5120, K:  5120, blas_init:   9.754 ms, blas_compute:  10.689 ms, cpu_compute:  63.883 ms
+	1 thread: gPU win! cPU/gPU: 3.12
+	2 thread: gPU win! cPU/gPU: 2.05
+	3 thread: gPU win! cPU/gPU: 1.53
+	4 thread: gPU win! cPU/gPU: 1.22
+M:   45, N:  5120, K:  5120, blas_init:   9.775 ms, blas_compute:  12.251 ms, cpu_compute:  64.974 ms
+	1 thread: gPU win! cPU/gPU: 2.95
+	2 thread: gPU win! cPU/gPU: 1.90
+	3 thread: gPU win! cPU/gPU: 1.40
+	4 thread: gPU win! cPU/gPU: 1.11
+M:   46, N:  5120, K:  5120, blas_init:   9.472 ms, blas_compute:  13.102 ms, cpu_compute:  66.367 ms
+	1 thread: gPU win! cPU/gPU: 2.94
+	2 thread: gPU win! cPU/gPU: 1.86
+	3 thread: gPU win! cPU/gPU: 1.36
+	4 thread: gPU win! cPU/gPU: 1.07
+M:   47, N:  5120, K:  5120, blas_init:   9.717 ms, blas_compute:  11.528 ms, cpu_compute:  66.899 ms
+	1 thread: gPU win! cPU/gPU: 3.15
+	2 thread: gPU win! cPU/gPU: 2.04
+	3 thread: gPU win! cPU/gPU: 1.51
+	4 thread: gPU win! cPU/gPU: 1.20
+M:   48, N:  5120, K:  5120, blas_init:   9.513 ms, blas_compute:  12.556 ms, cpu_compute:  69.343 ms
+	1 thread: gPU win! cPU/gPU: 3.14
+	2 thread: gPU win! cPU/gPU: 2.00
+	3 thread: gPU win! cPU/gPU: 1.47
+	4 thread: gPU win! cPU/gPU: 1.16
+M:   49, N:  5120, K:  5120, blas_init:   9.727 ms, blas_compute:  11.359 ms, cpu_compute:  69.770 ms
+	1 thread: gPU win! cPU/gPU: 3.31
+	2 thread: gPU win! cPU/gPU: 2.15
+	3 thread: gPU win! cPU/gPU: 1.59
+	4 thread: gPU win! cPU/gPU: 1.26
+M:   50, N:  5120, K:  5120, blas_init:   9.544 ms, blas_compute:  12.534 ms, cpu_compute:  70.803 ms
+	1 thread: gPU win! cPU/gPU: 3.21
+	2 thread: gPU win! cPU/gPU: 2.05
+	3 thread: gPU win! cPU/gPU: 1.50
+	4 thread: gPU win! cPU/gPU: 1.19
+M:   51, N:  5120, K:  5120, blas_init:   9.519 ms, blas_compute:  12.392 ms, cpu_compute:  72.491 ms
+	1 thread: gPU win! cPU/gPU: 3.31
+	2 thread: gPU win! cPU/gPU: 2.11
+	3 thread: gPU win! cPU/gPU: 1.55
+	4 thread: gPU win! cPU/gPU: 1.23
+M:   52, N:  5120, K:  5120, blas_init:   9.521 ms, blas_compute:  11.881 ms, cpu_compute:  72.836 ms
+	1 thread: gPU win! cPU/gPU: 3.40
+	2 thread: gPU win! cPU/gPU: 2.19
+	3 thread: gPU win! cPU/gPU: 1.61
+	4 thread: gPU win! cPU/gPU: 1.28
+M:   53, N:  5120, K:  5120, blas_init:   9.547 ms, blas_compute:  13.008 ms, cpu_compute:  74.484 ms
+	1 thread: gPU win! cPU/gPU: 3.30
+	2 thread: gPU win! cPU/gPU: 2.09
+	3 thread: gPU win! cPU/gPU: 1.53
+	4 thread: gPU win! cPU/gPU: 1.21
+M:   54, N:  5120, K:  5120, blas_init:   9.798 ms, blas_compute:  12.836 ms, cpu_compute:  75.974 ms
+	1 thread: gPU win! cPU/gPU: 3.36
+	2 thread: gPU win! cPU/gPU: 2.14
+	3 thread: gPU win! cPU/gPU: 1.57
+	4 thread: gPU win! cPU/gPU: 1.24
+M:   55, N:  5120, K:  5120, blas_init:   9.528 ms, blas_compute:  12.554 ms, cpu_compute:  76.805 ms
+	1 thread: gPU win! cPU/gPU: 3.48
+	2 thread: gPU win! cPU/gPU: 2.22
+	3 thread: gPU win! cPU/gPU: 1.63
+	4 thread: gPU win! cPU/gPU: 1.29
+M:   56, N:  5120, K:  5120, blas_init:   9.464 ms, blas_compute:  12.168 ms, cpu_compute:  78.720 ms
+	1 thread: gPU win! cPU/gPU: 3.64
+	2 thread: gPU win! cPU/gPU: 2.33
+	3 thread: gPU win! cPU/gPU: 1.71
+	4 thread: gPU win! cPU/gPU: 1.35
+M:   57, N:  5120, K:  5120, blas_init:   9.583 ms, blas_compute:  12.539 ms, cpu_compute:  80.294 ms
+	1 thread: gPU win! cPU/gPU: 3.63
+	2 thread: gPU win! cPU/gPU: 2.32
+	3 thread: gPU win! cPU/gPU: 1.70
+	4 thread: gPU win! cPU/gPU: 1.34
+M:   58, N:  5120, K:  5120, blas_init:   9.568 ms, blas_compute:  13.330 ms, cpu_compute:  80.611 ms
+	1 thread: gPU win! cPU/gPU: 3.52
+	2 thread: gPU win! cPU/gPU: 2.23
+	3 thread: gPU win! cPU/gPU: 1.63
+	4 thread: gPU win! cPU/gPU: 1.28
+M:   59, N:  5120, K:  5120, blas_init:   9.596 ms, blas_compute:  12.611 ms, cpu_compute:  82.675 ms
+	1 thread: gPU win! cPU/gPU: 3.72
+	2 thread: gPU win! cPU/gPU: 2.37
+	3 thread: gPU win! cPU/gPU: 1.74
+	4 thread: gPU win! cPU/gPU: 1.38
+M:   60, N:  5120, K:  5120, blas_init:   9.731 ms, blas_compute:  12.333 ms, cpu_compute:  84.753 ms
+	1 thread: gPU win! cPU/gPU: 3.84
+	2 thread: gPU win! cPU/gPU: 2.46
+	3 thread: gPU win! cPU/gPU: 1.81
+	4 thread: gPU win! cPU/gPU: 1.43
+M:   61, N:  5120, K:  5120, blas_init:   9.846 ms, blas_compute:  15.101 ms, cpu_compute:  86.272 ms
+	1 thread: gPU win! cPU/gPU: 3.46
+	2 thread: gPU win! cPU/gPU: 2.15
+	3 thread: gPU win! cPU/gPU: 1.56
+	4 thread: gPU win! cPU/gPU: 1.23
+M:   62, N:  5120, K:  5120, blas_init:   9.508 ms, blas_compute:  13.113 ms, cpu_compute:  85.398 ms
+	1 thread: gPU win! cPU/gPU: 3.78
+	2 thread: gPU win! cPU/gPU: 2.39
+	3 thread: gPU win! cPU/gPU: 1.75
+	4 thread: gPU win! cPU/gPU: 1.38
+M:   63, N:  5120, K:  5120, blas_init:   9.477 ms, blas_compute:  13.418 ms, cpu_compute:  87.913 ms
+	1 thread: gPU win! cPU/gPU: 3.84
+	2 thread: gPU win! cPU/gPU: 2.42
+	3 thread: gPU win! cPU/gPU: 1.77
+	4 thread: gPU win! cPU/gPU: 1.39
+M:   64, N:  5120, K:  5120, blas_init:   9.575 ms, blas_compute:  14.279 ms, cpu_compute:  89.016 ms
+	1 thread: gPU win! cPU/gPU: 3.73
+	2 thread: gPU win! cPU/gPU: 2.33
+	3 thread: gPU win! cPU/gPU: 1.70
+	4 thread: gPU win! cPU/gPU: 1.33
+M:   65, N:  5120, K:  5120, blas_init:   9.472 ms, blas_compute:  12.869 ms, cpu_compute:  88.990 ms
+	1 thread: gPU win! cPU/gPU: 3.98
+	2 thread: gPU win! cPU/gPU: 2.53
+	3 thread: gPU win! cPU/gPU: 1.85
+	4 thread: gPU win! cPU/gPU: 1.46
+M:   66, N:  5120, K:  5120, blas_init:   9.467 ms, blas_compute:  13.415 ms, cpu_compute:  91.601 ms
+	1 thread: gPU win! cPU/gPU: 4.00
+	2 thread: gPU win! cPU/gPU: 2.52
+	3 thread: gPU win! cPU/gPU: 1.84
+	4 thread: gPU win! cPU/gPU: 1.45
+M:   67, N:  5120, K:  5120, blas_init:   9.435 ms, blas_compute:  13.312 ms, cpu_compute:  92.026 ms
+	1 thread: gPU win! cPU/gPU: 4.05
+	2 thread: gPU win! cPU/gPU: 2.55
+	3 thread: gPU win! cPU/gPU: 1.86
+	4 thread: gPU win! cPU/gPU: 1.47
+M:   68, N:  5120, K:  5120, blas_init:   9.440 ms, blas_compute:  12.978 ms, cpu_compute:  93.643 ms
+	1 thread: gPU win! cPU/gPU: 4.18
+	2 thread: gPU win! cPU/gPU: 2.65
+	3 thread: gPU win! cPU/gPU: 1.94
+	4 thread: gPU win! cPU/gPU: 1.53
+M:   69, N:  5120, K:  5120, blas_init:   9.708 ms, blas_compute:  14.126 ms, cpu_compute:  95.383 ms
+	1 thread: gPU win! cPU/gPU: 4.00
+	2 thread: gPU win! cPU/gPU: 2.51
+	3 thread: gPU win! cPU/gPU: 1.83
+	4 thread: gPU win! cPU/gPU: 1.44
+M:   70, N:  5120, K:  5120, blas_init:   9.447 ms, blas_compute:  13.918 ms, cpu_compute:  95.277 ms
+	1 thread: gPU win! cPU/gPU: 4.08
+	2 thread: gPU win! cPU/gPU: 2.56
+	3 thread: gPU win! cPU/gPU: 1.86
+	4 thread: gPU win! cPU/gPU: 1.46
+M:   71, N:  5120, K:  5120, blas_init:   9.467 ms, blas_compute:  14.233 ms, cpu_compute:  97.031 ms
+	1 thread: gPU win! cPU/gPU: 4.09
+	2 thread: gPU win! cPU/gPU: 2.56
+	3 thread: gPU win! cPU/gPU: 1.86
+	4 thread: gPU win! cPU/gPU: 1.46
+M:   72, N:  5120, K:  5120, blas_init:   9.674 ms, blas_compute:  13.882 ms, cpu_compute:  98.964 ms
+	1 thread: gPU win! cPU/gPU: 4.20
+	2 thread: gPU win! cPU/gPU: 2.64
+	3 thread: gPU win! cPU/gPU: 1.93
+	4 thread: gPU win! cPU/gPU: 1.52
+M:   73, N:  5120, K:  5120, blas_init:   9.546 ms, blas_compute:  14.483 ms, cpu_compute:  99.906 ms
+	1 thread: gPU win! cPU/gPU: 4.16
+	2 thread: gPU win! cPU/gPU: 2.59
+	3 thread: gPU win! cPU/gPU: 1.89
+	4 thread: gPU win! cPU/gPU: 1.48
+M:   74, N:  5120, K:  5120, blas_init:   9.447 ms, blas_compute:  14.548 ms, cpu_compute: 101.420 ms
+	1 thread: gPU win! cPU/gPU: 4.23
+	2 thread: gPU win! cPU/gPU: 2.63
+	3 thread: gPU win! cPU/gPU: 1.91
+	4 thread: gPU win! cPU/gPU: 1.50
+M:   75, N:  5120, K:  5120, blas_init:   9.566 ms, blas_compute:  14.091 ms, cpu_compute: 101.949 ms
+	1 thread: gPU win! cPU/gPU: 4.31
+	2 thread: gPU win! cPU/gPU: 2.70
+	3 thread: gPU win! cPU/gPU: 1.97
+	4 thread: gPU win! cPU/gPU: 1.55
+M:   76, N:  5120, K:  5120, blas_init:   9.644 ms, blas_compute:  14.199 ms, cpu_compute: 104.275 ms
+	1 thread: gPU win! cPU/gPU: 4.37
+	2 thread: gPU win! cPU/gPU: 2.74
+	3 thread: gPU win! cPU/gPU: 2.00
+	4 thread: gPU win! cPU/gPU: 1.57
+M:   77, N:  5120, K:  5120, blas_init:   9.449 ms, blas_compute:  14.336 ms, cpu_compute: 104.719 ms
+	1 thread: gPU win! cPU/gPU: 4.40
+	2 thread: gPU win! cPU/gPU: 2.75
+	3 thread: gPU win! cPU/gPU: 2.00
+	4 thread: gPU win! cPU/gPU: 1.57
+M:   78, N:  5120, K:  5120, blas_init:   9.758 ms, blas_compute:  13.860 ms, cpu_compute: 106.693 ms
+	1 thread: gPU win! cPU/gPU: 4.52
+	2 thread: gPU win! cPU/gPU: 2.85
+	3 thread: gPU win! cPU/gPU: 2.08
+	4 thread: gPU win! cPU/gPU: 1.64
+M:   79, N:  5120, K:  5120, blas_init:   9.501 ms, blas_compute:  16.676 ms, cpu_compute: 107.943 ms
+	1 thread: gPU win! cPU/gPU: 4.12
+	2 thread: gPU win! cPU/gPU: 2.52
+	3 thread: gPU win! cPU/gPU: 1.81
+	4 thread: gPU win! cPU/gPU: 1.42
+M:   80, N:  5120, K:  5120, blas_init:   9.725 ms, blas_compute:  14.626 ms, cpu_compute: 109.793 ms
+	1 thread: gPU win! cPU/gPU: 4.51
+	2 thread: gPU win! cPU/gPU: 2.82
+	3 thread: gPU win! cPU/gPU: 2.05
+	4 thread: gPU win! cPU/gPU: 1.61
+M:   81, N:  5120, K:  5120, blas_init:   9.545 ms, blas_compute:  14.916 ms, cpu_compute: 111.997 ms
+	1 thread: gPU win! cPU/gPU: 4.58
+	2 thread: gPU win! cPU/gPU: 2.84
+	3 thread: gPU win! cPU/gPU: 2.06
+	4 thread: gPU win! cPU/gPU: 1.62
+M:   82, N:  5120, K:  5120, blas_init:   9.532 ms, blas_compute:  15.051 ms, cpu_compute: 110.998 ms
+	1 thread: gPU win! cPU/gPU: 4.52
+	2 thread: gPU win! cPU/gPU: 2.80
+	3 thread: gPU win! cPU/gPU: 2.03
+	4 thread: gPU win! cPU/gPU: 1.59
+M:   83, N:  5120, K:  5120, blas_init:   9.658 ms, blas_compute:  15.509 ms, cpu_compute: 114.018 ms
+	1 thread: gPU win! cPU/gPU: 4.53
+	2 thread: gPU win! cPU/gPU: 2.80
+	3 thread: gPU win! cPU/gPU: 2.03
+	4 thread: gPU win! cPU/gPU: 1.59
+M:   84, N:  5120, K:  5120, blas_init:   9.530 ms, blas_compute:  16.004 ms, cpu_compute: 116.473 ms
+	1 thread: gPU win! cPU/gPU: 4.56
+	2 thread: gPU win! cPU/gPU: 2.80
+	3 thread: gPU win! cPU/gPU: 2.02
+	4 thread: gPU win! cPU/gPU: 1.58
+M:   85, N:  5120, K:  5120, blas_init:   9.577 ms, blas_compute:  16.017 ms, cpu_compute: 114.905 ms
+	1 thread: gPU win! cPU/gPU: 4.49
+	2 thread: gPU win! cPU/gPU: 2.76
+	3 thread: gPU win! cPU/gPU: 1.99
+	4 thread: gPU win! cPU/gPU: 1.56
+M:   86, N:  5120, K:  5120, blas_init:   9.591 ms, blas_compute:  14.708 ms, cpu_compute: 117.889 ms
+	1 thread: gPU win! cPU/gPU: 4.85
+	2 thread: gPU win! cPU/gPU: 3.02
+	3 thread: gPU win! cPU/gPU: 2.19
+	4 thread: gPU win! cPU/gPU: 1.72
+M:   87, N:  5120, K:  5120, blas_init:   9.473 ms, blas_compute:  15.395 ms, cpu_compute: 119.215 ms
+	1 thread: gPU win! cPU/gPU: 4.79
+	2 thread: gPU win! cPU/gPU: 2.96
+	3 thread: gPU win! cPU/gPU: 2.14
+	4 thread: gPU win! cPU/gPU: 1.68
+M:   88, N:  5120, K:  5120, blas_init:   9.496 ms, blas_compute:  15.351 ms, cpu_compute: 119.464 ms
+	1 thread: gPU win! cPU/gPU: 4.81
+	2 thread: gPU win! cPU/gPU: 2.97
+	3 thread: gPU win! cPU/gPU: 2.15
+	4 thread: gPU win! cPU/gPU: 1.68
+M:   89, N:  5120, K:  5120, blas_init:   9.691 ms, blas_compute:  15.997 ms, cpu_compute: 121.355 ms
+	1 thread: gPU win! cPU/gPU: 4.72
+	2 thread: gPU win! cPU/gPU: 2.91
+	3 thread: gPU win! cPU/gPU: 2.10
+	4 thread: gPU win! cPU/gPU: 1.65
+M:   90, N:  5120, K:  5120, blas_init:   9.474 ms, blas_compute:  14.845 ms, cpu_compute: 122.188 ms
+	1 thread: gPU win! cPU/gPU: 5.02
+	2 thread: gPU win! cPU/gPU: 3.12
+	3 thread: gPU win! cPU/gPU: 2.26
+	4 thread: gPU win! cPU/gPU: 1.77
+M:   91, N:  5120, K:  5120, blas_init:   9.759 ms, blas_compute:  16.027 ms, cpu_compute: 123.438 ms
+	1 thread: gPU win! cPU/gPU: 4.79
+	2 thread: gPU win! cPU/gPU: 2.95
+	3 thread: gPU win! cPU/gPU: 2.13
+	4 thread: gPU win! cPU/gPU: 1.67
+M:   92, N:  5120, K:  5120, blas_init:   9.514 ms, blas_compute:  15.866 ms, cpu_compute: 126.316 ms
+	1 thread: gPU win! cPU/gPU: 4.98
+	2 thread: gPU win! cPU/gPU: 3.06
+	3 thread: gPU win! cPU/gPU: 2.21
+	4 thread: gPU win! cPU/gPU: 1.73
+M:   93, N:  5120, K:  5120, blas_init:   9.075 ms, blas_compute:  15.106 ms, cpu_compute: 122.919 ms
+	1 thread: gPU win! cPU/gPU: 5.08
+	2 thread: gPU win! cPU/gPU: 3.13
+	3 thread: gPU win! cPU/gPU: 2.26
+	4 thread: gPU win! cPU/gPU: 1.77
+M:   94, N:  5120, K:  5120, blas_init:   9.030 ms, blas_compute:  14.573 ms, cpu_compute: 124.375 ms
+	1 thread: gPU win! cPU/gPU: 5.27
+	2 thread: gPU win! cPU/gPU: 3.26
+	3 thread: gPU win! cPU/gPU: 2.36
+	4 thread: gPU win! cPU/gPU: 1.85
+M:   95, N:  5120, K:  5120, blas_init:   9.028 ms, blas_compute:  15.609 ms, cpu_compute: 125.713 ms
+	1 thread: gPU win! cPU/gPU: 5.10
+	2 thread: gPU win! cPU/gPU: 3.12
+	3 thread: gPU win! cPU/gPU: 2.25
+	4 thread: gPU win! cPU/gPU: 1.76
+M:   96, N:  5120, K:  5120, blas_init:   9.046 ms, blas_compute:  16.351 ms, cpu_compute: 127.244 ms
+	1 thread: gPU win! cPU/gPU: 5.01
+	2 thread: gPU win! cPU/gPU: 3.05
+	3 thread: gPU win! cPU/gPU: 2.19
+	4 thread: gPU win! cPU/gPU: 1.71
+M:   97, N:  5120, K:  5120, blas_init:   9.082 ms, blas_compute:  16.060 ms, cpu_compute: 128.022 ms
+	1 thread: gPU win! cPU/gPU: 5.09
+	2 thread: gPU win! cPU/gPU: 3.11
+	3 thread: gPU win! cPU/gPU: 2.24
+	4 thread: gPU win! cPU/gPU: 1.75
+M:   98, N:  5120, K:  5120, blas_init:   9.106 ms, blas_compute:  15.593 ms, cpu_compute: 130.581 ms
+	1 thread: gPU win! cPU/gPU: 5.29
+	2 thread: gPU win! cPU/gPU: 3.24
+	3 thread: gPU win! cPU/gPU: 2.34
+	4 thread: gPU win! cPU/gPU: 1.83
+M:   99, N:  5120, K:  5120, blas_init:   9.019 ms, blas_compute:  15.689 ms, cpu_compute: 130.360 ms
+	1 thread: gPU win! cPU/gPU: 5.28
+	2 thread: gPU win! cPU/gPU: 3.23
+	3 thread: gPU win! cPU/gPU: 2.32
+	4 thread: gPU win! cPU/gPU: 1.82
+M:  100, N:  5120, K:  5120, blas_init:   8.889 ms, blas_compute:  17.020 ms, cpu_compute: 133.645 ms
+	1 thread: gPU win! cPU/gPU: 5.16
+	2 thread: gPU win! cPU/gPU: 3.11
+	3 thread: gPU win! cPU/gPU: 2.23
+	4 thread: gPU win! cPU/gPU: 1.74
+M:  101, N:  5120, K:  5120, blas_init:   9.029 ms, blas_compute:  16.964 ms, cpu_compute: 134.149 ms
+	1 thread: gPU win! cPU/gPU: 5.16
+	2 thread: gPU win! cPU/gPU: 3.12
+	3 thread: gPU win! cPU/gPU: 2.24
+	4 thread: gPU win! cPU/gPU: 1.74
+M:  102, N:  5120, K:  5120, blas_init:   9.019 ms, blas_compute:  17.229 ms, cpu_compute: 134.011 ms
+	1 thread: gPU win! cPU/gPU: 5.11
+	2 thread: gPU win! cPU/gPU: 3.08
+	3 thread: gPU win! cPU/gPU: 2.21
+	4 thread: gPU win! cPU/gPU: 1.72
+M:  103, N:  5120, K:  5120, blas_init:   9.054 ms, blas_compute:  17.473 ms, cpu_compute: 135.646 ms
+	1 thread: gPU win! cPU/gPU: 5.11
+	2 thread: gPU win! cPU/gPU: 3.08
+	3 thread: gPU win! cPU/gPU: 2.21
+	4 thread: gPU win! cPU/gPU: 1.72
+M:  104, N:  5120, K:  5120, blas_init:   9.045 ms, blas_compute:  17.774 ms, cpu_compute: 136.873 ms
+	1 thread: gPU win! cPU/gPU: 5.10
+	2 thread: gPU win! cPU/gPU: 3.07
+	3 thread: gPU win! cPU/gPU: 2.19
+	4 thread: gPU win! cPU/gPU: 1.71
+M:  105, N:  5120, K:  5120, blas_init:   9.081 ms, blas_compute:  17.897 ms, cpu_compute: 137.119 ms
+	1 thread: gPU win! cPU/gPU: 5.08
+	2 thread: gPU win! cPU/gPU: 3.06
+	3 thread: gPU win! cPU/gPU: 2.18
+	4 thread: gPU win! cPU/gPU: 1.70
+M:  106, N:  5120, K:  5120, blas_init:   9.113 ms, blas_compute:  16.123 ms, cpu_compute: 139.017 ms
+	1 thread: gPU win! cPU/gPU: 5.51
+	2 thread: gPU win! cPU/gPU: 3.36
+	3 thread: gPU win! cPU/gPU: 2.42
+	4 thread: gPU win! cPU/gPU: 1.89
+M:  107, N:  5120, K:  5120, blas_init:   9.184 ms, blas_compute:  16.934 ms, cpu_compute: 140.029 ms
+	1 thread: gPU win! cPU/gPU: 5.36
+	2 thread: gPU win! cPU/gPU: 3.25
+	3 thread: gPU win! cPU/gPU: 2.33
+	4 thread: gPU win! cPU/gPU: 1.82
+M:  108, N:  5120, K:  5120, blas_init:   9.021 ms, blas_compute:  17.905 ms, cpu_compute: 141.909 ms
+	1 thread: gPU win! cPU/gPU: 5.27
+	2 thread: gPU win! cPU/gPU: 3.17
+	3 thread: gPU win! cPU/gPU: 2.26
+	4 thread: gPU win! cPU/gPU: 1.76
+M:  109, N:  5120, K:  5120, blas_init:   9.073 ms, blas_compute:  18.211 ms, cpu_compute: 142.849 ms
+	1 thread: gPU win! cPU/gPU: 5.24
+	2 thread: gPU win! cPU/gPU: 3.14
+	3 thread: gPU win! cPU/gPU: 2.24
+	4 thread: gPU win! cPU/gPU: 1.74
+M:  110, N:  5120, K:  5120, blas_init:   8.959 ms, blas_compute:  16.797 ms, cpu_compute: 144.192 ms
+	1 thread: gPU win! cPU/gPU: 5.60
+	2 thread: gPU win! cPU/gPU: 3.39
+	3 thread: gPU win! cPU/gPU: 2.43
+	4 thread: gPU win! cPU/gPU: 1.89
+M:  111, N:  5120, K:  5120, blas_init:   9.199 ms, blas_compute:  18.317 ms, cpu_compute: 145.651 ms
+	1 thread: gPU win! cPU/gPU: 5.29
+	2 thread: gPU win! cPU/gPU: 3.18
+	3 thread: gPU win! cPU/gPU: 2.27
+	4 thread: gPU win! cPU/gPU: 1.77
+M:  112, N:  5120, K:  5120, blas_init:   9.101 ms, blas_compute:  17.436 ms, cpu_compute: 148.329 ms
+	1 thread: gPU win! cPU/gPU: 5.59
+	2 thread: gPU win! cPU/gPU: 3.37
+	3 thread: gPU win! cPU/gPU: 2.42
+	4 thread: gPU win! cPU/gPU: 1.88
+M:  113, N:  5120, K:  5120, blas_init:   9.227 ms, blas_compute:  17.677 ms, cpu_compute: 147.753 ms
+	1 thread: gPU win! cPU/gPU: 5.49
+	2 thread: gPU win! cPU/gPU: 3.31
+	3 thread: gPU win! cPU/gPU: 2.37
+	4 thread: gPU win! cPU/gPU: 1.85
+M:  114, N:  5120, K:  5120, blas_init:   8.967 ms, blas_compute:  18.700 ms, cpu_compute: 149.067 ms
+	1 thread: gPU win! cPU/gPU: 5.39
+	2 thread: gPU win! cPU/gPU: 3.21
+	3 thread: gPU win! cPU/gPU: 2.29
+	4 thread: gPU win! cPU/gPU: 1.78
+M:  115, N:  5120, K:  5120, blas_init:   8.971 ms, blas_compute:  16.997 ms, cpu_compute: 151.123 ms
+	1 thread: gPU win! cPU/gPU: 5.82
+	2 thread: gPU win! cPU/gPU: 3.52
+	3 thread: gPU win! cPU/gPU: 2.52
+	4 thread: gPU win! cPU/gPU: 1.96
+M:  116, N:  5120, K:  5120, blas_init:   8.883 ms, blas_compute:  18.438 ms, cpu_compute: 151.380 ms
+	1 thread: gPU win! cPU/gPU: 5.54
+	2 thread: gPU win! cPU/gPU: 3.31
+	3 thread: gPU win! cPU/gPU: 2.36
+	4 thread: gPU win! cPU/gPU: 1.83
+M:  117, N:  5120, K:  5120, blas_init:   8.990 ms, blas_compute:  17.870 ms, cpu_compute: 156.726 ms
+	1 thread: gPU win! cPU/gPU: 5.83
+	2 thread: gPU win! cPU/gPU: 3.50
+	3 thread: gPU win! cPU/gPU: 2.50
+	4 thread: gPU win! cPU/gPU: 1.95
+M:  118, N:  5120, K:  5120, blas_init:   9.202 ms, blas_compute:  19.151 ms, cpu_compute: 156.714 ms
+	1 thread: gPU win! cPU/gPU: 5.53
+	2 thread: gPU win! cPU/gPU: 3.30
+	3 thread: gPU win! cPU/gPU: 2.35
+	4 thread: gPU win! cPU/gPU: 1.83
+M:  119, N:  5120, K:  5120, blas_init:   8.948 ms, blas_compute:  17.778 ms, cpu_compute: 157.485 ms
+	1 thread: gPU win! cPU/gPU: 5.89
+	2 thread: gPU win! cPU/gPU: 3.54
+	3 thread: gPU win! cPU/gPU: 2.53
+	4 thread: gPU win! cPU/gPU: 1.97
+M:  120, N:  5120, K:  5120, blas_init:   8.997 ms, blas_compute:  18.093 ms, cpu_compute: 157.184 ms
+	1 thread: gPU win! cPU/gPU: 5.80
+	2 thread: gPU win! cPU/gPU: 3.48
+	3 thread: gPU win! cPU/gPU: 2.48
+	4 thread: gPU win! cPU/gPU: 1.93
+M:  121, N:  5120, K:  5120, blas_init:   9.084 ms, blas_compute:  19.018 ms, cpu_compute: 158.862 ms
+	1 thread: gPU win! cPU/gPU: 5.65
+	2 thread: gPU win! cPU/gPU: 3.37
+	3 thread: gPU win! cPU/gPU: 2.40
+	4 thread: gPU win! cPU/gPU: 1.87
+M:  122, N:  5120, K:  5120, blas_init:   9.229 ms, blas_compute:  17.459 ms, cpu_compute: 159.420 ms
+	1 thread: gPU win! cPU/gPU: 5.97
+	2 thread: gPU win! cPU/gPU: 3.61
+	3 thread: gPU win! cPU/gPU: 2.59
+	4 thread: gPU win! cPU/gPU: 2.02
+M:  123, N:  5120, K:  5120, blas_init:   8.983 ms, blas_compute:  18.435 ms, cpu_compute: 160.517 ms
+	1 thread: gPU win! cPU/gPU: 5.85
+	2 thread: gPU win! cPU/gPU: 3.50
+	3 thread: gPU win! cPU/gPU: 2.50
+	4 thread: gPU win! cPU/gPU: 1.94
+M:  124, N:  5120, K:  5120, blas_init:   9.156 ms, blas_compute:  19.450 ms, cpu_compute: 168.148 ms
+	1 thread: gPU win! cPU/gPU: 5.88
+	2 thread: gPU win! cPU/gPU: 3.50
+	3 thread: gPU win! cPU/gPU: 2.49
+	4 thread: gPU win! cPU/gPU: 1.93
+M:  125, N:  5120, K:  5120, blas_init:   9.120 ms, blas_compute:  20.453 ms, cpu_compute: 163.436 ms
+	1 thread: gPU win! cPU/gPU: 5.53
+	2 thread: gPU win! cPU/gPU: 3.27
+	3 thread: gPU win! cPU/gPU: 2.32
+	4 thread: gPU win! cPU/gPU: 1.80
+M:  126, N:  5120, K:  5120, blas_init:   8.985 ms, blas_compute:  19.760 ms, cpu_compute: 169.225 ms
+	1 thread: gPU win! cPU/gPU: 5.89
+	2 thread: gPU win! cPU/gPU: 3.49
+	3 thread: gPU win! cPU/gPU: 2.48
+	4 thread: gPU win! cPU/gPU: 1.92
+M:  127, N:  5120, K:  5120, blas_init:   8.998 ms, blas_compute:  20.144 ms, cpu_compute: 170.761 ms
+	1 thread: gPU win! cPU/gPU: 5.86
+	2 thread: gPU win! cPU/gPU: 3.46
+	3 thread: gPU win! cPU/gPU: 2.46
+	4 thread: gPU win! cPU/gPU: 1.91
+M:  128, N:  5120, K:  5120, blas_init:   9.202 ms, blas_compute:  20.279 ms, cpu_compute: 171.252 ms
+	1 thread: gPU win! cPU/gPU: 5.81
+	2 thread: gPU win! cPU/gPU: 3.44
+	3 thread: gPU win! cPU/gPU: 2.45
+	4 thread: gPU win! cPU/gPU: 1.90
+M:    1, N: 13824, K:  5120, blas_init: 107.025 ms, blas_compute:  10.183 ms, cpu_compute:   6.013 ms
+	1 thread: cPU win! cPU/gPU: 0.05
+	2 thread: cPU win! cPU/gPU: 0.05
+	3 thread: cPU win! cPU/gPU: 0.04
+	4 thread: cPU win! cPU/gPU: 0.04
+M:    2, N: 13824, K:  5120, blas_init:  44.841 ms, blas_compute:  27.716 ms, cpu_compute:  11.204 ms
+	1 thread: cPU win! cPU/gPU: 0.15
+	2 thread: cPU win! cPU/gPU: 0.11
+	3 thread: cPU win! cPU/gPU: 0.09
+	4 thread: cPU win! cPU/gPU: 0.07
+M:    3, N: 13824, K:  5120, blas_init:  43.521 ms, blas_compute:  28.802 ms, cpu_compute:  15.852 ms
+	1 thread: cPU win! cPU/gPU: 0.22
+	2 thread: cPU win! cPU/gPU: 0.16
+	3 thread: cPU win! cPU/gPU: 0.12
+	4 thread: cPU win! cPU/gPU: 0.10
+M:    4, N: 13824, K:  5120, blas_init:  42.858 ms, blas_compute:  27.836 ms, cpu_compute:  20.600 ms
+	1 thread: cPU win! cPU/gPU: 0.29
+	2 thread: cPU win! cPU/gPU: 0.21
+	3 thread: cPU win! cPU/gPU: 0.16
+	4 thread: cPU win! cPU/gPU: 0.13
+M:    5, N: 13824, K:  5120, blas_init:  43.063 ms, blas_compute:  28.962 ms, cpu_compute:  25.284 ms
+	1 thread: cPU win! cPU/gPU: 0.35
+	2 thread: cPU win! cPU/gPU: 0.25
+	3 thread: cPU win! cPU/gPU: 0.19
+	4 thread: cPU win! cPU/gPU: 0.16
+M:    6, N: 13824, K:  5120, blas_init:  43.319 ms, blas_compute:  27.626 ms, cpu_compute:  29.788 ms
+	1 thread: cPU win! cPU/gPU: 0.42
+	2 thread: cPU win! cPU/gPU: 0.30
+	3 thread: cPU win! cPU/gPU: 0.24
+	4 thread: cPU win! cPU/gPU: 0.19
+M:    7, N: 13824, K:  5120, blas_init:  43.842 ms, blas_compute:  26.854 ms, cpu_compute:  34.339 ms
+	1 thread: cPU win! cPU/gPU: 0.49
+	2 thread: cPU win! cPU/gPU: 0.35
+	3 thread: cPU win! cPU/gPU: 0.28
+	4 thread: cPU win! cPU/gPU: 0.23
+M:    8, N: 13824, K:  5120, blas_init:  43.343 ms, blas_compute:  28.790 ms, cpu_compute:  39.309 ms
+	1 thread: cPU win! cPU/gPU: 0.54
+	2 thread: cPU win! cPU/gPU: 0.39
+	3 thread: cPU win! cPU/gPU: 0.30
+	4 thread: cPU win! cPU/gPU: 0.25
+M:    9, N: 13824, K:  5120, blas_init:  43.884 ms, blas_compute:  30.900 ms, cpu_compute:  44.191 ms
+	1 thread: cPU win! cPU/gPU: 0.59
+	2 thread: cPU win! cPU/gPU: 0.42
+	3 thread: cPU win! cPU/gPU: 0.32
+	4 thread: cPU win! cPU/gPU: 0.26
+M:   10, N: 13824, K:  5120, blas_init:  43.064 ms, blas_compute:  31.113 ms, cpu_compute:  47.256 ms
+	1 thread: cPU win! cPU/gPU: 0.64
+	2 thread: cPU win! cPU/gPU: 0.45
+	3 thread: cPU win! cPU/gPU: 0.35
+	4 thread: cPU win! cPU/gPU: 0.28
+M:   11, N: 13824, K:  5120, blas_init:  43.776 ms, blas_compute:  27.926 ms, cpu_compute:  51.077 ms
+	1 thread: cPU win! cPU/gPU: 0.71
+	2 thread: cPU win! cPU/gPU: 0.51
+	3 thread: cPU win! cPU/gPU: 0.40
+	4 thread: cPU win! cPU/gPU: 0.33
+M:   12, N: 13824, K:  5120, blas_init:  42.893 ms, blas_compute:  31.696 ms, cpu_compute:  55.341 ms
+	1 thread: cPU win! cPU/gPU: 0.74
+	2 thread: cPU win! cPU/gPU: 0.52
+	3 thread: cPU win! cPU/gPU: 0.40
+	4 thread: cPU win! cPU/gPU: 0.33
+M:   13, N: 13824, K:  5120, blas_init:  44.628 ms, blas_compute:  29.772 ms, cpu_compute:  59.290 ms
+	1 thread: cPU win! cPU/gPU: 0.80
+	2 thread: cPU win! cPU/gPU: 0.57
+	3 thread: cPU win! cPU/gPU: 0.44
+	4 thread: cPU win! cPU/gPU: 0.36
+M:   14, N: 13824, K:  5120, blas_init:  43.069 ms, blas_compute:  28.159 ms, cpu_compute:  62.561 ms
+	1 thread: cPU win! cPU/gPU: 0.88
+	2 thread: cPU win! cPU/gPU: 0.63
+	3 thread: cPU win! cPU/gPU: 0.49
+	4 thread: cPU win! cPU/gPU: 0.40
+M:   15, N: 13824, K:  5120, blas_init:  43.059 ms, blas_compute:  30.753 ms, cpu_compute:  65.335 ms
+	1 thread: cPU win! cPU/gPU: 0.89
+	2 thread: cPU win! cPU/gPU: 0.62
+	3 thread: cPU win! cPU/gPU: 0.48
+	4 thread: cPU win! cPU/gPU: 0.39
+M:   16, N: 13824, K:  5120, blas_init:  43.253 ms, blas_compute:  29.144 ms, cpu_compute:  69.773 ms
+	1 thread: cPU win! cPU/gPU: 0.96
+	2 thread: cPU win! cPU/gPU: 0.69
+	3 thread: cPU win! cPU/gPU: 0.53
+	4 thread: cPU win! cPU/gPU: 0.44
+M:   17, N: 13824, K:  5120, blas_init:  43.651 ms, blas_compute:  29.995 ms, cpu_compute:  84.521 ms
+	1 thread: gPU win! cPU/gPU: 1.15
+	2 thread: cPU win! cPU/gPU: 0.82
+	3 thread: cPU win! cPU/gPU: 0.63
+	4 thread: cPU win! cPU/gPU: 0.52
+M:   18, N: 13824, K:  5120, blas_init:  43.323 ms, blas_compute:  31.601 ms, cpu_compute:  76.332 ms
+	1 thread: gPU win! cPU/gPU: 1.02
+	2 thread: cPU win! cPU/gPU: 0.72
+	3 thread: cPU win! cPU/gPU: 0.55
+	4 thread: cPU win! cPU/gPU: 0.45
+M:   19, N: 13824, K:  5120, blas_init:  43.680 ms, blas_compute:  31.233 ms, cpu_compute:  79.079 ms
+	1 thread: gPU win! cPU/gPU: 1.06
+	2 thread: cPU win! cPU/gPU: 0.75
+	3 thread: cPU win! cPU/gPU: 0.58
+	4 thread: cPU win! cPU/gPU: 0.47
+M:   20, N: 13824, K:  5120, blas_init:  43.479 ms, blas_compute:  31.716 ms, cpu_compute:  83.713 ms
+	1 thread: gPU win! cPU/gPU: 1.11
+	2 thread: cPU win! cPU/gPU: 0.78
+	3 thread: cPU win! cPU/gPU: 0.60
+	4 thread: cPU win! cPU/gPU: 0.49
+M:   21, N: 13824, K:  5120, blas_init:  44.344 ms, blas_compute:  30.241 ms, cpu_compute:  86.128 ms
+	1 thread: gPU win! cPU/gPU: 1.15
+	2 thread: cPU win! cPU/gPU: 0.82
+	3 thread: cPU win! cPU/gPU: 0.64
+	4 thread: cPU win! cPU/gPU: 0.52
+M:   22, N: 13824, K:  5120, blas_init:  43.050 ms, blas_compute:  31.882 ms, cpu_compute:  89.322 ms
+	1 thread: gPU win! cPU/gPU: 1.19
+	2 thread: cPU win! cPU/gPU: 0.84
+	3 thread: cPU win! cPU/gPU: 0.64
+	4 thread: cPU win! cPU/gPU: 0.52
+M:   23, N: 13824, K:  5120, blas_init:  43.208 ms, blas_compute:  31.019 ms, cpu_compute:  92.428 ms
+	1 thread: gPU win! cPU/gPU: 1.25
+	2 thread: cPU win! cPU/gPU: 0.88
+	3 thread: cPU win! cPU/gPU: 0.68
+	4 thread: cPU win! cPU/gPU: 0.55
+M:   24, N: 13824, K:  5120, blas_init:  43.815 ms, blas_compute:  30.243 ms, cpu_compute:  96.285 ms
+	1 thread: gPU win! cPU/gPU: 1.30
+	2 thread: cPU win! cPU/gPU: 0.92
+	3 thread: cPU win! cPU/gPU: 0.72
+	4 thread: cPU win! cPU/gPU: 0.58
+M:   25, N: 13824, K:  5120, blas_init:  43.673 ms, blas_compute:  31.482 ms, cpu_compute:  99.692 ms
+	1 thread: gPU win! cPU/gPU: 1.33
+	2 thread: cPU win! cPU/gPU: 0.93
+	3 thread: cPU win! cPU/gPU: 0.72
+	4 thread: cPU win! cPU/gPU: 0.59
+M:   26, N: 13824, K:  5120, blas_init:  43.902 ms, blas_compute:  31.313 ms, cpu_compute: 102.515 ms
+	1 thread: gPU win! cPU/gPU: 1.36
+	2 thread: cPU win! cPU/gPU: 0.96
+	3 thread: cPU win! cPU/gPU: 0.74
+	4 thread: cPU win! cPU/gPU: 0.61
+M:   27, N: 13824, K:  5120, blas_init:  43.583 ms, blas_compute:  31.781 ms, cpu_compute: 106.013 ms
+	1 thread: gPU win! cPU/gPU: 1.41
+	2 thread: cPU win! cPU/gPU: 0.99
+	3 thread: cPU win! cPU/gPU: 0.76
+	4 thread: cPU win! cPU/gPU: 0.62
+M:   28, N: 13824, K:  5120, blas_init:  43.477 ms, blas_compute:  33.028 ms, cpu_compute: 109.963 ms
+	1 thread: gPU win! cPU/gPU: 1.44
+	2 thread: gPU win! cPU/gPU: 1.00
+	3 thread: cPU win! cPU/gPU: 0.77
+	4 thread: cPU win! cPU/gPU: 0.63
+M:   29, N: 13824, K:  5120, blas_init:  43.959 ms, blas_compute:  32.437 ms, cpu_compute: 112.665 ms
+	1 thread: gPU win! cPU/gPU: 1.47
+	2 thread: gPU win! cPU/gPU: 1.04
+	3 thread: cPU win! cPU/gPU: 0.80
+	4 thread: cPU win! cPU/gPU: 0.65
+M:   30, N: 13824, K:  5120, blas_init:  43.593 ms, blas_compute:  32.081 ms, cpu_compute: 116.472 ms
+	1 thread: gPU win! cPU/gPU: 1.54
+	2 thread: gPU win! cPU/gPU: 1.08
+	3 thread: cPU win! cPU/gPU: 0.83
+	4 thread: cPU win! cPU/gPU: 0.68
+M:   31, N: 13824, K:  5120, blas_init:  44.932 ms, blas_compute:  31.949 ms, cpu_compute: 119.677 ms
+	1 thread: gPU win! cPU/gPU: 1.56
+	2 thread: gPU win! cPU/gPU: 1.10
+	3 thread: cPU win! cPU/gPU: 0.85
+	4 thread: cPU win! cPU/gPU: 0.69
+M:   32, N: 13824, K:  5120, blas_init:  43.029 ms, blas_compute:  34.782 ms, cpu_compute: 122.079 ms
+	1 thread: gPU win! cPU/gPU: 1.57
+	2 thread: gPU win! cPU/gPU: 1.08
+	3 thread: cPU win! cPU/gPU: 0.83
+	4 thread: cPU win! cPU/gPU: 0.67
+M:   33, N: 13824, K:  5120, blas_init:  42.826 ms, blas_compute:  32.066 ms, cpu_compute: 126.032 ms
+	1 thread: gPU win! cPU/gPU: 1.68
+	2 thread: gPU win! cPU/gPU: 1.18
+	3 thread: cPU win! cPU/gPU: 0.91
+	4 thread: cPU win! cPU/gPU: 0.74
+M:   34, N: 13824, K:  5120, blas_init:  43.480 ms, blas_compute:  32.962 ms, cpu_compute: 129.873 ms
+	1 thread: gPU win! cPU/gPU: 1.70
+	2 thread: gPU win! cPU/gPU: 1.19
+	3 thread: cPU win! cPU/gPU: 0.91
+	4 thread: cPU win! cPU/gPU: 0.74
+M:   35, N: 13824, K:  5120, blas_init:  43.104 ms, blas_compute:  34.286 ms, cpu_compute: 132.591 ms
+	1 thread: gPU win! cPU/gPU: 1.71
+	2 thread: gPU win! cPU/gPU: 1.19
+	3 thread: cPU win! cPU/gPU: 0.91
+	4 thread: cPU win! cPU/gPU: 0.74
+M:   36, N: 13824, K:  5120, blas_init:  43.053 ms, blas_compute:  33.087 ms, cpu_compute: 135.736 ms
+	1 thread: gPU win! cPU/gPU: 1.78
+	2 thread: gPU win! cPU/gPU: 1.24
+	3 thread: cPU win! cPU/gPU: 0.95
+	4 thread: cPU win! cPU/gPU: 0.77
+M:   37, N: 13824, K:  5120, blas_init:  42.796 ms, blas_compute:  35.206 ms, cpu_compute: 139.867 ms
+	1 thread: gPU win! cPU/gPU: 1.79
+	2 thread: gPU win! cPU/gPU: 1.24
+	3 thread: cPU win! cPU/gPU: 0.94
+	4 thread: cPU win! cPU/gPU: 0.76
+M:   38, N: 13824, K:  5120, blas_init:  42.565 ms, blas_compute:  33.329 ms, cpu_compute: 143.226 ms
+	1 thread: gPU win! cPU/gPU: 1.89
+	2 thread: gPU win! cPU/gPU: 1.31
+	3 thread: gPU win! cPU/gPU: 1.00
+	4 thread: cPU win! cPU/gPU: 0.81
+M:   39, N: 13824, K:  5120, blas_init:  42.633 ms, blas_compute:  32.933 ms, cpu_compute: 146.272 ms
+	1 thread: gPU win! cPU/gPU: 1.94
+	2 thread: gPU win! cPU/gPU: 1.35
+	3 thread: gPU win! cPU/gPU: 1.03
+	4 thread: cPU win! cPU/gPU: 0.84
+M:   40, N: 13824, K:  5120, blas_init:  43.157 ms, blas_compute:  35.149 ms, cpu_compute: 152.446 ms
+	1 thread: gPU win! cPU/gPU: 1.95
+	2 thread: gPU win! cPU/gPU: 1.34
+	3 thread: gPU win! cPU/gPU: 1.03
+	4 thread: cPU win! cPU/gPU: 0.83
+M:   41, N: 13824, K:  5120, blas_init:  43.649 ms, blas_compute:  34.663 ms, cpu_compute: 153.754 ms
+	1 thread: gPU win! cPU/gPU: 1.96
+	2 thread: gPU win! cPU/gPU: 1.36
+	3 thread: gPU win! cPU/gPU: 1.04
+	4 thread: cPU win! cPU/gPU: 0.84
+M:   42, N: 13824, K:  5120, blas_init:  43.775 ms, blas_compute:  35.452 ms, cpu_compute: 157.029 ms
+	1 thread: gPU win! cPU/gPU: 1.98
+	2 thread: gPU win! cPU/gPU: 1.37
+	3 thread: gPU win! cPU/gPU: 1.05
+	4 thread: cPU win! cPU/gPU: 0.85
+M:   43, N: 13824, K:  5120, blas_init:  43.400 ms, blas_compute:  35.414 ms, cpu_compute: 159.423 ms
+	1 thread: gPU win! cPU/gPU: 2.02
+	2 thread: gPU win! cPU/gPU: 1.40
+	3 thread: gPU win! cPU/gPU: 1.07
+	4 thread: cPU win! cPU/gPU: 0.86
+M:   44, N: 13824, K:  5120, blas_init:  44.335 ms, blas_compute:  37.300 ms, cpu_compute: 164.627 ms
+	1 thread: gPU win! cPU/gPU: 2.02
+	2 thread: gPU win! cPU/gPU: 1.38
+	3 thread: gPU win! cPU/gPU: 1.05
+	4 thread: cPU win! cPU/gPU: 0.85
+M:   45, N: 13824, K:  5120, blas_init:  43.374 ms, blas_compute:  37.028 ms, cpu_compute: 167.252 ms
+	1 thread: gPU win! cPU/gPU: 2.08
+	2 thread: gPU win! cPU/gPU: 1.42
+	3 thread: gPU win! cPU/gPU: 1.08
+	4 thread: cPU win! cPU/gPU: 0.87
+M:   46, N: 13824, K:  5120, blas_init:  43.278 ms, blas_compute:  34.810 ms, cpu_compute: 172.954 ms
+	1 thread: gPU win! cPU/gPU: 2.21
+	2 thread: gPU win! cPU/gPU: 1.53
+	3 thread: gPU win! cPU/gPU: 1.17
+	4 thread: cPU win! cPU/gPU: 0.95
+M:   47, N: 13824, K:  5120, blas_init:  43.406 ms, blas_compute:  35.819 ms, cpu_compute: 173.186 ms
+	1 thread: gPU win! cPU/gPU: 2.19
+	2 thread: gPU win! cPU/gPU: 1.51
+	3 thread: gPU win! cPU/gPU: 1.15
+	4 thread: cPU win! cPU/gPU: 0.93
+M:   48, N: 13824, K:  5120, blas_init:  43.820 ms, blas_compute:  37.321 ms, cpu_compute: 182.562 ms
+	1 thread: gPU win! cPU/gPU: 2.25
+	2 thread: gPU win! cPU/gPU: 1.54
+	3 thread: gPU win! cPU/gPU: 1.17
+	4 thread: cPU win! cPU/gPU: 0.95
+M:   49, N: 13824, K:  5120, blas_init:  43.022 ms, blas_compute:  37.063 ms, cpu_compute: 181.122 ms
+	1 thread: gPU win! cPU/gPU: 2.26
+	2 thread: gPU win! cPU/gPU: 1.55
+	3 thread: gPU win! cPU/gPU: 1.17
+	4 thread: cPU win! cPU/gPU: 0.95
+M:   50, N: 13824, K:  5120, blas_init:  43.577 ms, blas_compute:  35.284 ms, cpu_compute: 184.074 ms
+	1 thread: gPU win! cPU/gPU: 2.33
+	2 thread: gPU win! cPU/gPU: 1.61
+	3 thread: gPU win! cPU/gPU: 1.23
+	4 thread: cPU win! cPU/gPU: 1.00
+M:   51, N: 13824, K:  5120, blas_init:  42.587 ms, blas_compute:  38.149 ms, cpu_compute: 187.023 ms
+	1 thread: gPU win! cPU/gPU: 2.32
+	2 thread: gPU win! cPU/gPU: 1.57
+	3 thread: gPU win! cPU/gPU: 1.19
+	4 thread: cPU win! cPU/gPU: 0.96
+M:   52, N: 13824, K:  5120, blas_init:  43.570 ms, blas_compute:  37.143 ms, cpu_compute: 190.862 ms
+	1 thread: gPU win! cPU/gPU: 2.36
+	2 thread: gPU win! cPU/gPU: 1.62
+	3 thread: gPU win! cPU/gPU: 1.23
+	4 thread: cPU win! cPU/gPU: 0.99
+M:   53, N: 13824, K:  5120, blas_init:  44.765 ms, blas_compute:  36.300 ms, cpu_compute: 194.373 ms
+	1 thread: gPU win! cPU/gPU: 2.40
+	2 thread: gPU win! cPU/gPU: 1.66
+	3 thread: gPU win! cPU/gPU: 1.26
+	4 thread: gPU win! cPU/gPU: 1.02
+M:   54, N: 13824, K:  5120, blas_init:  43.381 ms, blas_compute:  36.674 ms, cpu_compute: 197.806 ms
+	1 thread: gPU win! cPU/gPU: 2.47
+	2 thread: gPU win! cPU/gPU: 1.69
+	3 thread: gPU win! cPU/gPU: 1.29
+	4 thread: gPU win! cPU/gPU: 1.04
+M:   55, N: 13824, K:  5120, blas_init:  43.898 ms, blas_compute:  38.346 ms, cpu_compute: 201.925 ms
+	1 thread: gPU win! cPU/gPU: 2.46
+	2 thread: gPU win! cPU/gPU: 1.67
+	3 thread: gPU win! cPU/gPU: 1.27
+	4 thread: gPU win! cPU/gPU: 1.02
+M:   56, N: 13824, K:  5120, blas_init:  43.607 ms, blas_compute:  36.121 ms, cpu_compute: 204.243 ms
+	1 thread: gPU win! cPU/gPU: 2.56
+	2 thread: gPU win! cPU/gPU: 1.76
+	3 thread: gPU win! cPU/gPU: 1.34
+	4 thread: gPU win! cPU/gPU: 1.09
+M:   57, N: 13824, K:  5120, blas_init:  43.055 ms, blas_compute:  36.362 ms, cpu_compute: 207.620 ms
+	1 thread: gPU win! cPU/gPU: 2.61
+	2 thread: gPU win! cPU/gPU: 1.79
+	3 thread: gPU win! cPU/gPU: 1.36
+	4 thread: gPU win! cPU/gPU: 1.10
+M:   58, N: 13824, K:  5120, blas_init:  43.149 ms, blas_compute:  39.114 ms, cpu_compute: 210.098 ms
+	1 thread: gPU win! cPU/gPU: 2.55
+	2 thread: gPU win! cPU/gPU: 1.73
+	3 thread: gPU win! cPU/gPU: 1.31
+	4 thread: gPU win! cPU/gPU: 1.05
+M:   59, N: 13824, K:  5120, blas_init:  44.392 ms, blas_compute:  39.266 ms, cpu_compute: 214.812 ms
+	1 thread: gPU win! cPU/gPU: 2.57
+	2 thread: gPU win! cPU/gPU: 1.75
+	3 thread: gPU win! cPU/gPU: 1.32
+	4 thread: gPU win! cPU/gPU: 1.07
+M:   60, N: 13824, K:  5120, blas_init:  43.174 ms, blas_compute:  37.682 ms, cpu_compute: 217.158 ms
+	1 thread: gPU win! cPU/gPU: 2.69
+	2 thread: gPU win! cPU/gPU: 1.83
+	3 thread: gPU win! cPU/gPU: 1.39
+	4 thread: gPU win! cPU/gPU: 1.12
+M:   61, N: 13824, K:  5120, blas_init:  43.551 ms, blas_compute:  39.456 ms, cpu_compute: 223.089 ms
+	1 thread: gPU win! cPU/gPU: 2.69
+	2 thread: gPU win! cPU/gPU: 1.82
+	3 thread: gPU win! cPU/gPU: 1.38
+	4 thread: gPU win! cPU/gPU: 1.11
+M:   62, N: 13824, K:  5120, blas_init:  43.325 ms, blas_compute:  39.441 ms, cpu_compute: 224.167 ms
+	1 thread: gPU win! cPU/gPU: 2.71
+	2 thread: gPU win! cPU/gPU: 1.83
+	3 thread: gPU win! cPU/gPU: 1.39
+	4 thread: gPU win! cPU/gPU: 1.11
+M:   63, N: 13824, K:  5120, blas_init:  44.705 ms, blas_compute:  38.383 ms, cpu_compute: 227.249 ms
+	1 thread: gPU win! cPU/gPU: 2.74
+	2 thread: gPU win! cPU/gPU: 1.87
+	3 thread: gPU win! cPU/gPU: 1.42
+	4 thread: gPU win! cPU/gPU: 1.15
+M:   64, N: 13824, K:  5120, blas_init:  44.706 ms, blas_compute:  38.165 ms, cpu_compute: 231.128 ms
+	1 thread: gPU win! cPU/gPU: 2.79
+	2 thread: gPU win! cPU/gPU: 1.91
+	3 thread: gPU win! cPU/gPU: 1.45
+	4 thread: gPU win! cPU/gPU: 1.17
+M:   65, N: 13824, K:  5120, blas_init:  44.368 ms, blas_compute:  39.862 ms, cpu_compute: 234.840 ms
+	1 thread: gPU win! cPU/gPU: 2.79
+	2 thread: gPU win! cPU/gPU: 1.89
+	3 thread: gPU win! cPU/gPU: 1.43
+	4 thread: gPU win! cPU/gPU: 1.15
+M:   66, N: 13824, K:  5120, blas_init:  44.570 ms, blas_compute:  39.874 ms, cpu_compute: 238.630 ms
+	1 thread: gPU win! cPU/gPU: 2.83
+	2 thread: gPU win! cPU/gPU: 1.92
+	3 thread: gPU win! cPU/gPU: 1.45
+	4 thread: gPU win! cPU/gPU: 1.17
+M:   67, N: 13824, K:  5120, blas_init:  43.116 ms, blas_compute:  40.062 ms, cpu_compute: 241.445 ms
+	1 thread: gPU win! cPU/gPU: 2.90
+	2 thread: gPU win! cPU/gPU: 1.96
+	3 thread: gPU win! cPU/gPU: 1.48
+	4 thread: gPU win! cPU/gPU: 1.19
+M:   68, N: 13824, K:  5120, blas_init:  43.562 ms, blas_compute:  41.112 ms, cpu_compute: 246.561 ms
+	1 thread: gPU win! cPU/gPU: 2.91
+	2 thread: gPU win! cPU/gPU: 1.96
+	3 thread: gPU win! cPU/gPU: 1.48
+	4 thread: gPU win! cPU/gPU: 1.19
+M:   69, N: 13824, K:  5120, blas_init:  43.019 ms, blas_compute:  41.393 ms, cpu_compute: 248.509 ms
+	1 thread: gPU win! cPU/gPU: 2.94
+	2 thread: gPU win! cPU/gPU: 1.98
+	3 thread: gPU win! cPU/gPU: 1.49
+	4 thread: gPU win! cPU/gPU: 1.19
+M:   70, N: 13824, K:  5120, blas_init:  43.480 ms, blas_compute:  42.574 ms, cpu_compute: 252.234 ms
+	1 thread: gPU win! cPU/gPU: 2.93
+	2 thread: gPU win! cPU/gPU: 1.96
+	3 thread: gPU win! cPU/gPU: 1.47
+	4 thread: gPU win! cPU/gPU: 1.18
+M:   71, N: 13824, K:  5120, blas_init:  42.499 ms, blas_compute:  40.174 ms, cpu_compute: 254.390 ms
+	1 thread: gPU win! cPU/gPU: 3.08
+	2 thread: gPU win! cPU/gPU: 2.07
+	3 thread: gPU win! cPU/gPU: 1.56
+	4 thread: gPU win! cPU/gPU: 1.25
+M:   72, N: 13824, K:  5120, blas_init:  45.676 ms, blas_compute:  41.451 ms, cpu_compute: 262.676 ms
+	1 thread: gPU win! cPU/gPU: 3.01
+	2 thread: gPU win! cPU/gPU: 2.04
+	3 thread: gPU win! cPU/gPU: 1.54
+	4 thread: gPU win! cPU/gPU: 1.24
+M:   73, N: 13824, K:  5120, blas_init:  43.219 ms, blas_compute:  43.214 ms, cpu_compute: 262.393 ms
+	1 thread: gPU win! cPU/gPU: 3.04
+	2 thread: gPU win! cPU/gPU: 2.02
+	3 thread: gPU win! cPU/gPU: 1.52
+	4 thread: gPU win! cPU/gPU: 1.21
+M:   74, N: 13824, K:  5120, blas_init:  43.233 ms, blas_compute:  43.134 ms, cpu_compute: 266.474 ms
+	1 thread: gPU win! cPU/gPU: 3.09
+	2 thread: gPU win! cPU/gPU: 2.06
+	3 thread: gPU win! cPU/gPU: 1.54
+	4 thread: gPU win! cPU/gPU: 1.23
+M:   75, N: 13824, K:  5120, blas_init:  43.312 ms, blas_compute:  43.651 ms, cpu_compute: 266.910 ms
+	1 thread: gPU win! cPU/gPU: 3.07
+	2 thread: gPU win! cPU/gPU: 2.04
+	3 thread: gPU win! cPU/gPU: 1.53
+	4 thread: gPU win! cPU/gPU: 1.22
+M:   76, N: 13824, K:  5120, blas_init:  43.364 ms, blas_compute:  42.231 ms, cpu_compute: 272.590 ms
+	1 thread: gPU win! cPU/gPU: 3.18
+	2 thread: gPU win! cPU/gPU: 2.13
+	3 thread: gPU win! cPU/gPU: 1.60
+	4 thread: gPU win! cPU/gPU: 1.28
+M:   77, N: 13824, K:  5120, blas_init:  42.772 ms, blas_compute:  42.121 ms, cpu_compute: 274.977 ms
+	1 thread: gPU win! cPU/gPU: 3.24
+	2 thread: gPU win! cPU/gPU: 2.16
+	3 thread: gPU win! cPU/gPU: 1.63
+	4 thread: gPU win! cPU/gPU: 1.30
+M:   78, N: 13824, K:  5120, blas_init:  43.310 ms, blas_compute:  42.450 ms, cpu_compute: 282.084 ms
+	1 thread: gPU win! cPU/gPU: 3.29
+	2 thread: gPU win! cPU/gPU: 2.20
+	3 thread: gPU win! cPU/gPU: 1.65
+	4 thread: gPU win! cPU/gPU: 1.32
+M:   79, N: 13824, K:  5120, blas_init:  43.152 ms, blas_compute:  42.202 ms, cpu_compute: 282.283 ms
+	1 thread: gPU win! cPU/gPU: 3.31
+	2 thread: gPU win! cPU/gPU: 2.21
+	3 thread: gPU win! cPU/gPU: 1.66
+	4 thread: gPU win! cPU/gPU: 1.33
+M:   80, N: 13824, K:  5120, blas_init:  43.122 ms, blas_compute:  42.379 ms, cpu_compute: 291.252 ms
+	1 thread: gPU win! cPU/gPU: 3.41
+	2 thread: gPU win! cPU/gPU: 2.28
+	3 thread: gPU win! cPU/gPU: 1.71
+	4 thread: gPU win! cPU/gPU: 1.37
+M:   81, N: 13824, K:  5120, blas_init:  42.655 ms, blas_compute:  43.208 ms, cpu_compute: 287.664 ms
+	1 thread: gPU win! cPU/gPU: 3.35
+	2 thread: gPU win! cPU/gPU: 2.23
+	3 thread: gPU win! cPU/gPU: 1.67
+	4 thread: gPU win! cPU/gPU: 1.33
+M:   82, N: 13824, K:  5120, blas_init:  44.880 ms, blas_compute:  44.062 ms, cpu_compute: 296.372 ms
+	1 thread: gPU win! cPU/gPU: 3.33
+	2 thread: gPU win! cPU/gPU: 2.23
+	3 thread: gPU win! cPU/gPU: 1.67
+	4 thread: gPU win! cPU/gPU: 1.34
+M:   83, N: 13824, K:  5120, blas_init:  43.361 ms, blas_compute:  43.195 ms, cpu_compute: 295.140 ms
+	1 thread: gPU win! cPU/gPU: 3.41
+	2 thread: gPU win! cPU/gPU: 2.27
+	3 thread: gPU win! cPU/gPU: 1.71
+	4 thread: gPU win! cPU/gPU: 1.37
+M:   84, N: 13824, K:  5120, blas_init:  43.271 ms, blas_compute:  44.211 ms, cpu_compute: 301.948 ms
+	1 thread: gPU win! cPU/gPU: 3.45
+	2 thread: gPU win! cPU/gPU: 2.29
+	3 thread: gPU win! cPU/gPU: 1.72
+	4 thread: gPU win! cPU/gPU: 1.37
+M:   85, N: 13824, K:  5120, blas_init:  43.178 ms, blas_compute:  44.013 ms, cpu_compute: 305.575 ms
+	1 thread: gPU win! cPU/gPU: 3.50
+	2 thread: gPU win! cPU/gPU: 2.33
+	3 thread: gPU win! cPU/gPU: 1.74
+	4 thread: gPU win! cPU/gPU: 1.39
+M:   86, N: 13824, K:  5120, blas_init:  43.071 ms, blas_compute:  47.153 ms, cpu_compute: 307.214 ms
+	1 thread: gPU win! cPU/gPU: 3.41
+	2 thread: gPU win! cPU/gPU: 2.24
+	3 thread: gPU win! cPU/gPU: 1.66
+	4 thread: gPU win! cPU/gPU: 1.33
+M:   87, N: 13824, K:  5120, blas_init:  43.716 ms, blas_compute:  48.050 ms, cpu_compute: 311.442 ms
+	1 thread: gPU win! cPU/gPU: 3.39
+	2 thread: gPU win! cPU/gPU: 2.23
+	3 thread: gPU win! cPU/gPU: 1.66
+	4 thread: gPU win! cPU/gPU: 1.32
+M:   88, N: 13824, K:  5120, blas_init:  44.208 ms, blas_compute:  48.925 ms, cpu_compute: 313.768 ms
+	1 thread: gPU win! cPU/gPU: 3.37
+	2 thread: gPU win! cPU/gPU: 2.21
+	3 thread: gPU win! cPU/gPU: 1.64
+	4 thread: gPU win! cPU/gPU: 1.31
+M:   89, N: 13824, K:  5120, blas_init:  44.149 ms, blas_compute:  47.520 ms, cpu_compute: 314.847 ms
+	1 thread: gPU win! cPU/gPU: 3.43
+	2 thread: gPU win! cPU/gPU: 2.26
+	3 thread: gPU win! cPU/gPU: 1.69
+	4 thread: gPU win! cPU/gPU: 1.34
+M:   90, N: 13824, K:  5120, blas_init:  44.332 ms, blas_compute:  46.094 ms, cpu_compute: 320.078 ms
+	1 thread: gPU win! cPU/gPU: 3.54
+	2 thread: gPU win! cPU/gPU: 2.34
+	3 thread: gPU win! cPU/gPU: 1.75
+	4 thread: gPU win! cPU/gPU: 1.40
+M:   91, N: 13824, K:  5120, blas_init:  43.564 ms, blas_compute:  46.791 ms, cpu_compute: 326.562 ms
+	1 thread: gPU win! cPU/gPU: 3.61
+	2 thread: gPU win! cPU/gPU: 2.38
+	3 thread: gPU win! cPU/gPU: 1.78
+	4 thread: gPU win! cPU/gPU: 1.42
+M:   92, N: 13824, K:  5120, blas_init:  44.258 ms, blas_compute:  47.606 ms, cpu_compute: 325.863 ms
+	1 thread: gPU win! cPU/gPU: 3.55
+	2 thread: gPU win! cPU/gPU: 2.34
+	3 thread: gPU win! cPU/gPU: 1.74
+	4 thread: gPU win! cPU/gPU: 1.39
+M:   93, N: 13824, K:  5120, blas_init:  44.371 ms, blas_compute:  47.977 ms, cpu_compute: 347.681 ms
+	1 thread: gPU win! cPU/gPU: 3.76
+	2 thread: gPU win! cPU/gPU: 2.48
+	3 thread: gPU win! cPU/gPU: 1.85
+	4 thread: gPU win! cPU/gPU: 1.47
+M:   94, N: 13824, K:  5120, blas_init:  43.630 ms, blas_compute:  48.433 ms, cpu_compute: 341.875 ms
+	1 thread: gPU win! cPU/gPU: 3.71
+	2 thread: gPU win! cPU/gPU: 2.43
+	3 thread: gPU win! cPU/gPU: 1.81
+	4 thread: gPU win! cPU/gPU: 1.44
+M:   95, N: 13824, K:  5120, blas_init:  43.382 ms, blas_compute:  50.910 ms, cpu_compute: 343.652 ms
+	1 thread: gPU win! cPU/gPU: 3.64
+	2 thread: gPU win! cPU/gPU: 2.37
+	3 thread: gPU win! cPU/gPU: 1.75
+	4 thread: gPU win! cPU/gPU: 1.39
+M:   96, N: 13824, K:  5120, blas_init:  43.344 ms, blas_compute:  47.654 ms, cpu_compute: 339.176 ms
+	1 thread: gPU win! cPU/gPU: 3.73
+	2 thread: gPU win! cPU/gPU: 2.45
+	3 thread: gPU win! cPU/gPU: 1.82
+	4 thread: gPU win! cPU/gPU: 1.45
+M:   97, N: 13824, K:  5120, blas_init:  42.764 ms, blas_compute:  48.354 ms, cpu_compute: 343.863 ms
+	1 thread: gPU win! cPU/gPU: 3.77
+	2 thread: gPU win! cPU/gPU: 2.47
+	3 thread: gPU win! cPU/gPU: 1.83
+	4 thread: gPU win! cPU/gPU: 1.46
+M:   98, N: 13824, K:  5120, blas_init:  43.099 ms, blas_compute:  48.635 ms, cpu_compute: 347.626 ms
+	1 thread: gPU win! cPU/gPU: 3.79
+	2 thread: gPU win! cPU/gPU: 2.48
+	3 thread: gPU win! cPU/gPU: 1.84
+	4 thread: gPU win! cPU/gPU: 1.46
+M:   99, N: 13824, K:  5120, blas_init:  42.543 ms, blas_compute:  49.925 ms, cpu_compute: 350.229 ms
+	1 thread: gPU win! cPU/gPU: 3.79
+	2 thread: gPU win! cPU/gPU: 2.46
+	3 thread: gPU win! cPU/gPU: 1.82
+	4 thread: gPU win! cPU/gPU: 1.45
+M:  100, N: 13824, K:  5120, blas_init:  43.104 ms, blas_compute:  48.574 ms, cpu_compute: 355.302 ms
+	1 thread: gPU win! cPU/gPU: 3.88
+	2 thread: gPU win! cPU/gPU: 2.53
+	3 thread: gPU win! cPU/gPU: 1.88
+	4 thread: gPU win! cPU/gPU: 1.50
+M:  101, N: 13824, K:  5120, blas_init:  43.183 ms, blas_compute:  51.194 ms, cpu_compute: 357.847 ms
+	1 thread: gPU win! cPU/gPU: 3.79
+	2 thread: gPU win! cPU/gPU: 2.46
+	3 thread: gPU win! cPU/gPU: 1.82
+	4 thread: gPU win! cPU/gPU: 1.44
+M:  102, N: 13824, K:  5120, blas_init:  43.455 ms, blas_compute:  50.301 ms, cpu_compute: 361.231 ms
+	1 thread: gPU win! cPU/gPU: 3.85
+	2 thread: gPU win! cPU/gPU: 2.51
+	3 thread: gPU win! cPU/gPU: 1.86
+	4 thread: gPU win! cPU/gPU: 1.48
+M:  103, N: 13824, K:  5120, blas_init:  42.978 ms, blas_compute:  50.588 ms, cpu_compute: 364.955 ms
+	1 thread: gPU win! cPU/gPU: 3.90
+	2 thread: gPU win! cPU/gPU: 2.53
+	3 thread: gPU win! cPU/gPU: 1.87
+	4 thread: gPU win! cPU/gPU: 1.49
+M:  104, N: 13824, K:  5120, blas_init:  43.496 ms, blas_compute:  52.165 ms, cpu_compute: 367.994 ms
+	1 thread: gPU win! cPU/gPU: 3.85
+	2 thread: gPU win! cPU/gPU: 2.49
+	3 thread: gPU win! cPU/gPU: 1.84
+	4 thread: gPU win! cPU/gPU: 1.46
+M:  105, N: 13824, K:  5120, blas_init:  43.047 ms, blas_compute:  49.526 ms, cpu_compute: 371.961 ms
+	1 thread: gPU win! cPU/gPU: 4.02
+	2 thread: gPU win! cPU/gPU: 2.62
+	3 thread: gPU win! cPU/gPU: 1.94
+	4 thread: gPU win! cPU/gPU: 1.54
+M:  106, N: 13824, K:  5120, blas_init:  42.056 ms, blas_compute:  51.556 ms, cpu_compute: 372.837 ms
+	1 thread: gPU win! cPU/gPU: 3.98
+	2 thread: gPU win! cPU/gPU: 2.57
+	3 thread: gPU win! cPU/gPU: 1.90
+	4 thread: gPU win! cPU/gPU: 1.50
+M:  107, N: 13824, K:  5120, blas_init:  42.790 ms, blas_compute:  51.297 ms, cpu_compute: 380.331 ms
+	1 thread: gPU win! cPU/gPU: 4.04
+	2 thread: gPU win! cPU/gPU: 2.62
+	3 thread: gPU win! cPU/gPU: 1.93
+	4 thread: gPU win! cPU/gPU: 1.53
+M:  108, N: 13824, K:  5120, blas_init:  43.300 ms, blas_compute:  50.423 ms, cpu_compute: 390.385 ms
+	1 thread: gPU win! cPU/gPU: 4.17
+	2 thread: gPU win! cPU/gPU: 2.71
+	3 thread: gPU win! cPU/gPU: 2.01
+	4 thread: gPU win! cPU/gPU: 1.59
+M:  109, N: 13824, K:  5120, blas_init:  43.406 ms, blas_compute:  51.314 ms, cpu_compute: 386.354 ms
+	1 thread: gPU win! cPU/gPU: 4.08
+	2 thread: gPU win! cPU/gPU: 2.65
+	3 thread: gPU win! cPU/gPU: 1.96
+	4 thread: gPU win! cPU/gPU: 1.55
+M:  110, N: 13824, K:  5120, blas_init:  43.080 ms, blas_compute:  51.967 ms, cpu_compute: 392.375 ms
+	1 thread: gPU win! cPU/gPU: 4.13
+	2 thread: gPU win! cPU/gPU: 2.67
+	3 thread: gPU win! cPU/gPU: 1.97
+	4 thread: gPU win! cPU/gPU: 1.56
+M:  111, N: 13824, K:  5120, blas_init:  42.509 ms, blas_compute:  52.618 ms, cpu_compute: 398.960 ms
+	1 thread: gPU win! cPU/gPU: 4.19
+	2 thread: gPU win! cPU/gPU: 2.70
+	3 thread: gPU win! cPU/gPU: 1.99
+	4 thread: gPU win! cPU/gPU: 1.58
+M:  112, N: 13824, K:  5120, blas_init:  45.194 ms, blas_compute:  54.293 ms, cpu_compute: 398.463 ms
+	1 thread: gPU win! cPU/gPU: 4.01
+	2 thread: gPU win! cPU/gPU: 2.59
+	3 thread: gPU win! cPU/gPU: 1.92
+	4 thread: gPU win! cPU/gPU: 1.52
+M:  113, N: 13824, K:  5120, blas_init:  44.144 ms, blas_compute:  52.019 ms, cpu_compute: 411.596 ms
+	1 thread: gPU win! cPU/gPU: 4.28
+	2 thread: gPU win! cPU/gPU: 2.78
+	3 thread: gPU win! cPU/gPU: 2.06
+	4 thread: gPU win! cPU/gPU: 1.63
+M:  114, N: 13824, K:  5120, blas_init:  46.226 ms, blas_compute:  56.055 ms, cpu_compute: 410.160 ms
+	1 thread: gPU win! cPU/gPU: 4.01
+	2 thread: gPU win! cPU/gPU: 2.59
+	3 thread: gPU win! cPU/gPU: 1.91
+	4 thread: gPU win! cPU/gPU: 1.52
+M:  115, N: 13824, K:  5120, blas_init:  43.831 ms, blas_compute:  53.999 ms, cpu_compute: 416.646 ms
+	1 thread: gPU win! cPU/gPU: 4.26
+	2 thread: gPU win! cPU/gPU: 2.74
+	3 thread: gPU win! cPU/gPU: 2.02
+	4 thread: gPU win! cPU/gPU: 1.60
+M:  116, N: 13824, K:  5120, blas_init:  43.886 ms, blas_compute:  56.020 ms, cpu_compute: 413.918 ms
+	1 thread: gPU win! cPU/gPU: 4.14
+	2 thread: gPU win! cPU/gPU: 2.65
+	3 thread: gPU win! cPU/gPU: 1.95
+	4 thread: gPU win! cPU/gPU: 1.54
+M:  117, N: 13824, K:  5120, blas_init:  44.397 ms, blas_compute:  56.089 ms, cpu_compute: 420.269 ms
+	1 thread: gPU win! cPU/gPU: 4.18
+	2 thread: gPU win! cPU/gPU: 2.68
+	3 thread: gPU win! cPU/gPU: 1.98
+	4 thread: gPU win! cPU/gPU: 1.56
+M:  118, N: 13824, K:  5120, blas_init:  44.008 ms, blas_compute:  53.808 ms, cpu_compute: 424.583 ms
+	1 thread: gPU win! cPU/gPU: 4.34
+	2 thread: gPU win! cPU/gPU: 2.80
+	3 thread: gPU win! cPU/gPU: 2.07
+	4 thread: gPU win! cPU/gPU: 1.64
+M:  119, N: 13824, K:  5120, blas_init:  43.015 ms, blas_compute:  56.425 ms, cpu_compute: 427.496 ms
+	1 thread: gPU win! cPU/gPU: 4.30
+	2 thread: gPU win! cPU/gPU: 2.74
+	3 thread: gPU win! cPU/gPU: 2.01
+	4 thread: gPU win! cPU/gPU: 1.59
+M:  120, N: 13824, K:  5120, blas_init:  44.748 ms, blas_compute:  58.323 ms, cpu_compute: 432.343 ms
+	1 thread: gPU win! cPU/gPU: 4.19
+	2 thread: gPU win! cPU/gPU: 2.68
+	3 thread: gPU win! cPU/gPU: 1.97
+	4 thread: gPU win! cPU/gPU: 1.55
+M:  121, N: 13824, K:  5120, blas_init:  43.682 ms, blas_compute:  55.933 ms, cpu_compute: 435.969 ms
+	1 thread: gPU win! cPU/gPU: 4.38
+	2 thread: gPU win! cPU/gPU: 2.80
+	3 thread: gPU win! cPU/gPU: 2.06
+	4 thread: gPU win! cPU/gPU: 1.63
+M:  122, N: 13824, K:  5120, blas_init:  46.973 ms, blas_compute:  59.029 ms, cpu_compute: 440.144 ms
+	1 thread: gPU win! cPU/gPU: 4.15
+	2 thread: gPU win! cPU/gPU: 2.67
+	3 thread: gPU win! cPU/gPU: 1.96
+	4 thread: gPU win! cPU/gPU: 1.55
+M:  123, N: 13824, K:  5120, blas_init:  43.488 ms, blas_compute:  56.726 ms, cpu_compute: 442.230 ms
+	1 thread: gPU win! cPU/gPU: 4.41
+	2 thread: gPU win! cPU/gPU: 2.82
+	3 thread: gPU win! cPU/gPU: 2.07
+	4 thread: gPU win! cPU/gPU: 1.64
+M:  124, N: 13824, K:  5120, blas_init:  43.723 ms, blas_compute:  57.104 ms, cpu_compute: 443.672 ms
+	1 thread: gPU win! cPU/gPU: 4.40
+	2 thread: gPU win! cPU/gPU: 2.81
+	3 thread: gPU win! cPU/gPU: 2.06
+	4 thread: gPU win! cPU/gPU: 1.63
+M:  125, N: 13824, K:  5120, blas_init:  43.484 ms, blas_compute:  56.512 ms, cpu_compute: 448.976 ms
+	1 thread: gPU win! cPU/gPU: 4.49
+	2 thread: gPU win! cPU/gPU: 2.87
+	3 thread: gPU win! cPU/gPU: 2.11
+	4 thread: gPU win! cPU/gPU: 1.67
+M:  126, N: 13824, K:  5120, blas_init:  44.774 ms, blas_compute:  58.040 ms, cpu_compute: 455.100 ms
+	1 thread: gPU win! cPU/gPU: 4.43
+	2 thread: gPU win! cPU/gPU: 2.83
+	3 thread: gPU win! cPU/gPU: 2.08
+	4 thread: gPU win! cPU/gPU: 1.64
+M:  127, N: 13824, K:  5120, blas_init:  43.448 ms, blas_compute:  57.462 ms, cpu_compute: 454.264 ms
+	1 thread: gPU win! cPU/gPU: 4.50
+	2 thread: gPU win! cPU/gPU: 2.87
+	3 thread: gPU win! cPU/gPU: 2.10
+	4 thread: gPU win! cPU/gPU: 1.66
+M:  128, N: 13824, K:  5120, blas_init:  43.289 ms, blas_compute:  57.750 ms, cpu_compute: 458.926 ms
+	1 thread: gPU win! cPU/gPU: 4.54
+	2 thread: gPU win! cPU/gPU: 2.89
+	3 thread: gPU win! cPU/gPU: 2.12
+	4 thread: gPU win! cPU/gPU: 1.67
+M:    1, N:  5120, K: 13824, blas_init:  59.047 ms, blas_compute:  10.417 ms, cpu_compute:   5.876 ms
+	1 thread: cPU win! cPU/gPU: 0.08
+	2 thread: cPU win! cPU/gPU: 0.07
+	3 thread: cPU win! cPU/gPU: 0.07
+	4 thread: cPU win! cPU/gPU: 0.06
+M:    2, N:  5120, K: 13824, blas_init:  49.306 ms, blas_compute:  14.392 ms, cpu_compute:   9.743 ms
+	1 thread: cPU win! cPU/gPU: 0.15
+	2 thread: cPU win! cPU/gPU: 0.12
+	3 thread: cPU win! cPU/gPU: 0.11
+	4 thread: cPU win! cPU/gPU: 0.09
+M:    3, N:  5120, K: 13824, blas_init:  45.900 ms, blas_compute:  13.376 ms, cpu_compute:  14.345 ms
+	1 thread: cPU win! cPU/gPU: 0.24
+	2 thread: cPU win! cPU/gPU: 0.20
+	3 thread: cPU win! cPU/gPU: 0.17
+	4 thread: cPU win! cPU/gPU: 0.14
+M:    4, N:  5120, K: 13824, blas_init:  45.913 ms, blas_compute:  14.203 ms, cpu_compute:  19.283 ms
+	1 thread: cPU win! cPU/gPU: 0.32
+	2 thread: cPU win! cPU/gPU: 0.26
+	3 thread: cPU win! cPU/gPU: 0.22
+	4 thread: cPU win! cPU/gPU: 0.19
+M:    5, N:  5120, K: 13824, blas_init:  46.986 ms, blas_compute:  14.326 ms, cpu_compute:  23.826 ms
+	1 thread: cPU win! cPU/gPU: 0.39
+	2 thread: cPU win! cPU/gPU: 0.32
+	3 thread: cPU win! cPU/gPU: 0.26
+	4 thread: cPU win! cPU/gPU: 0.23
+M:    6, N:  5120, K: 13824, blas_init:  46.603 ms, blas_compute:  14.881 ms, cpu_compute:  28.162 ms
+	1 thread: cPU win! cPU/gPU: 0.46
+	2 thread: cPU win! cPU/gPU: 0.37
+	3 thread: cPU win! cPU/gPU: 0.31
+	4 thread: cPU win! cPU/gPU: 0.27
+M:    7, N:  5120, K: 13824, blas_init:  46.415 ms, blas_compute:  15.227 ms, cpu_compute:  31.685 ms
+	1 thread: cPU win! cPU/gPU: 0.51
+	2 thread: cPU win! cPU/gPU: 0.41
+	3 thread: cPU win! cPU/gPU: 0.34
+	4 thread: cPU win! cPU/gPU: 0.30
+M:    8, N:  5120, K: 13824, blas_init:  46.759 ms, blas_compute:  13.568 ms, cpu_compute:  37.191 ms
+	1 thread: cPU win! cPU/gPU: 0.62
+	2 thread: cPU win! cPU/gPU: 0.50
+	3 thread: cPU win! cPU/gPU: 0.43
+	4 thread: cPU win! cPU/gPU: 0.37
+M:    9, N:  5120, K: 13824, blas_init:  47.948 ms, blas_compute:  15.383 ms, cpu_compute:  41.791 ms
+	1 thread: cPU win! cPU/gPU: 0.66
+	2 thread: cPU win! cPU/gPU: 0.53
+	3 thread: cPU win! cPU/gPU: 0.44
+	4 thread: cPU win! cPU/gPU: 0.38
+M:   10, N:  5120, K: 13824, blas_init:  45.881 ms, blas_compute:  16.709 ms, cpu_compute:  44.069 ms
+	1 thread: cPU win! cPU/gPU: 0.70
+	2 thread: cPU win! cPU/gPU: 0.56
+	3 thread: cPU win! cPU/gPU: 0.46
+	4 thread: cPU win! cPU/gPU: 0.39
+M:   11, N:  5120, K: 13824, blas_init:  45.939 ms, blas_compute:  15.630 ms, cpu_compute:  47.422 ms
+	1 thread: cPU win! cPU/gPU: 0.77
+	2 thread: cPU win! cPU/gPU: 0.61
+	3 thread: cPU win! cPU/gPU: 0.51
+	4 thread: cPU win! cPU/gPU: 0.44
+M:   12, N:  5120, K: 13824, blas_init:  45.971 ms, blas_compute:  14.581 ms, cpu_compute:  50.604 ms
+	1 thread: cPU win! cPU/gPU: 0.84
+	2 thread: cPU win! cPU/gPU: 0.67
+	3 thread: cPU win! cPU/gPU: 0.56
+	4 thread: cPU win! cPU/gPU: 0.49
+M:   13, N:  5120, K: 13824, blas_init:  47.810 ms, blas_compute:  15.673 ms, cpu_compute:  55.490 ms
+	1 thread: cPU win! cPU/gPU: 0.87
+	2 thread: cPU win! cPU/gPU: 0.70
+	3 thread: cPU win! cPU/gPU: 0.59
+	4 thread: cPU win! cPU/gPU: 0.50
+M:   14, N:  5120, K: 13824, blas_init:  45.779 ms, blas_compute:  16.116 ms, cpu_compute:  58.695 ms
+	1 thread: cPU win! cPU/gPU: 0.95
+	2 thread: cPU win! cPU/gPU: 0.75
+	3 thread: cPU win! cPU/gPU: 0.62
+	4 thread: cPU win! cPU/gPU: 0.53
+M:   15, N:  5120, K: 13824, blas_init:  46.455 ms, blas_compute:  16.918 ms, cpu_compute:  60.964 ms
+	1 thread: cPU win! cPU/gPU: 0.96
+	2 thread: cPU win! cPU/gPU: 0.76
+	3 thread: cPU win! cPU/gPU: 0.63
+	4 thread: cPU win! cPU/gPU: 0.53
+M:   16, N:  5120, K: 13824, blas_init:  45.935 ms, blas_compute:  15.394 ms, cpu_compute:  63.596 ms
+	1 thread: gPU win! cPU/gPU: 1.04
+	2 thread: cPU win! cPU/gPU: 0.83
+	3 thread: cPU win! cPU/gPU: 0.69
+	4 thread: cPU win! cPU/gPU: 0.59
+M:   17, N:  5120, K: 13824, blas_init:  45.748 ms, blas_compute:  16.651 ms, cpu_compute:  68.377 ms
+	1 thread: gPU win! cPU/gPU: 1.10
+	2 thread: cPU win! cPU/gPU: 0.86
+	3 thread: cPU win! cPU/gPU: 0.71
+	4 thread: cPU win! cPU/gPU: 0.61
+M:   18, N:  5120, K: 13824, blas_init:  46.331 ms, blas_compute:  16.522 ms, cpu_compute:  70.179 ms
+	1 thread: gPU win! cPU/gPU: 1.12
+	2 thread: cPU win! cPU/gPU: 0.88
+	3 thread: cPU win! cPU/gPU: 0.73
+	4 thread: cPU win! cPU/gPU: 0.62
+M:   19, N:  5120, K: 13824, blas_init:  47.008 ms, blas_compute:  17.554 ms, cpu_compute:  73.417 ms
+	1 thread: gPU win! cPU/gPU: 1.14
+	2 thread: cPU win! cPU/gPU: 0.89
+	3 thread: cPU win! cPU/gPU: 0.74
+	4 thread: cPU win! cPU/gPU: 0.63
+M:   20, N:  5120, K: 13824, blas_init:  45.955 ms, blas_compute:  16.124 ms, cpu_compute:  78.564 ms
+	1 thread: gPU win! cPU/gPU: 1.27
+	2 thread: gPU win! cPU/gPU: 1.00
+	3 thread: cPU win! cPU/gPU: 0.83
+	4 thread: cPU win! cPU/gPU: 0.71
+M:   21, N:  5120, K: 13824, blas_init:  46.195 ms, blas_compute:  17.021 ms, cpu_compute:  80.611 ms
+	1 thread: gPU win! cPU/gPU: 1.28
+	2 thread: gPU win! cPU/gPU: 1.00
+	3 thread: cPU win! cPU/gPU: 0.83
+	4 thread: cPU win! cPU/gPU: 0.71
+M:   22, N:  5120, K: 13824, blas_init:  46.592 ms, blas_compute:  17.929 ms, cpu_compute:  83.833 ms
+	1 thread: gPU win! cPU/gPU: 1.30
+	2 thread: gPU win! cPU/gPU: 1.02
+	3 thread: cPU win! cPU/gPU: 0.84
+	4 thread: cPU win! cPU/gPU: 0.71
+M:   23, N:  5120, K: 13824, blas_init:  45.673 ms, blas_compute:  18.168 ms, cpu_compute:  87.480 ms
+	1 thread: gPU win! cPU/gPU: 1.37
+	2 thread: gPU win! cPU/gPU: 1.07
+	3 thread: cPU win! cPU/gPU: 0.87
+	4 thread: cPU win! cPU/gPU: 0.74
+M:   24, N:  5120, K: 13824, blas_init:  45.331 ms, blas_compute:  17.370 ms, cpu_compute:  91.126 ms
+	1 thread: gPU win! cPU/gPU: 1.45
+	2 thread: gPU win! cPU/gPU: 1.14
+	3 thread: cPU win! cPU/gPU: 0.94
+	4 thread: cPU win! cPU/gPU: 0.79
+M:   25, N:  5120, K: 13824, blas_init:  47.532 ms, blas_compute:  17.333 ms, cpu_compute:  94.866 ms
+	1 thread: gPU win! cPU/gPU: 1.46
+	2 thread: gPU win! cPU/gPU: 1.15
+	3 thread: cPU win! cPU/gPU: 0.95
+	4 thread: cPU win! cPU/gPU: 0.81
+M:   26, N:  5120, K: 13824, blas_init:  46.652 ms, blas_compute:  19.371 ms, cpu_compute:  96.151 ms
+	1 thread: gPU win! cPU/gPU: 1.46
+	2 thread: gPU win! cPU/gPU: 1.13
+	3 thread: cPU win! cPU/gPU: 0.92
+	4 thread: cPU win! cPU/gPU: 0.77
+M:   27, N:  5120, K: 13824, blas_init:  45.395 ms, blas_compute:  19.139 ms, cpu_compute:  99.681 ms
+	1 thread: gPU win! cPU/gPU: 1.54
+	2 thread: gPU win! cPU/gPU: 1.19
+	3 thread: cPU win! cPU/gPU: 0.97
+	4 thread: cPU win! cPU/gPU: 0.82
+M:   28, N:  5120, K: 13824, blas_init:  45.072 ms, blas_compute:  19.255 ms, cpu_compute: 102.777 ms
+	1 thread: gPU win! cPU/gPU: 1.60
+	2 thread: gPU win! cPU/gPU: 1.23
+	3 thread: cPU win! cPU/gPU: 1.00
+	4 thread: cPU win! cPU/gPU: 0.84
+M:   29, N:  5120, K: 13824, blas_init:  45.530 ms, blas_compute:  18.401 ms, cpu_compute: 106.337 ms
+	1 thread: gPU win! cPU/gPU: 1.66
+	2 thread: gPU win! cPU/gPU: 1.29
+	3 thread: gPU win! cPU/gPU: 1.06
+	4 thread: cPU win! cPU/gPU: 0.89
+M:   30, N:  5120, K: 13824, blas_init:  46.783 ms, blas_compute:  20.674 ms, cpu_compute: 109.652 ms
+	1 thread: gPU win! cPU/gPU: 1.63
+	2 thread: gPU win! cPU/gPU: 1.24
+	3 thread: gPU win! cPU/gPU: 1.01
+	4 thread: cPU win! cPU/gPU: 0.85
+M:   31, N:  5120, K: 13824, blas_init:  46.180 ms, blas_compute:  18.603 ms, cpu_compute: 112.800 ms
+	1 thread: gPU win! cPU/gPU: 1.74
+	2 thread: gPU win! cPU/gPU: 1.35
+	3 thread: gPU win! cPU/gPU: 1.11
+	4 thread: cPU win! cPU/gPU: 0.94
+M:   32, N:  5120, K: 13824, blas_init:  46.754 ms, blas_compute:  18.839 ms, cpu_compute: 117.206 ms
+	1 thread: gPU win! cPU/gPU: 1.79
+	2 thread: gPU win! cPU/gPU: 1.39
+	3 thread: gPU win! cPU/gPU: 1.13
+	4 thread: cPU win! cPU/gPU: 0.96
+M:   33, N:  5120, K: 13824, blas_init:  45.957 ms, blas_compute:  21.158 ms, cpu_compute: 119.444 ms
+	1 thread: gPU win! cPU/gPU: 1.78
+	2 thread: gPU win! cPU/gPU: 1.35
+	3 thread: gPU win! cPU/gPU: 1.09
+	4 thread: cPU win! cPU/gPU: 0.91
+M:   34, N:  5120, K: 13824, blas_init:  45.972 ms, blas_compute:  20.810 ms, cpu_compute: 124.198 ms
+	1 thread: gPU win! cPU/gPU: 1.86
+	2 thread: gPU win! cPU/gPU: 1.42
+	3 thread: gPU win! cPU/gPU: 1.15
+	4 thread: cPU win! cPU/gPU: 0.96
+M:   35, N:  5120, K: 13824, blas_init:  46.474 ms, blas_compute:  21.402 ms, cpu_compute: 126.305 ms
+	1 thread: gPU win! cPU/gPU: 1.86
+	2 thread: gPU win! cPU/gPU: 1.41
+	3 thread: gPU win! cPU/gPU: 1.14
+	4 thread: cPU win! cPU/gPU: 0.96
+M:   36, N:  5120, K: 13824, blas_init:  47.095 ms, blas_compute:  20.561 ms, cpu_compute: 130.978 ms
+	1 thread: gPU win! cPU/gPU: 1.94
+	2 thread: gPU win! cPU/gPU: 1.48
+	3 thread: gPU win! cPU/gPU: 1.20
+	4 thread: gPU win! cPU/gPU: 1.01
+M:   37, N:  5120, K: 13824, blas_init:  46.859 ms, blas_compute:  20.825 ms, cpu_compute: 134.056 ms
+	1 thread: gPU win! cPU/gPU: 1.98
+	2 thread: gPU win! cPU/gPU: 1.51
+	3 thread: gPU win! cPU/gPU: 1.23
+	4 thread: gPU win! cPU/gPU: 1.03
+M:   38, N:  5120, K: 13824, blas_init:  46.119 ms, blas_compute:  21.667 ms, cpu_compute: 136.652 ms
+	1 thread: gPU win! cPU/gPU: 2.02
+	2 thread: gPU win! cPU/gPU: 1.53
+	3 thread: gPU win! cPU/gPU: 1.23
+	4 thread: gPU win! cPU/gPU: 1.03
+M:   39, N:  5120, K: 13824, blas_init:  46.877 ms, blas_compute:  21.848 ms, cpu_compute: 139.062 ms
+	1 thread: gPU win! cPU/gPU: 2.02
+	2 thread: gPU win! cPU/gPU: 1.54
+	3 thread: gPU win! cPU/gPU: 1.24
+	4 thread: gPU win! cPU/gPU: 1.04
+M:   40, N:  5120, K: 13824, blas_init:  47.138 ms, blas_compute:  20.864 ms, cpu_compute: 143.582 ms
+	1 thread: gPU win! cPU/gPU: 2.11
+	2 thread: gPU win! cPU/gPU: 1.62
+	3 thread: gPU win! cPU/gPU: 1.31
+	4 thread: gPU win! cPU/gPU: 1.10
+M:   41, N:  5120, K: 13824, blas_init:  46.319 ms, blas_compute:  21.620 ms, cpu_compute: 144.853 ms
+	1 thread: gPU win! cPU/gPU: 2.13
+	2 thread: gPU win! cPU/gPU: 1.62
+	3 thread: gPU win! cPU/gPU: 1.30
+	4 thread: gPU win! cPU/gPU: 1.09
+M:   42, N:  5120, K: 13824, blas_init:  45.878 ms, blas_compute:  21.505 ms, cpu_compute: 148.235 ms
+	1 thread: gPU win! cPU/gPU: 2.20
+	2 thread: gPU win! cPU/gPU: 1.67
+	3 thread: gPU win! cPU/gPU: 1.34
+	4 thread: gPU win! cPU/gPU: 1.12
+M:   43, N:  5120, K: 13824, blas_init:  47.109 ms, blas_compute:  22.791 ms, cpu_compute: 152.763 ms
+	1 thread: gPU win! cPU/gPU: 2.19
+	2 thread: gPU win! cPU/gPU: 1.65
+	3 thread: gPU win! cPU/gPU: 1.32
+	4 thread: gPU win! cPU/gPU: 1.10
+M:   44, N:  5120, K: 13824, blas_init:  45.817 ms, blas_compute:  22.933 ms, cpu_compute: 155.297 ms
+	1 thread: gPU win! cPU/gPU: 2.26
+	2 thread: gPU win! cPU/gPU: 1.69
+	3 thread: gPU win! cPU/gPU: 1.35
+	4 thread: gPU win! cPU/gPU: 1.13
+M:   45, N:  5120, K: 13824, blas_init:  46.119 ms, blas_compute:  21.872 ms, cpu_compute: 158.318 ms
+	1 thread: gPU win! cPU/gPU: 2.33
+	2 thread: gPU win! cPU/gPU: 1.76
+	3 thread: gPU win! cPU/gPU: 1.42
+	4 thread: gPU win! cPU/gPU: 1.18
+M:   46, N:  5120, K: 13824, blas_init:  45.640 ms, blas_compute:  22.310 ms, cpu_compute: 163.004 ms
+	1 thread: gPU win! cPU/gPU: 2.40
+	2 thread: gPU win! cPU/gPU: 1.81
+	3 thread: gPU win! cPU/gPU: 1.45
+	4 thread: gPU win! cPU/gPU: 1.21
+M:   47, N:  5120, K: 13824, blas_init:  46.507 ms, blas_compute:  23.071 ms, cpu_compute: 164.799 ms
+	1 thread: gPU win! cPU/gPU: 2.37
+	2 thread: gPU win! cPU/gPU: 1.78
+	3 thread: gPU win! cPU/gPU: 1.42
+	4 thread: gPU win! cPU/gPU: 1.19
+M:   48, N:  5120, K: 13824, blas_init:  46.249 ms, blas_compute:  22.342 ms, cpu_compute: 173.106 ms
+	1 thread: gPU win! cPU/gPU: 2.52
+	2 thread: gPU win! cPU/gPU: 1.90
+	3 thread: gPU win! cPU/gPU: 1.53
+	4 thread: gPU win! cPU/gPU: 1.28
+M:   49, N:  5120, K: 13824, blas_init:  46.412 ms, blas_compute:  23.603 ms, cpu_compute: 171.719 ms
+	1 thread: gPU win! cPU/gPU: 2.45
+	2 thread: gPU win! cPU/gPU: 1.83
+	3 thread: gPU win! cPU/gPU: 1.46
+	4 thread: gPU win! cPU/gPU: 1.22
+M:   50, N:  5120, K: 13824, blas_init:  46.356 ms, blas_compute:  24.277 ms, cpu_compute: 174.725 ms
+	1 thread: gPU win! cPU/gPU: 2.47
+	2 thread: gPU win! cPU/gPU: 1.84
+	3 thread: gPU win! cPU/gPU: 1.47
+	4 thread: gPU win! cPU/gPU: 1.22
+M:   51, N:  5120, K: 13824, blas_init:  46.778 ms, blas_compute:  23.973 ms, cpu_compute: 178.539 ms
+	1 thread: gPU win! cPU/gPU: 2.52
+	2 thread: gPU win! cPU/gPU: 1.88
+	3 thread: gPU win! cPU/gPU: 1.50
+	4 thread: gPU win! cPU/gPU: 1.25
+M:   52, N:  5120, K: 13824, blas_init:  45.719 ms, blas_compute:  24.400 ms, cpu_compute: 181.212 ms
+	1 thread: gPU win! cPU/gPU: 2.58
+	2 thread: gPU win! cPU/gPU: 1.92
+	3 thread: gPU win! cPU/gPU: 1.52
+	4 thread: gPU win! cPU/gPU: 1.26
+M:   53, N:  5120, K: 13824, blas_init:  45.339 ms, blas_compute:  23.945 ms, cpu_compute: 184.511 ms
+	1 thread: gPU win! cPU/gPU: 2.66
+	2 thread: gPU win! cPU/gPU: 1.98
+	3 thread: gPU win! cPU/gPU: 1.57
+	4 thread: gPU win! cPU/gPU: 1.31
+M:   54, N:  5120, K: 13824, blas_init:  46.341 ms, blas_compute:  23.393 ms, cpu_compute: 188.696 ms
+	1 thread: gPU win! cPU/gPU: 2.71
+	2 thread: gPU win! cPU/gPU: 2.03
+	3 thread: gPU win! cPU/gPU: 1.62
+	4 thread: gPU win! cPU/gPU: 1.35
+M:   55, N:  5120, K: 13824, blas_init:  45.503 ms, blas_compute:  25.506 ms, cpu_compute: 191.685 ms
+	1 thread: gPU win! cPU/gPU: 2.70
+	2 thread: gPU win! cPU/gPU: 1.99
+	3 thread: gPU win! cPU/gPU: 1.57
+	4 thread: gPU win! cPU/gPU: 1.30
+M:   56, N:  5120, K: 13824, blas_init:  49.051 ms, blas_compute:  24.973 ms, cpu_compute: 200.420 ms
+	1 thread: gPU win! cPU/gPU: 2.71
+	2 thread: gPU win! cPU/gPU: 2.02
+	3 thread: gPU win! cPU/gPU: 1.62
+	4 thread: gPU win! cPU/gPU: 1.35
+M:   57, N:  5120, K: 13824, blas_init:  45.800 ms, blas_compute:  24.542 ms, cpu_compute: 198.352 ms
+	1 thread: gPU win! cPU/gPU: 2.82
+	2 thread: gPU win! cPU/gPU: 2.09
+	3 thread: gPU win! cPU/gPU: 1.66
+	4 thread: gPU win! cPU/gPU: 1.38
+M:   58, N:  5120, K: 13824, blas_init:  47.101 ms, blas_compute:  27.183 ms, cpu_compute: 201.756 ms
+	1 thread: gPU win! cPU/gPU: 2.72
+	2 thread: gPU win! cPU/gPU: 1.99
+	3 thread: gPU win! cPU/gPU: 1.57
+	4 thread: gPU win! cPU/gPU: 1.29
+M:   59, N:  5120, K: 13824, blas_init:  46.182 ms, blas_compute:  23.871 ms, cpu_compute: 204.868 ms
+	1 thread: gPU win! cPU/gPU: 2.92
+	2 thread: gPU win! cPU/gPU: 2.18
+	3 thread: gPU win! cPU/gPU: 1.74
+	4 thread: gPU win! cPU/gPU: 1.45
+M:   60, N:  5120, K: 13824, blas_init:  45.480 ms, blas_compute:  25.696 ms, cpu_compute: 207.829 ms
+	1 thread: gPU win! cPU/gPU: 2.92
+	2 thread: gPU win! cPU/gPU: 2.15
+	3 thread: gPU win! cPU/gPU: 1.70
+	4 thread: gPU win! cPU/gPU: 1.40
+M:   61, N:  5120, K: 13824, blas_init:  45.655 ms, blas_compute:  26.880 ms, cpu_compute: 213.738 ms
+	1 thread: gPU win! cPU/gPU: 2.95
+	2 thread: gPU win! cPU/gPU: 2.15
+	3 thread: gPU win! cPU/gPU: 1.69
+	4 thread: gPU win! cPU/gPU: 1.40
+M:   62, N:  5120, K: 13824, blas_init:  46.631 ms, blas_compute:  24.520 ms, cpu_compute: 220.415 ms
+	1 thread: gPU win! cPU/gPU: 3.10
+	2 thread: gPU win! cPU/gPU: 2.30
+	3 thread: gPU win! cPU/gPU: 1.83
+	4 thread: gPU win! cPU/gPU: 1.52
+M:   63, N:  5120, K: 13824, blas_init:  45.840 ms, blas_compute:  27.900 ms, cpu_compute: 219.321 ms
+	1 thread: gPU win! cPU/gPU: 2.97
+	2 thread: gPU win! cPU/gPU: 2.16
+	3 thread: gPU win! cPU/gPU: 1.69
+	4 thread: gPU win! cPU/gPU: 1.39
+M:   64, N:  5120, K: 13824, blas_init:  45.935 ms, blas_compute:  26.595 ms, cpu_compute: 223.522 ms
+	1 thread: gPU win! cPU/gPU: 3.08
+	2 thread: gPU win! cPU/gPU: 2.25
+	3 thread: gPU win! cPU/gPU: 1.78
+	4 thread: gPU win! cPU/gPU: 1.47
+M:   65, N:  5120, K: 13824, blas_init:  45.614 ms, blas_compute:  28.786 ms, cpu_compute: 225.499 ms
+	1 thread: gPU win! cPU/gPU: 3.03
+	2 thread: gPU win! cPU/gPU: 2.19
+	3 thread: gPU win! cPU/gPU: 1.71
+	4 thread: gPU win! cPU/gPU: 1.40
+M:   66, N:  5120, K: 13824, blas_init:  46.448 ms, blas_compute:  30.257 ms, cpu_compute: 231.411 ms
+	1 thread: gPU win! cPU/gPU: 3.02
+	2 thread: gPU win! cPU/gPU: 2.16
+	3 thread: gPU win! cPU/gPU: 1.69
+	4 thread: gPU win! cPU/gPU: 1.38
+M:   67, N:  5120, K: 13824, blas_init:  46.322 ms, blas_compute:  28.718 ms, cpu_compute: 231.417 ms
+	1 thread: gPU win! cPU/gPU: 3.08
+	2 thread: gPU win! cPU/gPU: 2.23
+	3 thread: gPU win! cPU/gPU: 1.75
+	4 thread: gPU win! cPU/gPU: 1.44
+M:   68, N:  5120, K: 13824, blas_init:  45.829 ms, blas_compute:  27.331 ms, cpu_compute: 237.737 ms
+	1 thread: gPU win! cPU/gPU: 3.25
+	2 thread: gPU win! cPU/gPU: 2.37
+	3 thread: gPU win! cPU/gPU: 1.86
+	4 thread: gPU win! cPU/gPU: 1.53
+M:   69, N:  5120, K: 13824, blas_init:  45.937 ms, blas_compute:  28.883 ms, cpu_compute: 238.872 ms
+	1 thread: gPU win! cPU/gPU: 3.19
+	2 thread: gPU win! cPU/gPU: 2.30
+	3 thread: gPU win! cPU/gPU: 1.80
+	4 thread: gPU win! cPU/gPU: 1.48
+M:   70, N:  5120, K: 13824, blas_init:  45.856 ms, blas_compute:  28.708 ms, cpu_compute: 250.133 ms
+	1 thread: gPU win! cPU/gPU: 3.35
+	2 thread: gPU win! cPU/gPU: 2.42
+	3 thread: gPU win! cPU/gPU: 1.90
+	4 thread: gPU win! cPU/gPU: 1.56
+M:   71, N:  5120, K: 13824, blas_init:  45.759 ms, blas_compute:  31.025 ms, cpu_compute: 247.431 ms
+	1 thread: gPU win! cPU/gPU: 3.22
+	2 thread: gPU win! cPU/gPU: 2.30
+	3 thread: gPU win! cPU/gPU: 1.78
+	4 thread: gPU win! cPU/gPU: 1.46
+M:   72, N:  5120, K: 13824, blas_init:  45.509 ms, blas_compute:  27.827 ms, cpu_compute: 253.444 ms
+	1 thread: gPU win! cPU/gPU: 3.46
+	2 thread: gPU win! cPU/gPU: 2.51
+	3 thread: gPU win! cPU/gPU: 1.96
+	4 thread: gPU win! cPU/gPU: 1.62
+M:   73, N:  5120, K: 13824, blas_init:  45.054 ms, blas_compute:  30.183 ms, cpu_compute: 256.560 ms
+	1 thread: gPU win! cPU/gPU: 3.41
+	2 thread: gPU win! cPU/gPU: 2.43
+	3 thread: gPU win! cPU/gPU: 1.89
+	4 thread: gPU win! cPU/gPU: 1.55
+M:   74, N:  5120, K: 13824, blas_init:  44.867 ms, blas_compute:  29.348 ms, cpu_compute: 259.517 ms
+	1 thread: gPU win! cPU/gPU: 3.50
+	2 thread: gPU win! cPU/gPU: 2.51
+	3 thread: gPU win! cPU/gPU: 1.95
+	4 thread: gPU win! cPU/gPU: 1.60
+M:   75, N:  5120, K: 13824, blas_init:  45.583 ms, blas_compute:  30.723 ms, cpu_compute: 259.702 ms
+	1 thread: gPU win! cPU/gPU: 3.40
+	2 thread: gPU win! cPU/gPU: 2.43
+	3 thread: gPU win! cPU/gPU: 1.89
+	4 thread: gPU win! cPU/gPU: 1.54
+M:   76, N:  5120, K: 13824, blas_init:  44.689 ms, blas_compute:  30.048 ms, cpu_compute: 261.381 ms
+	1 thread: gPU win! cPU/gPU: 3.50
+	2 thread: gPU win! cPU/gPU: 2.49
+	3 thread: gPU win! cPU/gPU: 1.94
+	4 thread: gPU win! cPU/gPU: 1.59
+M:   77, N:  5120, K: 13824, blas_init:  47.398 ms, blas_compute:  44.926 ms, cpu_compute: 282.344 ms
+	1 thread: gPU win! cPU/gPU: 3.06
+	2 thread: gPU win! cPU/gPU: 2.06
+	3 thread: gPU win! cPU/gPU: 1.55
+	4 thread: gPU win! cPU/gPU: 1.24
+M:   78, N:  5120, K: 13824, blas_init:  46.692 ms, blas_compute:  29.442 ms, cpu_compute: 279.844 ms
+	1 thread: gPU win! cPU/gPU: 3.68
+	2 thread: gPU win! cPU/gPU: 2.65
+	3 thread: gPU win! cPU/gPU: 2.07
+	4 thread: gPU win! cPU/gPU: 1.70
+M:   79, N:  5120, K: 13824, blas_init:  46.854 ms, blas_compute:  31.084 ms, cpu_compute: 292.977 ms
+	1 thread: gPU win! cPU/gPU: 3.76
+	2 thread: gPU win! cPU/gPU: 2.69
+	3 thread: gPU win! cPU/gPU: 2.09
+	4 thread: gPU win! cPU/gPU: 1.71
+M:   80, N:  5120, K: 13824, blas_init:  46.710 ms, blas_compute:  31.910 ms, cpu_compute: 287.965 ms
+	1 thread: gPU win! cPU/gPU: 3.66
+	2 thread: gPU win! cPU/gPU: 2.61
+	3 thread: gPU win! cPU/gPU: 2.02
+	4 thread: gPU win! cPU/gPU: 1.65
+M:   81, N:  5120, K: 13824, blas_init:  47.173 ms, blas_compute:  33.180 ms, cpu_compute: 295.141 ms
+	1 thread: gPU win! cPU/gPU: 3.67
+	2 thread: gPU win! cPU/gPU: 2.60
+	3 thread: gPU win! cPU/gPU: 2.01
+	4 thread: gPU win! cPU/gPU: 1.64
+M:   82, N:  5120, K: 13824, blas_init:  46.701 ms, blas_compute:  33.358 ms, cpu_compute: 296.013 ms
+	1 thread: gPU win! cPU/gPU: 3.70
+	2 thread: gPU win! cPU/gPU: 2.61
+	3 thread: gPU win! cPU/gPU: 2.02
+	4 thread: gPU win! cPU/gPU: 1.64
+M:   83, N:  5120, K: 13824, blas_init:  47.193 ms, blas_compute:  32.228 ms, cpu_compute: 288.023 ms
+	1 thread: gPU win! cPU/gPU: 3.63
+	2 thread: gPU win! cPU/gPU: 2.58
+	3 thread: gPU win! cPU/gPU: 2.00
+	4 thread: gPU win! cPU/gPU: 1.64
+M:   84, N:  5120, K: 13824, blas_init:  46.900 ms, blas_compute:  32.027 ms, cpu_compute: 289.991 ms
+	1 thread: gPU win! cPU/gPU: 3.67
+	2 thread: gPU win! cPU/gPU: 2.61
+	3 thread: gPU win! cPU/gPU: 2.03
+	4 thread: gPU win! cPU/gPU: 1.66
+M:   85, N:  5120, K: 13824, blas_init:  44.898 ms, blas_compute:  31.846 ms, cpu_compute: 300.830 ms
+	1 thread: gPU win! cPU/gPU: 3.92
+	2 thread: gPU win! cPU/gPU: 2.77
+	3 thread: gPU win! cPU/gPU: 2.14
+	4 thread: gPU win! cPU/gPU: 1.75
+M:   86, N:  5120, K: 13824, blas_init:  44.736 ms, blas_compute:  32.407 ms, cpu_compute: 294.496 ms
+	1 thread: gPU win! cPU/gPU: 3.82
+	2 thread: gPU win! cPU/gPU: 2.69
+	3 thread: gPU win! cPU/gPU: 2.07
+	4 thread: gPU win! cPU/gPU: 1.69
+M:   87, N:  5120, K: 13824, blas_init:  45.745 ms, blas_compute:  33.853 ms, cpu_compute: 300.381 ms
+	1 thread: gPU win! cPU/gPU: 3.77
+	2 thread: gPU win! cPU/gPU: 2.65
+	3 thread: gPU win! cPU/gPU: 2.04
+	4 thread: gPU win! cPU/gPU: 1.66
+M:   88, N:  5120, K: 13824, blas_init:  45.553 ms, blas_compute:  33.414 ms, cpu_compute: 310.461 ms
+	1 thread: gPU win! cPU/gPU: 3.93
+	2 thread: gPU win! cPU/gPU: 2.76
+	3 thread: gPU win! cPU/gPU: 2.13
+	4 thread: gPU win! cPU/gPU: 1.73
+M:   89, N:  5120, K: 13824, blas_init:  45.498 ms, blas_compute:  33.964 ms, cpu_compute: 308.830 ms
+	1 thread: gPU win! cPU/gPU: 3.89
+	2 thread: gPU win! cPU/gPU: 2.72
+	3 thread: gPU win! cPU/gPU: 2.10
+	4 thread: gPU win! cPU/gPU: 1.70
+M:   90, N:  5120, K: 13824, blas_init:  45.785 ms, blas_compute:  33.529 ms, cpu_compute: 308.079 ms
+	1 thread: gPU win! cPU/gPU: 3.88
+	2 thread: gPU win! cPU/gPU: 2.73
+	3 thread: gPU win! cPU/gPU: 2.10
+	4 thread: gPU win! cPU/gPU: 1.71
+M:   91, N:  5120, K: 13824, blas_init:  45.538 ms, blas_compute:  35.334 ms, cpu_compute: 315.889 ms
+	1 thread: gPU win! cPU/gPU: 3.91
+	2 thread: gPU win! cPU/gPU: 2.72
+	3 thread: gPU win! cPU/gPU: 2.08
+	4 thread: gPU win! cPU/gPU: 1.69
+M:   92, N:  5120, K: 13824, blas_init:  46.340 ms, blas_compute:  31.724 ms, cpu_compute: 321.966 ms
+	1 thread: gPU win! cPU/gPU: 4.12
+	2 thread: gPU win! cPU/gPU: 2.93
+	3 thread: gPU win! cPU/gPU: 2.28
+	4 thread: gPU win! cPU/gPU: 1.86
+M:   93, N:  5120, K: 13824, blas_init:  45.537 ms, blas_compute:  34.294 ms, cpu_compute: 321.902 ms
+	1 thread: gPU win! cPU/gPU: 4.03
+	2 thread: gPU win! cPU/gPU: 2.82
+	3 thread: gPU win! cPU/gPU: 2.17
+	4 thread: gPU win! cPU/gPU: 1.76
+M:   94, N:  5120, K: 13824, blas_init:  46.167 ms, blas_compute:  34.031 ms, cpu_compute: 328.757 ms
+	1 thread: gPU win! cPU/gPU: 4.10
+	2 thread: gPU win! cPU/gPU: 2.88
+	3 thread: gPU win! cPU/gPU: 2.22
+	4 thread: gPU win! cPU/gPU: 1.80
+M:   95, N:  5120, K: 13824, blas_init:  45.293 ms, blas_compute:  35.538 ms, cpu_compute: 328.050 ms
+	1 thread: gPU win! cPU/gPU: 4.06
+	2 thread: gPU win! cPU/gPU: 2.82
+	3 thread: gPU win! cPU/gPU: 2.16
+	4 thread: gPU win! cPU/gPU: 1.75
+M:   96, N:  5120, K: 13824, blas_init:  45.943 ms, blas_compute:  37.186 ms, cpu_compute: 335.863 ms
+	1 thread: gPU win! cPU/gPU: 4.04
+	2 thread: gPU win! cPU/gPU: 2.79
+	3 thread: gPU win! cPU/gPU: 2.13
+	4 thread: gPU win! cPU/gPU: 1.73
+M:   97, N:  5120, K: 13824, blas_init:  44.891 ms, blas_compute:  35.153 ms, cpu_compute: 330.608 ms
+	1 thread: gPU win! cPU/gPU: 4.13
+	2 thread: gPU win! cPU/gPU: 2.87
+	3 thread: gPU win! cPU/gPU: 2.20
+	4 thread: gPU win! cPU/gPU: 1.78
+M:   98, N:  5120, K: 13824, blas_init:  45.043 ms, blas_compute:  36.432 ms, cpu_compute: 344.183 ms
+	1 thread: gPU win! cPU/gPU: 4.22
+	2 thread: gPU win! cPU/gPU: 2.92
+	3 thread: gPU win! cPU/gPU: 2.23
+	4 thread: gPU win! cPU/gPU: 1.80
+M:   99, N:  5120, K: 13824, blas_init:  46.104 ms, blas_compute:  35.849 ms, cpu_compute: 347.629 ms
+	1 thread: gPU win! cPU/gPU: 4.24
+	2 thread: gPU win! cPU/gPU: 2.95
+	3 thread: gPU win! cPU/gPU: 2.26
+	4 thread: gPU win! cPU/gPU: 1.83
+M:  100, N:  5120, K: 13824, blas_init:  44.868 ms, blas_compute:  37.038 ms, cpu_compute: 343.330 ms
+	1 thread: gPU win! cPU/gPU: 4.19
+	2 thread: gPU win! cPU/gPU: 2.89
+	3 thread: gPU win! cPU/gPU: 2.20
+	4 thread: gPU win! cPU/gPU: 1.78
+M:  101, N:  5120, K: 13824, blas_init:  46.222 ms, blas_compute:  36.565 ms, cpu_compute: 350.698 ms
+	1 thread: gPU win! cPU/gPU: 4.24
+	2 thread: gPU win! cPU/gPU: 2.94
+	3 thread: gPU win! cPU/gPU: 2.25
+	4 thread: gPU win! cPU/gPU: 1.82
+M:  102, N:  5120, K: 13824, blas_init:  45.082 ms, blas_compute:  36.836 ms, cpu_compute: 359.276 ms
+	1 thread: gPU win! cPU/gPU: 4.39
+	2 thread: gPU win! cPU/gPU: 3.03
+	3 thread: gPU win! cPU/gPU: 2.31
+	4 thread: gPU win! cPU/gPU: 1.87
+M:  103, N:  5120, K: 13824, blas_init:  46.042 ms, blas_compute:  38.120 ms, cpu_compute: 363.274 ms
+	1 thread: gPU win! cPU/gPU: 4.32
+	2 thread: gPU win! cPU/gPU: 2.97
+	3 thread: gPU win! cPU/gPU: 2.26
+	4 thread: gPU win! cPU/gPU: 1.83
+M:  104, N:  5120, K: 13824, blas_init:  45.557 ms, blas_compute:  36.236 ms, cpu_compute: 367.614 ms
+	1 thread: gPU win! cPU/gPU: 4.49
+	2 thread: gPU win! cPU/gPU: 3.11
+	3 thread: gPU win! cPU/gPU: 2.38
+	4 thread: gPU win! cPU/gPU: 1.93
+M:  105, N:  5120, K: 13824, blas_init:  46.212 ms, blas_compute:  40.254 ms, cpu_compute: 369.697 ms
+	1 thread: gPU win! cPU/gPU: 4.28
+	2 thread: gPU win! cPU/gPU: 2.92
+	3 thread: gPU win! cPU/gPU: 2.21
+	4 thread: gPU win! cPU/gPU: 1.78
+M:  106, N:  5120, K: 13824, blas_init:  44.971 ms, blas_compute:  38.920 ms, cpu_compute: 359.917 ms
+	1 thread: gPU win! cPU/gPU: 4.29
+	2 thread: gPU win! cPU/gPU: 2.93
+	3 thread: gPU win! cPU/gPU: 2.23
+	4 thread: gPU win! cPU/gPU: 1.79
+M:  107, N:  5120, K: 13824, blas_init:  44.929 ms, blas_compute:  38.110 ms, cpu_compute: 364.895 ms
+	1 thread: gPU win! cPU/gPU: 4.39
+	2 thread: gPU win! cPU/gPU: 3.01
+	3 thread: gPU win! cPU/gPU: 2.29
+	4 thread: gPU win! cPU/gPU: 1.85
+M:  108, N:  5120, K: 13824, blas_init:  44.977 ms, blas_compute:  38.119 ms, cpu_compute: 369.318 ms
+	1 thread: gPU win! cPU/gPU: 4.44
+	2 thread: gPU win! cPU/gPU: 3.05
+	3 thread: gPU win! cPU/gPU: 2.32
+	4 thread: gPU win! cPU/gPU: 1.87
+M:  109, N:  5120, K: 13824, blas_init:  44.832 ms, blas_compute:  39.936 ms, cpu_compute: 377.820 ms
+	1 thread: gPU win! cPU/gPU: 4.46
+	2 thread: gPU win! cPU/gPU: 3.03
+	3 thread: gPU win! cPU/gPU: 2.29
+	4 thread: gPU win! cPU/gPU: 1.85
+M:  110, N:  5120, K: 13824, blas_init:  59.732 ms, blas_compute:  63.915 ms, cpu_compute: 387.556 ms
+	1 thread: gPU win! cPU/gPU: 3.13
+	2 thread: gPU win! cPU/gPU: 2.07
+	3 thread: gPU win! cPU/gPU: 1.54
+	4 thread: gPU win! cPU/gPU: 1.23
+M:  111, N:  5120, K: 13824, blas_init:  45.251 ms, blas_compute:  40.259 ms, cpu_compute: 382.775 ms
+	1 thread: gPU win! cPU/gPU: 4.48
+	2 thread: gPU win! cPU/gPU: 3.04
+	3 thread: gPU win! cPU/gPU: 2.31
+	4 thread: gPU win! cPU/gPU: 1.86
+M:  112, N:  5120, K: 13824, blas_init:  45.746 ms, blas_compute:  39.818 ms, cpu_compute: 387.549 ms
+	1 thread: gPU win! cPU/gPU: 4.53
+	2 thread: gPU win! cPU/gPU: 3.09
+	3 thread: gPU win! cPU/gPU: 2.35
+	4 thread: gPU win! cPU/gPU: 1.89
+M:  113, N:  5120, K: 13824, blas_init:  45.819 ms, blas_compute:  40.365 ms, cpu_compute: 394.647 ms
+	1 thread: gPU win! cPU/gPU: 4.58
+	2 thread: gPU win! cPU/gPU: 3.12
+	3 thread: gPU win! cPU/gPU: 2.36
+	4 thread: gPU win! cPU/gPU: 1.90
+M:  114, N:  5120, K: 13824, blas_init:  45.402 ms, blas_compute:  41.105 ms, cpu_compute: 390.616 ms
+	1 thread: gPU win! cPU/gPU: 4.52
+	2 thread: gPU win! cPU/gPU: 3.06
+	3 thread: gPU win! cPU/gPU: 2.32
+	4 thread: gPU win! cPU/gPU: 1.86
+M:  115, N:  5120, K: 13824, blas_init:  45.068 ms, blas_compute:  39.520 ms, cpu_compute: 407.981 ms
+	1 thread: gPU win! cPU/gPU: 4.82
+	2 thread: gPU win! cPU/gPU: 3.29
+	3 thread: gPU win! cPU/gPU: 2.49
+	4 thread: gPU win! cPU/gPU: 2.01
+M:  116, N:  5120, K: 13824, blas_init:  45.322 ms, blas_compute:  40.984 ms, cpu_compute: 397.364 ms
+	1 thread: gPU win! cPU/gPU: 4.60
+	2 thread: gPU win! cPU/gPU: 3.12
+	3 thread: gPU win! cPU/gPU: 2.36
+	4 thread: gPU win! cPU/gPU: 1.90
+M:  117, N:  5120, K: 13824, blas_init:  45.319 ms, blas_compute:  41.314 ms, cpu_compute: 399.272 ms
+	1 thread: gPU win! cPU/gPU: 4.61
+	2 thread: gPU win! cPU/gPU: 3.12
+	3 thread: gPU win! cPU/gPU: 2.36
+	4 thread: gPU win! cPU/gPU: 1.90
+M:  118, N:  5120, K: 13824, blas_init:  45.102 ms, blas_compute:  39.988 ms, cpu_compute: 415.649 ms
+	1 thread: gPU win! cPU/gPU: 4.88
+	2 thread: gPU win! cPU/gPU: 3.32
+	3 thread: gPU win! cPU/gPU: 2.52
+	4 thread: gPU win! cPU/gPU: 2.03
+M:  119, N:  5120, K: 13824, blas_init:  44.772 ms, blas_compute:  43.511 ms, cpu_compute: 406.067 ms
+	1 thread: gPU win! cPU/gPU: 4.60
+	2 thread: gPU win! cPU/gPU: 3.08
+	3 thread: gPU win! cPU/gPU: 2.32
+	4 thread: gPU win! cPU/gPU: 1.86
+M:  120, N:  5120, K: 13824, blas_init:  47.187 ms, blas_compute:  43.153 ms, cpu_compute: 408.721 ms
+	1 thread: gPU win! cPU/gPU: 4.52
+	2 thread: gPU win! cPU/gPU: 3.06
+	3 thread: gPU win! cPU/gPU: 2.31
+	4 thread: gPU win! cPU/gPU: 1.86
+M:  121, N:  5120, K: 13824, blas_init:  44.444 ms, blas_compute:  38.781 ms, cpu_compute: 416.552 ms
+	1 thread: gPU win! cPU/gPU: 5.01
+	2 thread: gPU win! cPU/gPU: 3.41
+	3 thread: gPU win! cPU/gPU: 2.59
+	4 thread: gPU win! cPU/gPU: 2.09
+M:  122, N:  5120, K: 13824, blas_init:  45.522 ms, blas_compute:  42.706 ms, cpu_compute: 430.165 ms
+	1 thread: gPU win! cPU/gPU: 4.88
+	2 thread: gPU win! cPU/gPU: 3.29
+	3 thread: gPU win! cPU/gPU: 2.48
+	4 thread: gPU win! cPU/gPU: 1.99
+M:  123, N:  5120, K: 13824, blas_init:  45.057 ms, blas_compute:  43.304 ms, cpu_compute: 421.670 ms
+	1 thread: gPU win! cPU/gPU: 4.77
+	2 thread: gPU win! cPU/gPU: 3.20
+	3 thread: gPU win! cPU/gPU: 2.41
+	4 thread: gPU win! cPU/gPU: 1.93
+M:  124, N:  5120, K: 13824, blas_init:  45.569 ms, blas_compute:  43.752 ms, cpu_compute: 423.849 ms
+	1 thread: gPU win! cPU/gPU: 4.75
+	2 thread: gPU win! cPU/gPU: 3.19
+	3 thread: gPU win! cPU/gPU: 2.40
+	4 thread: gPU win! cPU/gPU: 1.92
+M:  125, N:  5120, K: 13824, blas_init:  45.388 ms, blas_compute:  43.401 ms, cpu_compute: 442.767 ms
+	1 thread: gPU win! cPU/gPU: 4.99
+	2 thread: gPU win! cPU/gPU: 3.35
+	3 thread: gPU win! cPU/gPU: 2.52
+	4 thread: gPU win! cPU/gPU: 2.02
+M:  126, N:  5120, K: 13824, blas_init:  45.552 ms, blas_compute:  43.106 ms, cpu_compute: 438.502 ms
+	1 thread: gPU win! cPU/gPU: 4.95
+	2 thread: gPU win! cPU/gPU: 3.33
+	3 thread: gPU win! cPU/gPU: 2.51
+	4 thread: gPU win! cPU/gPU: 2.01
+M:  127, N:  5120, K: 13824, blas_init:  45.466 ms, blas_compute:  42.174 ms, cpu_compute: 439.741 ms
+	1 thread: gPU win! cPU/gPU: 5.02
+	2 thread: gPU win! cPU/gPU: 3.39
+	3 thread: gPU win! cPU/gPU: 2.56
+	4 thread: gPU win! cPU/gPU: 2.05
+M:  128, N:  5120, K: 13824, blas_init:  45.855 ms, blas_compute:  42.450 ms, cpu_compute: 446.512 ms
+	1 thread: gPU win! cPU/gPU: 5.06
+	2 thread: gPU win! cPU/gPU: 3.41
+	3 thread: gPU win! cPU/gPU: 2.58
+	4 thread: gPU win! cPU/gPU: 2.07
+M:    1, N:  4096, K:  4096, blas_init:   9.499 ms, blas_compute:   2.635 ms, cpu_compute:   1.178 ms
+	1 thread: cPU win! cPU/gPU: 0.10
+	2 thread: cPU win! cPU/gPU: 0.08
+	3 thread: cPU win! cPU/gPU: 0.07
+	4 thread: cPU win! cPU/gPU: 0.06
+M:    2, N:  4096, K:  4096, blas_init:   6.375 ms, blas_compute:   6.733 ms, cpu_compute:   2.341 ms
+	1 thread: cPU win! cPU/gPU: 0.18
+	2 thread: cPU win! cPU/gPU: 0.12
+	3 thread: cPU win! cPU/gPU: 0.09
+	4 thread: cPU win! cPU/gPU: 0.07
+M:    3, N:  4096, K:  4096, blas_init:   6.444 ms, blas_compute:   4.379 ms, cpu_compute:   3.495 ms
+	1 thread: cPU win! cPU/gPU: 0.32
+	2 thread: cPU win! cPU/gPU: 0.23
+	3 thread: cPU win! cPU/gPU: 0.18
+	4 thread: cPU win! cPU/gPU: 0.15
+M:    4, N:  4096, K:  4096, blas_init:   6.363 ms, blas_compute:   5.691 ms, cpu_compute:   4.657 ms
+	1 thread: cPU win! cPU/gPU: 0.39
+	2 thread: cPU win! cPU/gPU: 0.26
+	3 thread: cPU win! cPU/gPU: 0.20
+	4 thread: cPU win! cPU/gPU: 0.16
+M:    5, N:  4096, K:  4096, blas_init:   6.408 ms, blas_compute:   5.321 ms, cpu_compute:   5.845 ms
+	1 thread: cPU win! cPU/gPU: 0.50
+	2 thread: cPU win! cPU/gPU: 0.34
+	3 thread: cPU win! cPU/gPU: 0.26
+	4 thread: cPU win! cPU/gPU: 0.21
+M:    6, N:  4096, K:  4096, blas_init:   6.476 ms, blas_compute:   5.658 ms, cpu_compute:   6.963 ms
+	1 thread: cPU win! cPU/gPU: 0.57
+	2 thread: cPU win! cPU/gPU: 0.39
+	3 thread: cPU win! cPU/gPU: 0.30
+	4 thread: cPU win! cPU/gPU: 0.24
+M:    7, N:  4096, K:  4096, blas_init:   6.422 ms, blas_compute:   6.648 ms, cpu_compute:   8.007 ms
+	1 thread: cPU win! cPU/gPU: 0.61
+	2 thread: cPU win! cPU/gPU: 0.41
+	3 thread: cPU win! cPU/gPU: 0.30
+	4 thread: cPU win! cPU/gPU: 0.24
+M:    8, N:  4096, K:  4096, blas_init:   6.345 ms, blas_compute:   4.551 ms, cpu_compute:   9.090 ms
+	1 thread: cPU win! cPU/gPU: 0.83
+	2 thread: cPU win! cPU/gPU: 0.59
+	3 thread: cPU win! cPU/gPU: 0.45
+	4 thread: cPU win! cPU/gPU: 0.37
+M:    9, N:  4096, K:  4096, blas_init:   6.586 ms, blas_compute:   6.167 ms, cpu_compute:  10.275 ms
+	1 thread: cPU win! cPU/gPU: 0.81
+	2 thread: cPU win! cPU/gPU: 0.54
+	3 thread: cPU win! cPU/gPU: 0.41
+	4 thread: cPU win! cPU/gPU: 0.33
+M:   10, N:  4096, K:  4096, blas_init:   6.373 ms, blas_compute:   5.664 ms, cpu_compute:  11.312 ms
+	1 thread: cPU win! cPU/gPU: 0.94
+	2 thread: cPU win! cPU/gPU: 0.64
+	3 thread: cPU win! cPU/gPU: 0.48
+	4 thread: cPU win! cPU/gPU: 0.39
+M:   11, N:  4096, K:  4096, blas_init:   6.361 ms, blas_compute:   5.057 ms, cpu_compute:  12.431 ms
+	1 thread: gPU win! cPU/gPU: 1.09
+	2 thread: cPU win! cPU/gPU: 0.75
+	3 thread: cPU win! cPU/gPU: 0.58
+	4 thread: cPU win! cPU/gPU: 0.47
+M:   12, N:  4096, K:  4096, blas_init:   6.573 ms, blas_compute:   4.570 ms, cpu_compute:  13.519 ms
+	1 thread: gPU win! cPU/gPU: 1.21
+	2 thread: cPU win! cPU/gPU: 0.86
+	3 thread: cPU win! cPU/gPU: 0.67
+	4 thread: cPU win! cPU/gPU: 0.54
+M:   13, N:  4096, K:  4096, blas_init:   6.364 ms, blas_compute:   4.617 ms, cpu_compute:  14.662 ms
+	1 thread: gPU win! cPU/gPU: 1.34
+	2 thread: cPU win! cPU/gPU: 0.94
+	3 thread: cPU win! cPU/gPU: 0.73
+	4 thread: cPU win! cPU/gPU: 0.59
+M:   14, N:  4096, K:  4096, blas_init:   6.375 ms, blas_compute:   4.968 ms, cpu_compute:  15.491 ms
+	1 thread: gPU win! cPU/gPU: 1.37
+	2 thread: cPU win! cPU/gPU: 0.95
+	3 thread: cPU win! cPU/gPU: 0.73
+	4 thread: cPU win! cPU/gPU: 0.59
+M:   15, N:  4096, K:  4096, blas_init:   6.418 ms, blas_compute:   4.896 ms, cpu_compute:  16.670 ms
+	1 thread: gPU win! cPU/gPU: 1.47
+	2 thread: gPU win! cPU/gPU: 1.03
+	3 thread: cPU win! cPU/gPU: 0.79
+	4 thread: cPU win! cPU/gPU: 0.64
+M:   16, N:  4096, K:  4096, blas_init:   6.347 ms, blas_compute:   5.255 ms, cpu_compute:  17.679 ms
+	1 thread: gPU win! cPU/gPU: 1.52
+	2 thread: gPU win! cPU/gPU: 1.05
+	3 thread: cPU win! cPU/gPU: 0.80
+	4 thread: cPU win! cPU/gPU: 0.65
+M:   17, N:  4096, K:  4096, blas_init:   6.330 ms, blas_compute:   5.088 ms, cpu_compute:  18.742 ms
+	1 thread: gPU win! cPU/gPU: 1.64
+	2 thread: gPU win! cPU/gPU: 1.14
+	3 thread: cPU win! cPU/gPU: 0.87
+	4 thread: cPU win! cPU/gPU: 0.70
+M:   18, N:  4096, K:  4096, blas_init:   6.389 ms, blas_compute:   6.592 ms, cpu_compute:  19.899 ms
+	1 thread: gPU win! cPU/gPU: 1.53
+	2 thread: gPU win! cPU/gPU: 1.02
+	3 thread: cPU win! cPU/gPU: 0.76
+	4 thread: cPU win! cPU/gPU: 0.61
+M:   19, N:  4096, K:  4096, blas_init:   6.438 ms, blas_compute:   6.189 ms, cpu_compute:  20.776 ms
+	1 thread: gPU win! cPU/gPU: 1.65
+	2 thread: gPU win! cPU/gPU: 1.10
+	3 thread: cPU win! cPU/gPU: 0.83
+	4 thread: cPU win! cPU/gPU: 0.67
+M:   20, N:  4096, K:  4096, blas_init:   6.486 ms, blas_compute:   4.831 ms, cpu_compute:  21.637 ms
+	1 thread: gPU win! cPU/gPU: 1.91
+	2 thread: gPU win! cPU/gPU: 1.34
+	3 thread: gPU win! cPU/gPU: 1.03
+	4 thread: cPU win! cPU/gPU: 0.84
+M:   21, N:  4096, K:  4096, blas_init:   6.333 ms, blas_compute:   4.866 ms, cpu_compute:  22.650 ms
+	1 thread: gPU win! cPU/gPU: 2.02
+	2 thread: gPU win! cPU/gPU: 1.41
+	3 thread: gPU win! cPU/gPU: 1.08
+	4 thread: cPU win! cPU/gPU: 0.88
+M:   22, N:  4096, K:  4096, blas_init:   6.372 ms, blas_compute:   5.451 ms, cpu_compute:  23.470 ms
+	1 thread: gPU win! cPU/gPU: 1.99
+	2 thread: gPU win! cPU/gPU: 1.36
+	3 thread: gPU win! cPU/gPU: 1.03
+	4 thread: cPU win! cPU/gPU: 0.83
+M:   23, N:  4096, K:  4096, blas_init:   6.383 ms, blas_compute:   6.139 ms, cpu_compute:  24.487 ms
+	1 thread: gPU win! cPU/gPU: 1.96
+	2 thread: gPU win! cPU/gPU: 1.31
+	3 thread: cPU win! cPU/gPU: 0.99
+	4 thread: cPU win! cPU/gPU: 0.79
+M:   24, N:  4096, K:  4096, blas_init:   6.336 ms, blas_compute:   5.369 ms, cpu_compute:  25.633 ms
+	1 thread: gPU win! cPU/gPU: 2.19
+	2 thread: gPU win! cPU/gPU: 1.50
+	3 thread: gPU win! cPU/gPU: 1.14
+	4 thread: cPU win! cPU/gPU: 0.92
+M:   25, N:  4096, K:  4096, blas_init:   6.602 ms, blas_compute:   6.704 ms, cpu_compute:  26.963 ms
+	1 thread: gPU win! cPU/gPU: 2.03
+	2 thread: gPU win! cPU/gPU: 1.35
+	3 thread: gPU win! cPU/gPU: 1.01
+	4 thread: cPU win! cPU/gPU: 0.81
+M:   26, N:  4096, K:  4096, blas_init:   6.437 ms, blas_compute:   5.484 ms, cpu_compute:  27.541 ms
+	1 thread: gPU win! cPU/gPU: 2.31
+	2 thread: gPU win! cPU/gPU: 1.58
+	3 thread: gPU win! cPU/gPU: 1.20
+	4 thread: cPU win! cPU/gPU: 0.97
+M:   27, N:  4096, K:  4096, blas_init:   6.403 ms, blas_compute:   7.215 ms, cpu_compute:  28.787 ms
+	1 thread: gPU win! cPU/gPU: 2.11
+	2 thread: gPU win! cPU/gPU: 1.38
+	3 thread: gPU win! cPU/gPU: 1.03
+	4 thread: cPU win! cPU/gPU: 0.82
+M:   28, N:  4096, K:  4096, blas_init:   6.594 ms, blas_compute:   6.772 ms, cpu_compute:  29.868 ms
+	1 thread: gPU win! cPU/gPU: 2.23
+	2 thread: gPU win! cPU/gPU: 1.48
+	3 thread: gPU win! cPU/gPU: 1.11
+	4 thread: cPU win! cPU/gPU: 0.89
+M:   29, N:  4096, K:  4096, blas_init:   6.530 ms, blas_compute:   6.276 ms, cpu_compute:  30.564 ms
+	1 thread: gPU win! cPU/gPU: 2.39
+	2 thread: gPU win! cPU/gPU: 1.60
+	3 thread: gPU win! cPU/gPU: 1.21
+	4 thread: cPU win! cPU/gPU: 0.97
+M:   30, N:  4096, K:  4096, blas_init:   6.413 ms, blas_compute:   7.315 ms, cpu_compute:  31.275 ms
+	1 thread: gPU win! cPU/gPU: 2.28
+	2 thread: gPU win! cPU/gPU: 1.49
+	3 thread: gPU win! cPU/gPU: 1.10
+	4 thread: cPU win! cPU/gPU: 0.88
+M:   31, N:  4096, K:  4096, blas_init:   6.338 ms, blas_compute:   6.398 ms, cpu_compute:  32.080 ms
+	1 thread: gPU win! cPU/gPU: 2.52
+	2 thread: gPU win! cPU/gPU: 1.68
+	3 thread: gPU win! cPU/gPU: 1.26
+	4 thread: gPU win! cPU/gPU: 1.00
+M:   32, N:  4096, K:  4096, blas_init:   6.346 ms, blas_compute:   6.572 ms, cpu_compute:  33.347 ms
+	1 thread: gPU win! cPU/gPU: 2.58
+	2 thread: gPU win! cPU/gPU: 1.71
+	3 thread: gPU win! cPU/gPU: 1.28
+	4 thread: gPU win! cPU/gPU: 1.02
+M:   33, N:  4096, K:  4096, blas_init:   6.390 ms, blas_compute:   6.559 ms, cpu_compute:  34.424 ms
+	1 thread: gPU win! cPU/gPU: 2.66
+	2 thread: gPU win! cPU/gPU: 1.76
+	3 thread: gPU win! cPU/gPU: 1.32
+	4 thread: gPU win! cPU/gPU: 1.06
+M:   34, N:  4096, K:  4096, blas_init:   6.421 ms, blas_compute:   6.447 ms, cpu_compute:  35.030 ms
+	1 thread: gPU win! cPU/gPU: 2.72
+	2 thread: gPU win! cPU/gPU: 1.81
+	3 thread: gPU win! cPU/gPU: 1.36
+	4 thread: gPU win! cPU/gPU: 1.09
+M:   35, N:  4096, K:  4096, blas_init:   6.373 ms, blas_compute:   6.412 ms, cpu_compute:  35.590 ms
+	1 thread: gPU win! cPU/gPU: 2.78
+	2 thread: gPU win! cPU/gPU: 1.85
+	3 thread: gPU win! cPU/gPU: 1.39
+	4 thread: gPU win! cPU/gPU: 1.11
+M:   36, N:  4096, K:  4096, blas_init:   6.376 ms, blas_compute:   6.849 ms, cpu_compute:  37.381 ms
+	1 thread: gPU win! cPU/gPU: 2.83
+	2 thread: gPU win! cPU/gPU: 1.86
+	3 thread: gPU win! cPU/gPU: 1.39
+	4 thread: gPU win! cPU/gPU: 1.11
+M:   37, N:  4096, K:  4096, blas_init:   6.333 ms, blas_compute:   6.890 ms, cpu_compute:  37.715 ms
+	1 thread: gPU win! cPU/gPU: 2.85
+	2 thread: gPU win! cPU/gPU: 1.88
+	3 thread: gPU win! cPU/gPU: 1.40
+	4 thread: gPU win! cPU/gPU: 1.11
+M:   38, N:  4096, K:  4096, blas_init:   6.458 ms, blas_compute:   7.246 ms, cpu_compute:  39.357 ms
+	1 thread: gPU win! cPU/gPU: 2.87
+	2 thread: gPU win! cPU/gPU: 1.88
+	3 thread: gPU win! cPU/gPU: 1.40
+	4 thread: gPU win! cPU/gPU: 1.11
+M:   39, N:  4096, K:  4096, blas_init:   6.594 ms, blas_compute:   6.686 ms, cpu_compute:  39.610 ms
+	1 thread: gPU win! cPU/gPU: 2.98
+	2 thread: gPU win! cPU/gPU: 1.98
+	3 thread: gPU win! cPU/gPU: 1.49
+	4 thread: gPU win! cPU/gPU: 1.19
+M:   40, N:  4096, K:  4096, blas_init:   6.373 ms, blas_compute:   7.405 ms, cpu_compute:  40.002 ms
+	1 thread: gPU win! cPU/gPU: 2.90
+	2 thread: gPU win! cPU/gPU: 1.89
+	3 thread: gPU win! cPU/gPU: 1.40
+	4 thread: gPU win! cPU/gPU: 1.11
+M:   41, N:  4096, K:  4096, blas_init:   6.702 ms, blas_compute:   6.204 ms, cpu_compute:  40.596 ms
+	1 thread: gPU win! cPU/gPU: 3.15
+	2 thread: gPU win! cPU/gPU: 2.12
+	3 thread: gPU win! cPU/gPU: 1.60
+	4 thread: gPU win! cPU/gPU: 1.29
+M:   42, N:  4096, K:  4096, blas_init:   6.380 ms, blas_compute:   6.823 ms, cpu_compute:  41.544 ms
+	1 thread: gPU win! cPU/gPU: 3.15
+	2 thread: gPU win! cPU/gPU: 2.07
+	3 thread: gPU win! cPU/gPU: 1.55
+	4 thread: gPU win! cPU/gPU: 1.23
+M:   43, N:  4096, K:  4096, blas_init:   6.360 ms, blas_compute:   7.138 ms, cpu_compute:  42.848 ms
+	1 thread: gPU win! cPU/gPU: 3.17
+	2 thread: gPU win! cPU/gPU: 2.08
+	3 thread: gPU win! cPU/gPU: 1.54
+	4 thread: gPU win! cPU/gPU: 1.23
+M:   44, N:  4096, K:  4096, blas_init:   6.254 ms, blas_compute:   6.579 ms, cpu_compute:  42.637 ms
+	1 thread: gPU win! cPU/gPU: 3.32
+	2 thread: gPU win! cPU/gPU: 2.20
+	3 thread: gPU win! cPU/gPU: 1.64
+	4 thread: gPU win! cPU/gPU: 1.31
+M:   45, N:  4096, K:  4096, blas_init:   6.279 ms, blas_compute:   7.856 ms, cpu_compute:  43.981 ms
+	1 thread: gPU win! cPU/gPU: 3.11
+	2 thread: gPU win! cPU/gPU: 2.00
+	3 thread: gPU win! cPU/gPU: 1.47
+	4 thread: gPU win! cPU/gPU: 1.17
+M:   46, N:  4096, K:  4096, blas_init:   6.436 ms, blas_compute:   8.360 ms, cpu_compute:  45.339 ms
+	1 thread: gPU win! cPU/gPU: 3.06
+	2 thread: gPU win! cPU/gPU: 1.96
+	3 thread: gPU win! cPU/gPU: 1.44
+	4 thread: gPU win! cPU/gPU: 1.14
+M:   47, N:  4096, K:  4096, blas_init:   6.665 ms, blas_compute:   7.309 ms, cpu_compute:  45.007 ms
+	1 thread: gPU win! cPU/gPU: 3.22
+	2 thread: gPU win! cPU/gPU: 2.11
+	3 thread: gPU win! cPU/gPU: 1.57
+	4 thread: gPU win! cPU/gPU: 1.25
+M:   48, N:  4096, K:  4096, blas_init:   6.256 ms, blas_compute:   7.050 ms, cpu_compute:  47.021 ms
+	1 thread: gPU win! cPU/gPU: 3.53
+	2 thread: gPU win! cPU/gPU: 2.31
+	3 thread: gPU win! cPU/gPU: 1.72
+	4 thread: gPU win! cPU/gPU: 1.36
+M:   49, N:  4096, K:  4096, blas_init:   6.271 ms, blas_compute:   6.540 ms, cpu_compute:  45.762 ms
+	1 thread: gPU win! cPU/gPU: 3.57
+	2 thread: gPU win! cPU/gPU: 2.36
+	3 thread: gPU win! cPU/gPU: 1.77
+	4 thread: gPU win! cPU/gPU: 1.41
+M:   50, N:  4096, K:  4096, blas_init:   6.256 ms, blas_compute:   6.752 ms, cpu_compute:  47.129 ms
+	1 thread: gPU win! cPU/gPU: 3.62
+	2 thread: gPU win! cPU/gPU: 2.39
+	3 thread: gPU win! cPU/gPU: 1.78
+	4 thread: gPU win! cPU/gPU: 1.42
+M:   51, N:  4096, K:  4096, blas_init:   6.302 ms, blas_compute:   8.406 ms, cpu_compute:  48.177 ms
+	1 thread: gPU win! cPU/gPU: 3.28
+	2 thread: gPU win! cPU/gPU: 2.08
+	3 thread: gPU win! cPU/gPU: 1.53
+	4 thread: gPU win! cPU/gPU: 1.21
+M:   52, N:  4096, K:  4096, blas_init:   6.411 ms, blas_compute:   6.879 ms, cpu_compute:  49.113 ms
+	1 thread: gPU win! cPU/gPU: 3.70
+	2 thread: gPU win! cPU/gPU: 2.44
+	3 thread: gPU win! cPU/gPU: 1.82
+	4 thread: gPU win! cPU/gPU: 1.45
+M:   53, N:  4096, K:  4096, blas_init:   6.478 ms, blas_compute:   7.869 ms, cpu_compute:  50.343 ms
+	1 thread: gPU win! cPU/gPU: 3.51
+	2 thread: gPU win! cPU/gPU: 2.27
+	3 thread: gPU win! cPU/gPU: 1.67
+	4 thread: gPU win! cPU/gPU: 1.33
+M:   54, N:  4096, K:  4096, blas_init:   6.264 ms, blas_compute:   6.921 ms, cpu_compute:  50.539 ms
+	1 thread: gPU win! cPU/gPU: 3.83
+	2 thread: gPU win! cPU/gPU: 2.51
+	3 thread: gPU win! cPU/gPU: 1.87
+	4 thread: gPU win! cPU/gPU: 1.49
+M:   55, N:  4096, K:  4096, blas_init:   6.369 ms, blas_compute:   7.991 ms, cpu_compute:  51.489 ms
+	1 thread: gPU win! cPU/gPU: 3.59
+	2 thread: gPU win! cPU/gPU: 2.30
+	3 thread: gPU win! cPU/gPU: 1.70
+	4 thread: gPU win! cPU/gPU: 1.34
+M:   56, N:  4096, K:  4096, blas_init:   6.333 ms, blas_compute:   7.504 ms, cpu_compute:  52.106 ms
+	1 thread: gPU win! cPU/gPU: 3.77
+	2 thread: gPU win! cPU/gPU: 2.44
+	3 thread: gPU win! cPU/gPU: 1.81
+	4 thread: gPU win! cPU/gPU: 1.43
+M:   57, N:  4096, K:  4096, blas_init:   6.285 ms, blas_compute:   7.375 ms, cpu_compute:  53.243 ms
+	1 thread: gPU win! cPU/gPU: 3.90
+	2 thread: gPU win! cPU/gPU: 2.53
+	3 thread: gPU win! cPU/gPU: 1.87
+	4 thread: gPU win! cPU/gPU: 1.49
+M:   58, N:  4096, K:  4096, blas_init:   6.230 ms, blas_compute:   7.234 ms, cpu_compute:  53.789 ms
+	1 thread: gPU win! cPU/gPU: 4.00
+	2 thread: gPU win! cPU/gPU: 2.60
+	3 thread: gPU win! cPU/gPU: 1.93
+	4 thread: gPU win! cPU/gPU: 1.53
+M:   59, N:  4096, K:  4096, blas_init:   6.248 ms, blas_compute:   7.656 ms, cpu_compute:  54.007 ms
+	1 thread: gPU win! cPU/gPU: 3.88
+	2 thread: gPU win! cPU/gPU: 2.50
+	3 thread: gPU win! cPU/gPU: 1.85
+	4 thread: gPU win! cPU/gPU: 1.46
+M:   60, N:  4096, K:  4096, blas_init:   6.179 ms, blas_compute:   8.818 ms, cpu_compute:  53.948 ms
+	1 thread: gPU win! cPU/gPU: 3.60
+	2 thread: gPU win! cPU/gPU: 2.27
+	3 thread: gPU win! cPU/gPU: 1.65
+	4 thread: gPU win! cPU/gPU: 1.30
+M:   61, N:  4096, K:  4096, blas_init:   6.274 ms, blas_compute:   7.332 ms, cpu_compute:  56.012 ms
+	1 thread: gPU win! cPU/gPU: 4.12
+	2 thread: gPU win! cPU/gPU: 2.68
+	3 thread: gPU win! cPU/gPU: 1.98
+	4 thread: gPU win! cPU/gPU: 1.57
+M:   62, N:  4096, K:  4096, blas_init:   6.257 ms, blas_compute:   8.777 ms, cpu_compute:  56.017 ms
+	1 thread: gPU win! cPU/gPU: 3.73
+	2 thread: gPU win! cPU/gPU: 2.35
+	3 thread: gPU win! cPU/gPU: 1.72
+	4 thread: gPU win! cPU/gPU: 1.35
+M:   63, N:  4096, K:  4096, blas_init:   6.243 ms, blas_compute:   8.048 ms, cpu_compute:  57.427 ms
+	1 thread: gPU win! cPU/gPU: 4.02
+	2 thread: gPU win! cPU/gPU: 2.57
+	3 thread: gPU win! cPU/gPU: 1.89
+	4 thread: gPU win! cPU/gPU: 1.49
+M:   64, N:  4096, K:  4096, blas_init:   6.260 ms, blas_compute:   7.764 ms, cpu_compute:  59.127 ms
+	1 thread: gPU win! cPU/gPU: 4.22
+	2 thread: gPU win! cPU/gPU: 2.71
+	3 thread: gPU win! cPU/gPU: 2.00
+	4 thread: gPU win! cPU/gPU: 1.58
+M:   65, N:  4096, K:  4096, blas_init:   6.295 ms, blas_compute:   8.148 ms, cpu_compute:  59.666 ms
+	1 thread: gPU win! cPU/gPU: 4.13
+	2 thread: gPU win! cPU/gPU: 2.64
+	3 thread: gPU win! cPU/gPU: 1.94
+	4 thread: gPU win! cPU/gPU: 1.53
+M:   66, N:  4096, K:  4096, blas_init:   6.231 ms, blas_compute:   8.746 ms, cpu_compute:  60.474 ms
+	1 thread: gPU win! cPU/gPU: 4.04
+	2 thread: gPU win! cPU/gPU: 2.55
+	3 thread: gPU win! cPU/gPU: 1.86
+	4 thread: gPU win! cPU/gPU: 1.47
+M:   67, N:  4096, K:  4096, blas_init:   6.221 ms, blas_compute:   9.328 ms, cpu_compute:  60.790 ms
+	1 thread: gPU win! cPU/gPU: 3.91
+	2 thread: gPU win! cPU/gPU: 2.44
+	3 thread: gPU win! cPU/gPU: 1.78
+	4 thread: gPU win! cPU/gPU: 1.40
+M:   68, N:  4096, K:  4096, blas_init:   6.264 ms, blas_compute:   8.638 ms, cpu_compute:  62.208 ms
+	1 thread: gPU win! cPU/gPU: 4.17
+	2 thread: gPU win! cPU/gPU: 2.64
+	3 thread: gPU win! cPU/gPU: 1.93
+	4 thread: gPU win! cPU/gPU: 1.52
+M:   69, N:  4096, K:  4096, blas_init:   6.216 ms, blas_compute:   8.895 ms, cpu_compute:  62.878 ms
+	1 thread: gPU win! cPU/gPU: 4.16
+	2 thread: gPU win! cPU/gPU: 2.62
+	3 thread: gPU win! cPU/gPU: 1.91
+	4 thread: gPU win! cPU/gPU: 1.50
+M:   70, N:  4096, K:  4096, blas_init:   6.281 ms, blas_compute:   8.742 ms, cpu_compute:  63.802 ms
+	1 thread: gPU win! cPU/gPU: 4.25
+	2 thread: gPU win! cPU/gPU: 2.68
+	3 thread: gPU win! cPU/gPU: 1.96
+	4 thread: gPU win! cPU/gPU: 1.55
+M:   71, N:  4096, K:  4096, blas_init:   6.246 ms, blas_compute:   8.327 ms, cpu_compute:  64.417 ms
+	1 thread: gPU win! cPU/gPU: 4.42
+	2 thread: gPU win! cPU/gPU: 2.81
+	3 thread: gPU win! cPU/gPU: 2.06
+	4 thread: gPU win! cPU/gPU: 1.63
+M:   72, N:  4096, K:  4096, blas_init:   6.450 ms, blas_compute:   9.428 ms, cpu_compute:  65.179 ms
+	1 thread: gPU win! cPU/gPU: 4.10
+	2 thread: gPU win! cPU/gPU: 2.58
+	3 thread: gPU win! cPU/gPU: 1.88
+	4 thread: gPU win! cPU/gPU: 1.48
+M:   73, N:  4096, K:  4096, blas_init:   6.245 ms, blas_compute:   9.222 ms, cpu_compute:  65.955 ms
+	1 thread: gPU win! cPU/gPU: 4.26
+	2 thread: gPU win! cPU/gPU: 2.67
+	3 thread: gPU win! cPU/gPU: 1.94
+	4 thread: gPU win! cPU/gPU: 1.53
+M:   74, N:  4096, K:  4096, blas_init:   6.378 ms, blas_compute:   9.914 ms, cpu_compute:  67.888 ms
+	1 thread: gPU win! cPU/gPU: 4.17
+	2 thread: gPU win! cPU/gPU: 2.59
+	3 thread: gPU win! cPU/gPU: 1.88
+	4 thread: gPU win! cPU/gPU: 1.47
+M:   75, N:  4096, K:  4096, blas_init:   6.223 ms, blas_compute:   9.325 ms, cpu_compute:  69.803 ms
+	1 thread: gPU win! cPU/gPU: 4.49
+	2 thread: gPU win! cPU/gPU: 2.81
+	3 thread: gPU win! cPU/gPU: 2.04
+	4 thread: gPU win! cPU/gPU: 1.60
+M:   76, N:  4096, K:  4096, blas_init:   6.161 ms, blas_compute:   8.873 ms, cpu_compute:  67.451 ms
+	1 thread: gPU win! cPU/gPU: 4.49
+	2 thread: gPU win! cPU/gPU: 2.82
+	3 thread: gPU win! cPU/gPU: 2.06
+	4 thread: gPU win! cPU/gPU: 1.62
+M:   77, N:  4096, K:  4096, blas_init:   6.390 ms, blas_compute:   8.959 ms, cpu_compute:  68.943 ms
+	1 thread: gPU win! cPU/gPU: 4.49
+	2 thread: gPU win! cPU/gPU: 2.84
+	3 thread: gPU win! cPU/gPU: 2.07
+	4 thread: gPU win! cPU/gPU: 1.63
+M:   78, N:  4096, K:  4096, blas_init:   6.312 ms, blas_compute:   9.777 ms, cpu_compute:  71.520 ms
+	1 thread: gPU win! cPU/gPU: 4.45
+	2 thread: gPU win! cPU/gPU: 2.77
+	3 thread: gPU win! cPU/gPU: 2.01
+	4 thread: gPU win! cPU/gPU: 1.57
+M:   79, N:  4096, K:  4096, blas_init:   6.369 ms, blas_compute:  10.778 ms, cpu_compute:  71.928 ms
+	1 thread: gPU win! cPU/gPU: 4.19
+	2 thread: gPU win! cPU/gPU: 2.58
+	3 thread: gPU win! cPU/gPU: 1.86
+	4 thread: gPU win! cPU/gPU: 1.45
+M:   80, N:  4096, K:  4096, blas_init:   6.566 ms, blas_compute:   9.940 ms, cpu_compute:  73.575 ms
+	1 thread: gPU win! cPU/gPU: 4.46
+	2 thread: gPU win! cPU/gPU: 2.78
+	3 thread: gPU win! cPU/gPU: 2.02
+	4 thread: gPU win! cPU/gPU: 1.59
+M:   81, N:  4096, K:  4096, blas_init:   6.506 ms, blas_compute:  10.397 ms, cpu_compute:  74.060 ms
+	1 thread: gPU win! cPU/gPU: 4.38
+	2 thread: gPU win! cPU/gPU: 2.71
+	3 thread: gPU win! cPU/gPU: 1.96
+	4 thread: gPU win! cPU/gPU: 1.54
+M:   82, N:  4096, K:  4096, blas_init:   6.429 ms, blas_compute:  10.868 ms, cpu_compute:  74.799 ms
+	1 thread: gPU win! cPU/gPU: 4.32
+	2 thread: gPU win! cPU/gPU: 2.66
+	3 thread: gPU win! cPU/gPU: 1.92
+	4 thread: gPU win! cPU/gPU: 1.50
+M:   83, N:  4096, K:  4096, blas_init:   6.513 ms, blas_compute:  10.120 ms, cpu_compute:  75.146 ms
+	1 thread: gPU win! cPU/gPU: 4.52
+	2 thread: gPU win! cPU/gPU: 2.81
+	3 thread: gPU win! cPU/gPU: 2.04
+	4 thread: gPU win! cPU/gPU: 1.60
+M:   84, N:  4096, K:  4096, blas_init:   6.535 ms, blas_compute:  10.201 ms, cpu_compute:  76.532 ms
+	1 thread: gPU win! cPU/gPU: 4.57
+	2 thread: gPU win! cPU/gPU: 2.84
+	3 thread: gPU win! cPU/gPU: 2.06
+	4 thread: gPU win! cPU/gPU: 1.62
+M:   85, N:  4096, K:  4096, blas_init:   6.569 ms, blas_compute:  10.016 ms, cpu_compute:  82.299 ms
+	1 thread: gPU win! cPU/gPU: 4.96
+	2 thread: gPU win! cPU/gPU: 3.09
+	3 thread: gPU win! cPU/gPU: 2.25
+	4 thread: gPU win! cPU/gPU: 1.76
+M:   86, N:  4096, K:  4096, blas_init:   6.519 ms, blas_compute:  10.431 ms, cpu_compute:  76.356 ms
+	1 thread: gPU win! cPU/gPU: 4.50
+	2 thread: gPU win! cPU/gPU: 2.79
+	3 thread: gPU win! cPU/gPU: 2.02
+	4 thread: gPU win! cPU/gPU: 1.58
+M:   87, N:  4096, K:  4096, blas_init:   6.288 ms, blas_compute:  10.651 ms, cpu_compute:  76.977 ms
+	1 thread: gPU win! cPU/gPU: 4.54
+	2 thread: gPU win! cPU/gPU: 2.79
+	3 thread: gPU win! cPU/gPU: 2.01
+	4 thread: gPU win! cPU/gPU: 1.57
+M:   88, N:  4096, K:  4096, blas_init:   6.376 ms, blas_compute:   9.435 ms, cpu_compute:  81.989 ms
+	1 thread: gPU win! cPU/gPU: 5.19
+	2 thread: gPU win! cPU/gPU: 3.25
+	3 thread: gPU win! cPU/gPU: 2.36
+	4 thread: gPU win! cPU/gPU: 1.86
+M:   89, N:  4096, K:  4096, blas_init:   6.287 ms, blas_compute:  10.353 ms, cpu_compute:  79.600 ms
+	1 thread: gPU win! cPU/gPU: 4.78
+	2 thread: gPU win! cPU/gPU: 2.95
+	3 thread: gPU win! cPU/gPU: 2.13
+	4 thread: gPU win! cPU/gPU: 1.67
+M:   90, N:  4096, K:  4096, blas_init:   6.329 ms, blas_compute:  10.425 ms, cpu_compute:  80.526 ms
+	1 thread: gPU win! cPU/gPU: 4.81
+	2 thread: gPU win! cPU/gPU: 2.96
+	3 thread: gPU win! cPU/gPU: 2.14
+	4 thread: gPU win! cPU/gPU: 1.68
+M:   91, N:  4096, K:  4096, blas_init:   6.234 ms, blas_compute:  11.334 ms, cpu_compute:  82.387 ms
+	1 thread: gPU win! cPU/gPU: 4.69
+	2 thread: gPU win! cPU/gPU: 2.85
+	3 thread: gPU win! cPU/gPU: 2.05
+	4 thread: gPU win! cPU/gPU: 1.60
+M:   92, N:  4096, K:  4096, blas_init:   6.307 ms, blas_compute:  10.858 ms, cpu_compute:  81.325 ms
+	1 thread: gPU win! cPU/gPU: 4.74
+	2 thread: gPU win! cPU/gPU: 2.90
+	3 thread: gPU win! cPU/gPU: 2.09
+	4 thread: gPU win! cPU/gPU: 1.64
+M:   93, N:  4096, K:  4096, blas_init:   6.254 ms, blas_compute:  10.580 ms, cpu_compute:  81.523 ms
+	1 thread: gPU win! cPU/gPU: 4.84
+	2 thread: gPU win! cPU/gPU: 2.97
+	3 thread: gPU win! cPU/gPU: 2.15
+	4 thread: gPU win! cPU/gPU: 1.68
+M:   94, N:  4096, K:  4096, blas_init:   6.405 ms, blas_compute:  11.312 ms, cpu_compute:  84.777 ms
+	1 thread: gPU win! cPU/gPU: 4.79
+	2 thread: gPU win! cPU/gPU: 2.92
+	3 thread: gPU win! cPU/gPU: 2.10
+	4 thread: gPU win! cPU/gPU: 1.64
+M:   95, N:  4096, K:  4096, blas_init:   6.590 ms, blas_compute:  10.631 ms, cpu_compute:  85.467 ms
+	1 thread: gPU win! cPU/gPU: 4.96
+	2 thread: gPU win! cPU/gPU: 3.07
+	3 thread: gPU win! cPU/gPU: 2.22
+	4 thread: gPU win! cPU/gPU: 1.74
+M:   96, N:  4096, K:  4096, blas_init:   6.255 ms, blas_compute:  11.226 ms, cpu_compute:  85.319 ms
+	1 thread: gPU win! cPU/gPU: 4.88
+	2 thread: gPU win! cPU/gPU: 2.97
+	3 thread: gPU win! cPU/gPU: 2.14
+	4 thread: gPU win! cPU/gPU: 1.67
+M:   97, N:  4096, K:  4096, blas_init:   6.254 ms, blas_compute:  10.773 ms, cpu_compute:  86.577 ms
+	1 thread: gPU win! cPU/gPU: 5.08
+	2 thread: gPU win! cPU/gPU: 3.11
+	3 thread: gPU win! cPU/gPU: 2.24
+	4 thread: gPU win! cPU/gPU: 1.75
+M:   98, N:  4096, K:  4096, blas_init:   6.972 ms, blas_compute:  11.863 ms, cpu_compute:  90.747 ms
+	1 thread: gPU win! cPU/gPU: 4.82
+	2 thread: gPU win! cPU/gPU: 2.96
+	3 thread: gPU win! cPU/gPU: 2.13
+	4 thread: gPU win! cPU/gPU: 1.67
+M:   99, N:  4096, K:  4096, blas_init:   6.699 ms, blas_compute:  11.362 ms, cpu_compute:  87.722 ms
+	1 thread: gPU win! cPU/gPU: 4.86
+	2 thread: gPU win! cPU/gPU: 2.98
+	3 thread: gPU win! cPU/gPU: 2.15
+	4 thread: gPU win! cPU/gPU: 1.68
+M:  100, N:  4096, K:  4096, blas_init:   6.335 ms, blas_compute:  10.967 ms, cpu_compute:  87.732 ms
+	1 thread: gPU win! cPU/gPU: 5.07
+	2 thread: gPU win! cPU/gPU: 3.10
+	3 thread: gPU win! cPU/gPU: 2.24
+	4 thread: gPU win! cPU/gPU: 1.75
+M:  101, N:  4096, K:  4096, blas_init:   6.283 ms, blas_compute:  11.598 ms, cpu_compute:  92.349 ms
+	1 thread: gPU win! cPU/gPU: 5.16
+	2 thread: gPU win! cPU/gPU: 3.13
+	3 thread: gPU win! cPU/gPU: 2.25
+	4 thread: gPU win! cPU/gPU: 1.75
+M:  102, N:  4096, K:  4096, blas_init:   6.184 ms, blas_compute:  11.096 ms, cpu_compute:  89.387 ms
+	1 thread: gPU win! cPU/gPU: 5.17
+	2 thread: gPU win! cPU/gPU: 3.15
+	3 thread: gPU win! cPU/gPU: 2.26
+	4 thread: gPU win! cPU/gPU: 1.77
+M:  103, N:  4096, K:  4096, blas_init:   6.330 ms, blas_compute:  11.806 ms, cpu_compute:  90.733 ms
+	1 thread: gPU win! cPU/gPU: 5.00
+	2 thread: gPU win! cPU/gPU: 3.03
+	3 thread: gPU win! cPU/gPU: 2.17
+	4 thread: gPU win! cPU/gPU: 1.69
+M:  104, N:  4096, K:  4096, blas_init:   6.363 ms, blas_compute:  10.955 ms, cpu_compute:  92.590 ms
+	1 thread: gPU win! cPU/gPU: 5.35
+	2 thread: gPU win! cPU/gPU: 3.27
+	3 thread: gPU win! cPU/gPU: 2.36
+	4 thread: gPU win! cPU/gPU: 1.85
+M:  105, N:  4096, K:  4096, blas_init:   6.404 ms, blas_compute:  11.114 ms, cpu_compute:  91.329 ms
+	1 thread: gPU win! cPU/gPU: 5.21
+	2 thread: gPU win! cPU/gPU: 3.19
+	3 thread: gPU win! cPU/gPU: 2.30
+	4 thread: gPU win! cPU/gPU: 1.80
+M:  106, N:  4096, K:  4096, blas_init:   6.244 ms, blas_compute:  11.979 ms, cpu_compute:  94.289 ms
+	1 thread: gPU win! cPU/gPU: 5.17
+	2 thread: gPU win! cPU/gPU: 3.12
+	3 thread: gPU win! cPU/gPU: 2.24
+	4 thread: gPU win! cPU/gPU: 1.74
+M:  107, N:  4096, K:  4096, blas_init:   6.488 ms, blas_compute:  11.866 ms, cpu_compute:  96.846 ms
+	1 thread: gPU win! cPU/gPU: 5.28
+	2 thread: gPU win! cPU/gPU: 3.20
+	3 thread: gPU win! cPU/gPU: 2.30
+	4 thread: gPU win! cPU/gPU: 1.80
+M:  108, N:  4096, K:  4096, blas_init:   6.265 ms, blas_compute:  11.112 ms, cpu_compute:  94.618 ms
+	1 thread: gPU win! cPU/gPU: 5.45
+	2 thread: gPU win! cPU/gPU: 3.32
+	3 thread: gPU win! cPU/gPU: 2.39
+	4 thread: gPU win! cPU/gPU: 1.87
+M:  109, N:  4096, K:  4096, blas_init:   6.265 ms, blas_compute:  11.778 ms, cpu_compute:  96.855 ms
+	1 thread: gPU win! cPU/gPU: 5.37
+	2 thread: gPU win! cPU/gPU: 3.25
+	3 thread: gPU win! cPU/gPU: 2.33
+	4 thread: gPU win! cPU/gPU: 1.81
+M:  110, N:  4096, K:  4096, blas_init:   6.245 ms, blas_compute:  12.242 ms, cpu_compute:  96.936 ms
+	1 thread: gPU win! cPU/gPU: 5.24
+	2 thread: gPU win! cPU/gPU: 3.15
+	3 thread: gPU win! cPU/gPU: 2.26
+	4 thread: gPU win! cPU/gPU: 1.76
+M:  111, N:  4096, K:  4096, blas_init:   6.635 ms, blas_compute:  12.090 ms, cpu_compute: 100.599 ms
+	1 thread: gPU win! cPU/gPU: 5.37
+	2 thread: gPU win! cPU/gPU: 3.26
+	3 thread: gPU win! cPU/gPU: 2.34
+	4 thread: gPU win! cPU/gPU: 1.83
+M:  112, N:  4096, K:  4096, blas_init:   6.758 ms, blas_compute:  12.253 ms, cpu_compute:  99.314 ms
+	1 thread: gPU win! cPU/gPU: 5.22
+	2 thread: gPU win! cPU/gPU: 3.18
+	3 thread: gPU win! cPU/gPU: 2.28
+	4 thread: gPU win! cPU/gPU: 1.78
+M:  113, N:  4096, K:  4096, blas_init:   6.252 ms, blas_compute:  12.611 ms, cpu_compute:  98.934 ms
+	1 thread: gPU win! cPU/gPU: 5.24
+	2 thread: gPU win! cPU/gPU: 3.14
+	3 thread: gPU win! cPU/gPU: 2.24
+	4 thread: gPU win! cPU/gPU: 1.74
+M:  114, N:  4096, K:  4096, blas_init:   6.670 ms, blas_compute:  13.387 ms, cpu_compute: 112.640 ms
+	1 thread: gPU win! cPU/gPU: 5.62
+	2 thread: gPU win! cPU/gPU: 3.37
+	3 thread: gPU win! cPU/gPU: 2.41
+	4 thread: gPU win! cPU/gPU: 1.87
+M:  115, N:  4096, K:  4096, blas_init:   7.232 ms, blas_compute:  13.914 ms, cpu_compute: 103.063 ms
+	1 thread: gPU win! cPU/gPU: 4.87
+	2 thread: gPU win! cPU/gPU: 2.94
+	3 thread: gPU win! cPU/gPU: 2.10
+	4 thread: gPU win! cPU/gPU: 1.64
+M:  116, N:  4096, K:  4096, blas_init:   6.386 ms, blas_compute:  12.676 ms, cpu_compute: 102.867 ms
+	1 thread: gPU win! cPU/gPU: 5.40
+	2 thread: gPU win! cPU/gPU: 3.24
+	3 thread: gPU win! cPU/gPU: 2.32
+	4 thread: gPU win! cPU/gPU: 1.80
+M:  117, N:  4096, K:  4096, blas_init:   6.515 ms, blas_compute:  12.199 ms, cpu_compute: 103.984 ms
+	1 thread: gPU win! cPU/gPU: 5.56
+	2 thread: gPU win! cPU/gPU: 3.36
+	3 thread: gPU win! cPU/gPU: 2.41
+	4 thread: gPU win! cPU/gPU: 1.88
+M:  118, N:  4096, K:  4096, blas_init:   6.247 ms, blas_compute:  12.339 ms, cpu_compute: 102.922 ms
+	1 thread: gPU win! cPU/gPU: 5.54
+	2 thread: gPU win! cPU/gPU: 3.33
+	3 thread: gPU win! cPU/gPU: 2.38
+	4 thread: gPU win! cPU/gPU: 1.85
+M:  119, N:  4096, K:  4096, blas_init:   6.362 ms, blas_compute:  12.141 ms, cpu_compute: 103.807 ms
+	1 thread: gPU win! cPU/gPU: 5.61
+	2 thread: gPU win! cPU/gPU: 3.39
+	3 thread: gPU win! cPU/gPU: 2.43
+	4 thread: gPU win! cPU/gPU: 1.89
+M:  120, N:  4096, K:  4096, blas_init:   6.274 ms, blas_compute:  12.006 ms, cpu_compute: 112.267 ms
+	1 thread: gPU win! cPU/gPU: 6.14
+	2 thread: gPU win! cPU/gPU: 3.71
+	3 thread: gPU win! cPU/gPU: 2.65
+	4 thread: gPU win! cPU/gPU: 2.07
+M:  121, N:  4096, K:  4096, blas_init:   6.286 ms, blas_compute:  13.126 ms, cpu_compute: 105.940 ms
+	1 thread: gPU win! cPU/gPU: 5.46
+	2 thread: gPU win! cPU/gPU: 3.26
+	3 thread: gPU win! cPU/gPU: 2.32
+	4 thread: gPU win! cPU/gPU: 1.80
+M:  122, N:  4096, K:  4096, blas_init:   6.493 ms, blas_compute:  12.518 ms, cpu_compute: 106.313 ms
+	1 thread: gPU win! cPU/gPU: 5.59
+	2 thread: gPU win! cPU/gPU: 3.37
+	3 thread: gPU win! cPU/gPU: 2.41
+	4 thread: gPU win! cPU/gPU: 1.88
+M:  123, N:  4096, K:  4096, blas_init:   6.471 ms, blas_compute:  12.129 ms, cpu_compute: 109.742 ms
+	1 thread: gPU win! cPU/gPU: 5.90
+	2 thread: gPU win! cPU/gPU: 3.57
+	3 thread: gPU win! cPU/gPU: 2.56
+	4 thread: gPU win! cPU/gPU: 2.00
+M:  124, N:  4096, K:  4096, blas_init:   6.639 ms, blas_compute:  13.856 ms, cpu_compute: 112.190 ms
+	1 thread: gPU win! cPU/gPU: 5.47
+	2 thread: gPU win! cPU/gPU: 3.27
+	3 thread: gPU win! cPU/gPU: 2.33
+	4 thread: gPU win! cPU/gPU: 1.81
+M:  125, N:  4096, K:  4096, blas_init:   6.667 ms, blas_compute:  13.910 ms, cpu_compute: 111.595 ms
+	1 thread: gPU win! cPU/gPU: 5.42
+	2 thread: gPU win! cPU/gPU: 3.24
+	3 thread: gPU win! cPU/gPU: 2.31
+	4 thread: gPU win! cPU/gPU: 1.79
+M:  126, N:  4096, K:  4096, blas_init:   6.832 ms, blas_compute:  13.808 ms, cpu_compute: 112.325 ms
+	1 thread: gPU win! cPU/gPU: 5.44
+	2 thread: gPU win! cPU/gPU: 3.26
+	3 thread: gPU win! cPU/gPU: 2.33
+	4 thread: gPU win! cPU/gPU: 1.81
+M:  127, N:  4096, K:  4096, blas_init:   6.411 ms, blas_compute:  13.963 ms, cpu_compute: 112.818 ms
+	1 thread: gPU win! cPU/gPU: 5.54
+	2 thread: gPU win! cPU/gPU: 3.29
+	3 thread: gPU win! cPU/gPU: 2.34
+	4 thread: gPU win! cPU/gPU: 1.81
+M:  128, N:  4096, K:  4096, blas_init:   7.256 ms, blas_compute:  15.893 ms, cpu_compute: 128.854 ms
+	1 thread: gPU win! cPU/gPU: 5.57
+	2 thread: gPU win! cPU/gPU: 3.30
+	3 thread: gPU win! cPU/gPU: 2.35
+	4 thread: gPU win! cPU/gPU: 1.82
+M:    1, N:  4096, K: 11008, blas_init:  99.898 ms, blas_compute:   6.874 ms, cpu_compute:   3.411 ms
+	1 thread: cPU win! cPU/gPU: 0.03
+	2 thread: cPU win! cPU/gPU: 0.03
+	3 thread: cPU win! cPU/gPU: 0.03
+	4 thread: cPU win! cPU/gPU: 0.03
+M:    2, N:  4096, K: 11008, blas_init:  17.080 ms, blas_compute:   8.359 ms, cpu_compute:   6.253 ms
+	1 thread: cPU win! cPU/gPU: 0.25
+	2 thread: cPU win! cPU/gPU: 0.19
+	3 thread: cPU win! cPU/gPU: 0.15
+	4 thread: cPU win! cPU/gPU: 0.12
+M:    3, N:  4096, K: 11008, blas_init:  17.670 ms, blas_compute:   9.434 ms, cpu_compute:   9.354 ms
+	1 thread: cPU win! cPU/gPU: 0.35
+	2 thread: cPU win! cPU/gPU: 0.26
+	3 thread: cPU win! cPU/gPU: 0.20
+	4 thread: cPU win! cPU/gPU: 0.17
+M:    4, N:  4096, K: 11008, blas_init:  17.069 ms, blas_compute:   8.060 ms, cpu_compute:  12.058 ms
+	1 thread: cPU win! cPU/gPU: 0.48
+	2 thread: cPU win! cPU/gPU: 0.36
+	3 thread: cPU win! cPU/gPU: 0.29
+	4 thread: cPU win! cPU/gPU: 0.24
+M:    5, N:  4096, K: 11008, blas_init:  17.014 ms, blas_compute:   9.002 ms, cpu_compute:  15.225 ms
+	1 thread: cPU win! cPU/gPU: 0.59
+	2 thread: cPU win! cPU/gPU: 0.43
+	3 thread: cPU win! cPU/gPU: 0.35
+	4 thread: cPU win! cPU/gPU: 0.29
+M:    6, N:  4096, K: 11008, blas_init:  16.609 ms, blas_compute:   8.561 ms, cpu_compute:  17.720 ms
+	1 thread: cPU win! cPU/gPU: 0.70
+	2 thread: cPU win! cPU/gPU: 0.53
+	3 thread: cPU win! cPU/gPU: 0.42
+	4 thread: cPU win! cPU/gPU: 0.35
+M:    7, N:  4096, K: 11008, blas_init:  16.587 ms, blas_compute:   8.519 ms, cpu_compute:  20.322 ms
+	1 thread: cPU win! cPU/gPU: 0.81
+	2 thread: cPU win! cPU/gPU: 0.60
+	3 thread: cPU win! cPU/gPU: 0.48
+	4 thread: cPU win! cPU/gPU: 0.40
+M:    8, N:  4096, K: 11008, blas_init:  16.473 ms, blas_compute:   9.408 ms, cpu_compute:  23.779 ms
+	1 thread: cPU win! cPU/gPU: 0.92
+	2 thread: cPU win! cPU/gPU: 0.67
+	3 thread: cPU win! cPU/gPU: 0.53
+	4 thread: cPU win! cPU/gPU: 0.44
+M:    9, N:  4096, K: 11008, blas_init:  16.622 ms, blas_compute:   9.283 ms, cpu_compute:  26.434 ms
+	1 thread: gPU win! cPU/gPU: 1.02
+	2 thread: cPU win! cPU/gPU: 0.75
+	3 thread: cPU win! cPU/gPU: 0.59
+	4 thread: cPU win! cPU/gPU: 0.49
+M:   10, N:  4096, K: 11008, blas_init:  16.393 ms, blas_compute:   8.852 ms, cpu_compute:  28.383 ms
+	1 thread: gPU win! cPU/gPU: 1.12
+	2 thread: cPU win! cPU/gPU: 0.83
+	3 thread: cPU win! cPU/gPU: 0.66
+	4 thread: cPU win! cPU/gPU: 0.55
+M:   11, N:  4096, K: 11008, blas_init:  16.521 ms, blas_compute:   9.328 ms, cpu_compute:  31.674 ms
+	1 thread: gPU win! cPU/gPU: 1.23
+	2 thread: cPU win! cPU/gPU: 0.90
+	3 thread: cPU win! cPU/gPU: 0.71
+	4 thread: cPU win! cPU/gPU: 0.59
+M:   12, N:  4096, K: 11008, blas_init:  16.506 ms, blas_compute:   8.777 ms, cpu_compute:  34.298 ms
+	1 thread: gPU win! cPU/gPU: 1.36
+	2 thread: gPU win! cPU/gPU: 1.01
+	3 thread: cPU win! cPU/gPU: 0.80
+	4 thread: cPU win! cPU/gPU: 0.66
+M:   13, N:  4096, K: 11008, blas_init:  16.963 ms, blas_compute:   9.370 ms, cpu_compute:  36.802 ms
+	1 thread: gPU win! cPU/gPU: 1.40
+	2 thread: gPU win! cPU/gPU: 1.03
+	3 thread: cPU win! cPU/gPU: 0.82
+	4 thread: cPU win! cPU/gPU: 0.68
+M:   14, N:  4096, K: 11008, blas_init:  16.379 ms, blas_compute:  10.084 ms, cpu_compute:  38.689 ms
+	1 thread: gPU win! cPU/gPU: 1.46
+	2 thread: gPU win! cPU/gPU: 1.06
+	3 thread: cPU win! cPU/gPU: 0.83
+	4 thread: cPU win! cPU/gPU: 0.68
+M:   15, N:  4096, K: 11008, blas_init:  16.287 ms, blas_compute:   9.345 ms, cpu_compute:  40.659 ms
+	1 thread: gPU win! cPU/gPU: 1.59
+	2 thread: gPU win! cPU/gPU: 1.16
+	3 thread: cPU win! cPU/gPU: 0.92
+	4 thread: cPU win! cPU/gPU: 0.76
+M:   16, N:  4096, K: 11008, blas_init:  16.298 ms, blas_compute:   9.222 ms, cpu_compute:  43.431 ms
+	1 thread: gPU win! cPU/gPU: 1.70
+	2 thread: gPU win! cPU/gPU: 1.25
+	3 thread: cPU win! cPU/gPU: 0.99
+	4 thread: cPU win! cPU/gPU: 0.82
+M:   17, N:  4096, K: 11008, blas_init:  16.422 ms, blas_compute:   9.675 ms, cpu_compute:  45.647 ms
+	1 thread: gPU win! cPU/gPU: 1.75
+	2 thread: gPU win! cPU/gPU: 1.28
+	3 thread: gPU win! cPU/gPU: 1.00
+	4 thread: cPU win! cPU/gPU: 0.83
+M:   18, N:  4096, K: 11008, blas_init:  17.016 ms, blas_compute:  10.723 ms, cpu_compute:  48.353 ms
+	1 thread: gPU win! cPU/gPU: 1.74
+	2 thread: gPU win! cPU/gPU: 1.26
+	3 thread: cPU win! cPU/gPU: 0.98
+	4 thread: cPU win! cPU/gPU: 0.81
+M:   19, N:  4096, K: 11008, blas_init:  18.040 ms, blas_compute:  10.679 ms, cpu_compute:  53.211 ms
+	1 thread: gPU win! cPU/gPU: 1.85
+	2 thread: gPU win! cPU/gPU: 1.35
+	3 thread: gPU win! cPU/gPU: 1.06
+	4 thread: cPU win! cPU/gPU: 0.88
+M:   20, N:  4096, K: 11008, blas_init:  17.592 ms, blas_compute:  10.733 ms, cpu_compute:  53.686 ms
+	1 thread: gPU win! cPU/gPU: 1.90
+	2 thread: gPU win! cPU/gPU: 1.37
+	3 thread: gPU win! cPU/gPU: 1.08
+	4 thread: cPU win! cPU/gPU: 0.89
+M:   21, N:  4096, K: 11008, blas_init:  16.949 ms, blas_compute:  10.926 ms, cpu_compute:  53.362 ms
+	1 thread: gPU win! cPU/gPU: 1.91
+	2 thread: gPU win! cPU/gPU: 1.38
+	3 thread: gPU win! cPU/gPU: 1.07
+	4 thread: cPU win! cPU/gPU: 0.88
+M:   22, N:  4096, K: 11008, blas_init:  16.412 ms, blas_compute:  10.777 ms, cpu_compute:  56.965 ms
+	1 thread: gPU win! cPU/gPU: 2.10
+	2 thread: gPU win! cPU/gPU: 1.50
+	3 thread: gPU win! cPU/gPU: 1.17
+	4 thread: cPU win! cPU/gPU: 0.96
+M:   23, N:  4096, K: 11008, blas_init:  16.673 ms, blas_compute:  11.900 ms, cpu_compute:  57.664 ms
+	1 thread: gPU win! cPU/gPU: 2.02
+	2 thread: gPU win! cPU/gPU: 1.42
+	3 thread: gPU win! cPU/gPU: 1.10
+	4 thread: cPU win! cPU/gPU: 0.90
+M:   24, N:  4096, K: 11008, blas_init:  16.150 ms, blas_compute:  10.376 ms, cpu_compute:  58.532 ms
+	1 thread: gPU win! cPU/gPU: 2.21
+	2 thread: gPU win! cPU/gPU: 1.59
+	3 thread: gPU win! cPU/gPU: 1.24
+	4 thread: gPU win! cPU/gPU: 1.02
+M:   25, N:  4096, K: 11008, blas_init:  16.647 ms, blas_compute:  10.080 ms, cpu_compute:  60.900 ms
+	1 thread: gPU win! cPU/gPU: 2.28
+	2 thread: gPU win! cPU/gPU: 1.65
+	3 thread: gPU win! cPU/gPU: 1.30
+	4 thread: gPU win! cPU/gPU: 1.07
+M:   26, N:  4096, K: 11008, blas_init:  16.382 ms, blas_compute:  10.950 ms, cpu_compute:  61.782 ms
+	1 thread: gPU win! cPU/gPU: 2.26
+	2 thread: gPU win! cPU/gPU: 1.61
+	3 thread: gPU win! cPU/gPU: 1.25
+	4 thread: gPU win! cPU/gPU: 1.03
+M:   27, N:  4096, K: 11008, blas_init:  16.277 ms, blas_compute:  11.082 ms, cpu_compute:  63.614 ms
+	1 thread: gPU win! cPU/gPU: 2.33
+	2 thread: gPU win! cPU/gPU: 1.65
+	3 thread: gPU win! cPU/gPU: 1.28
+	4 thread: gPU win! cPU/gPU: 1.05
+M:   28, N:  4096, K: 11008, blas_init:  16.113 ms, blas_compute:  11.382 ms, cpu_compute:  66.206 ms
+	1 thread: gPU win! cPU/gPU: 2.41
+	2 thread: gPU win! cPU/gPU: 1.70
+	3 thread: gPU win! cPU/gPU: 1.32
+	4 thread: gPU win! cPU/gPU: 1.07
+M:   29, N:  4096, K: 11008, blas_init:  16.083 ms, blas_compute:  11.528 ms, cpu_compute:  71.271 ms
+	1 thread: gPU win! cPU/gPU: 2.58
+	2 thread: gPU win! cPU/gPU: 1.82
+	3 thread: gPU win! cPU/gPU: 1.41
+	4 thread: gPU win! cPU/gPU: 1.15
+M:   30, N:  4096, K: 11008, blas_init:  16.250 ms, blas_compute:  11.118 ms, cpu_compute:  70.412 ms
+	1 thread: gPU win! cPU/gPU: 2.57
+	2 thread: gPU win! cPU/gPU: 1.83
+	3 thread: gPU win! cPU/gPU: 1.42
+	4 thread: gPU win! cPU/gPU: 1.16
+M:   31, N:  4096, K: 11008, blas_init:  16.327 ms, blas_compute:  12.128 ms, cpu_compute:  71.990 ms
+	1 thread: gPU win! cPU/gPU: 2.53
+	2 thread: gPU win! cPU/gPU: 1.77
+	3 thread: gPU win! cPU/gPU: 1.37
+	4 thread: gPU win! cPU/gPU: 1.11
+M:   32, N:  4096, K: 11008, blas_init:  16.265 ms, blas_compute:  12.600 ms, cpu_compute:  74.309 ms
+	1 thread: gPU win! cPU/gPU: 2.57
+	2 thread: gPU win! cPU/gPU: 1.79
+	3 thread: gPU win! cPU/gPU: 1.37
+	4 thread: gPU win! cPU/gPU: 1.11
+M:   33, N:  4096, K: 11008, blas_init:  16.289 ms, blas_compute:  11.617 ms, cpu_compute:  77.019 ms
+	1 thread: gPU win! cPU/gPU: 2.76
+	2 thread: gPU win! cPU/gPU: 1.95
+	3 thread: gPU win! cPU/gPU: 1.51
+	4 thread: gPU win! cPU/gPU: 1.23
+M:   34, N:  4096, K: 11008, blas_init:  16.473 ms, blas_compute:  12.305 ms, cpu_compute:  79.255 ms
+	1 thread: gPU win! cPU/gPU: 2.75
+	2 thread: gPU win! cPU/gPU: 1.93
+	3 thread: gPU win! cPU/gPU: 1.48
+	4 thread: gPU win! cPU/gPU: 1.21
+M:   35, N:  4096, K: 11008, blas_init:  16.136 ms, blas_compute:  11.198 ms, cpu_compute:  80.263 ms
+	1 thread: gPU win! cPU/gPU: 2.94
+	2 thread: gPU win! cPU/gPU: 2.08
+	3 thread: gPU win! cPU/gPU: 1.61
+	4 thread: gPU win! cPU/gPU: 1.32
+M:   36, N:  4096, K: 11008, blas_init:  16.171 ms, blas_compute:  12.911 ms, cpu_compute:  83.954 ms
+	1 thread: gPU win! cPU/gPU: 2.89
+	2 thread: gPU win! cPU/gPU: 2.00
+	3 thread: gPU win! cPU/gPU: 1.53
+	4 thread: gPU win! cPU/gPU: 1.24
+M:   37, N:  4096, K: 11008, blas_init:  16.203 ms, blas_compute:  14.323 ms, cpu_compute:  86.699 ms
+	1 thread: gPU win! cPU/gPU: 2.84
+	2 thread: gPU win! cPU/gPU: 1.93
+	3 thread: gPU win! cPU/gPU: 1.47
+	4 thread: gPU win! cPU/gPU: 1.18
+M:   38, N:  4096, K: 11008, blas_init:  16.118 ms, blas_compute:  13.561 ms, cpu_compute:  87.605 ms
+	1 thread: gPU win! cPU/gPU: 2.95
+	2 thread: gPU win! cPU/gPU: 2.03
+	3 thread: gPU win! cPU/gPU: 1.54
+	4 thread: gPU win! cPU/gPU: 1.25
+M:   39, N:  4096, K: 11008, blas_init:  16.157 ms, blas_compute:  13.751 ms, cpu_compute:  89.639 ms
+	1 thread: gPU win! cPU/gPU: 3.00
+	2 thread: gPU win! cPU/gPU: 2.05
+	3 thread: gPU win! cPU/gPU: 1.56
+	4 thread: gPU win! cPU/gPU: 1.26
+M:   40, N:  4096, K: 11008, blas_init:  16.212 ms, blas_compute:  13.876 ms, cpu_compute:  90.958 ms
+	1 thread: gPU win! cPU/gPU: 3.02
+	2 thread: gPU win! cPU/gPU: 2.07
+	3 thread: gPU win! cPU/gPU: 1.57
+	4 thread: gPU win! cPU/gPU: 1.27
+M:   41, N:  4096, K: 11008, blas_init:  16.286 ms, blas_compute:  13.390 ms, cpu_compute:  93.765 ms
+	1 thread: gPU win! cPU/gPU: 3.16
+	2 thread: gPU win! cPU/gPU: 2.18
+	3 thread: gPU win! cPU/gPU: 1.66
+	4 thread: gPU win! cPU/gPU: 1.34
+M:   42, N:  4096, K: 11008, blas_init:  16.067 ms, blas_compute:  13.400 ms, cpu_compute:  95.026 ms
+	1 thread: gPU win! cPU/gPU: 3.22
+	2 thread: gPU win! cPU/gPU: 2.22
+	3 thread: gPU win! cPU/gPU: 1.69
+	4 thread: gPU win! cPU/gPU: 1.36
+M:   43, N:  4096, K: 11008, blas_init:  16.212 ms, blas_compute:  14.253 ms, cpu_compute:  97.598 ms
+	1 thread: gPU win! cPU/gPU: 3.20
+	2 thread: gPU win! cPU/gPU: 2.18
+	3 thread: gPU win! cPU/gPU: 1.66
+	4 thread: gPU win! cPU/gPU: 1.33
+M:   44, N:  4096, K: 11008, blas_init:  16.190 ms, blas_compute:  13.661 ms, cpu_compute:  99.621 ms
+	1 thread: gPU win! cPU/gPU: 3.34
+	2 thread: gPU win! cPU/gPU: 2.29
+	3 thread: gPU win! cPU/gPU: 1.74
+	4 thread: gPU win! cPU/gPU: 1.41
+M:   45, N:  4096, K: 11008, blas_init:  16.314 ms, blas_compute:  14.551 ms, cpu_compute: 102.659 ms
+	1 thread: gPU win! cPU/gPU: 3.33
+	2 thread: gPU win! cPU/gPU: 2.26
+	3 thread: gPU win! cPU/gPU: 1.71
+	4 thread: gPU win! cPU/gPU: 1.38
+M:   46, N:  4096, K: 11008, blas_init:  16.136 ms, blas_compute:  14.316 ms, cpu_compute: 103.824 ms
+	1 thread: gPU win! cPU/gPU: 3.41
+	2 thread: gPU win! cPU/gPU: 2.32
+	3 thread: gPU win! cPU/gPU: 1.76
+	4 thread: gPU win! cPU/gPU: 1.41
+M:   47, N:  4096, K: 11008, blas_init:  16.175 ms, blas_compute:  15.152 ms, cpu_compute: 105.635 ms
+	1 thread: gPU win! cPU/gPU: 3.37
+	2 thread: gPU win! cPU/gPU: 2.27
+	3 thread: gPU win! cPU/gPU: 1.71
+	4 thread: gPU win! cPU/gPU: 1.38
+M:   48, N:  4096, K: 11008, blas_init:  16.070 ms, blas_compute:  14.245 ms, cpu_compute: 107.822 ms
+	1 thread: gPU win! cPU/gPU: 3.56
+	2 thread: gPU win! cPU/gPU: 2.42
+	3 thread: gPU win! cPU/gPU: 1.83
+	4 thread: gPU win! cPU/gPU: 1.48
+M:   49, N:  4096, K: 11008, blas_init:  16.135 ms, blas_compute:  15.636 ms, cpu_compute: 112.460 ms
+	1 thread: gPU win! cPU/gPU: 3.54
+	2 thread: gPU win! cPU/gPU: 2.37
+	3 thread: gPU win! cPU/gPU: 1.78
+	4 thread: gPU win! cPU/gPU: 1.43
+M:   50, N:  4096, K: 11008, blas_init:  16.412 ms, blas_compute:  14.705 ms, cpu_compute: 112.739 ms
+	1 thread: gPU win! cPU/gPU: 3.62
+	2 thread: gPU win! cPU/gPU: 2.46
+	3 thread: gPU win! cPU/gPU: 1.86
+	4 thread: gPU win! cPU/gPU: 1.50
+M:   51, N:  4096, K: 11008, blas_init:  16.067 ms, blas_compute:  14.207 ms, cpu_compute: 114.897 ms
+	1 thread: gPU win! cPU/gPU: 3.80
+	2 thread: gPU win! cPU/gPU: 2.58
+	3 thread: gPU win! cPU/gPU: 1.96
+	4 thread: gPU win! cPU/gPU: 1.58
+M:   52, N:  4096, K: 11008, blas_init:  16.258 ms, blas_compute:  14.859 ms, cpu_compute: 116.891 ms
+	1 thread: gPU win! cPU/gPU: 3.76
+	2 thread: gPU win! cPU/gPU: 2.54
+	3 thread: gPU win! cPU/gPU: 1.92
+	4 thread: gPU win! cPU/gPU: 1.54
+M:   53, N:  4096, K: 11008, blas_init:  16.202 ms, blas_compute:  14.797 ms, cpu_compute: 119.762 ms
+	1 thread: gPU win! cPU/gPU: 3.86
+	2 thread: gPU win! cPU/gPU: 2.62
+	3 thread: gPU win! cPU/gPU: 1.98
+	4 thread: gPU win! cPU/gPU: 1.59
+M:   54, N:  4096, K: 11008, blas_init:  16.187 ms, blas_compute:  16.700 ms, cpu_compute: 120.566 ms
+	1 thread: gPU win! cPU/gPU: 3.67
+	2 thread: gPU win! cPU/gPU: 2.43
+	3 thread: gPU win! cPU/gPU: 1.82
+	4 thread: gPU win! cPU/gPU: 1.45
+M:   55, N:  4096, K: 11008, blas_init:  16.083 ms, blas_compute:  17.336 ms, cpu_compute: 122.893 ms
+	1 thread: gPU win! cPU/gPU: 3.68
+	2 thread: gPU win! cPU/gPU: 2.42
+	3 thread: gPU win! cPU/gPU: 1.80
+	4 thread: gPU win! cPU/gPU: 1.44
+M:   56, N:  4096, K: 11008, blas_init:  16.081 ms, blas_compute:  15.639 ms, cpu_compute: 125.488 ms
+	1 thread: gPU win! cPU/gPU: 3.96
+	2 thread: gPU win! cPU/gPU: 2.65
+	3 thread: gPU win! cPU/gPU: 1.99
+	4 thread: gPU win! cPU/gPU: 1.60
+M:   57, N:  4096, K: 11008, blas_init:  16.072 ms, blas_compute:  15.419 ms, cpu_compute: 127.181 ms
+	1 thread: gPU win! cPU/gPU: 4.04
+	2 thread: gPU win! cPU/gPU: 2.71
+	3 thread: gPU win! cPU/gPU: 2.04
+	4 thread: gPU win! cPU/gPU: 1.64
+M:   58, N:  4096, K: 11008, blas_init:  16.331 ms, blas_compute:  16.543 ms, cpu_compute: 130.190 ms
+	1 thread: gPU win! cPU/gPU: 3.96
+	2 thread: gPU win! cPU/gPU: 2.63
+	3 thread: gPU win! cPU/gPU: 1.97
+	4 thread: gPU win! cPU/gPU: 1.58
+M:   59, N:  4096, K: 11008, blas_init:  16.254 ms, blas_compute:  16.716 ms, cpu_compute: 132.667 ms
+	1 thread: gPU win! cPU/gPU: 4.02
+	2 thread: gPU win! cPU/gPU: 2.67
+	3 thread: gPU win! cPU/gPU: 2.00
+	4 thread: gPU win! cPU/gPU: 1.60
+M:   60, N:  4096, K: 11008, blas_init:  16.074 ms, blas_compute:  17.068 ms, cpu_compute: 134.438 ms
+	1 thread: gPU win! cPU/gPU: 4.06
+	2 thread: gPU win! cPU/gPU: 2.68
+	3 thread: gPU win! cPU/gPU: 2.00
+	4 thread: gPU win! cPU/gPU: 1.59
+M:   61, N:  4096, K: 11008, blas_init:  16.076 ms, blas_compute:  16.694 ms, cpu_compute: 135.572 ms
+	1 thread: gPU win! cPU/gPU: 4.14
+	2 thread: gPU win! cPU/gPU: 2.74
+	3 thread: gPU win! cPU/gPU: 2.05
+	4 thread: gPU win! cPU/gPU: 1.64
+M:   62, N:  4096, K: 11008, blas_init:  16.059 ms, blas_compute:  18.484 ms, cpu_compute: 138.291 ms
+	1 thread: gPU win! cPU/gPU: 4.00
+	2 thread: gPU win! cPU/gPU: 2.61
+	3 thread: gPU win! cPU/gPU: 1.93
+	4 thread: gPU win! cPU/gPU: 1.54
+M:   63, N:  4096, K: 11008, blas_init:  16.121 ms, blas_compute:  18.109 ms, cpu_compute: 141.168 ms
+	1 thread: gPU win! cPU/gPU: 4.12
+	2 thread: gPU win! cPU/gPU: 2.70
+	3 thread: gPU win! cPU/gPU: 2.00
+	4 thread: gPU win! cPU/gPU: 1.59
+M:   64, N:  4096, K: 11008, blas_init:  16.068 ms, blas_compute:  16.515 ms, cpu_compute: 143.014 ms
+	1 thread: gPU win! cPU/gPU: 4.39
+	2 thread: gPU win! cPU/gPU: 2.91
+	3 thread: gPU win! cPU/gPU: 2.18
+	4 thread: gPU win! cPU/gPU: 1.74
+M:   65, N:  4096, K: 11008, blas_init:  17.678 ms, blas_compute:  16.927 ms, cpu_compute: 152.613 ms
+	1 thread: gPU win! cPU/gPU: 4.41
+	2 thread: gPU win! cPU/gPU: 2.96
+	3 thread: gPU win! cPU/gPU: 2.23
+	4 thread: gPU win! cPU/gPU: 1.79
+M:   66, N:  4096, K: 11008, blas_init:  16.198 ms, blas_compute:  17.856 ms, cpu_compute: 151.411 ms
+	1 thread: gPU win! cPU/gPU: 4.45
+	2 thread: gPU win! cPU/gPU: 2.92
+	3 thread: gPU win! cPU/gPU: 2.17
+	4 thread: gPU win! cPU/gPU: 1.73
+M:   67, N:  4096, K: 11008, blas_init:  16.406 ms, blas_compute:  18.869 ms, cpu_compute: 149.501 ms
+	1 thread: gPU win! cPU/gPU: 4.24
+	2 thread: gPU win! cPU/gPU: 2.76
+	3 thread: gPU win! cPU/gPU: 2.05
+	4 thread: gPU win! cPU/gPU: 1.63
+M:   68, N:  4096, K: 11008, blas_init:  16.090 ms, blas_compute:  18.540 ms, cpu_compute: 151.943 ms
+	1 thread: gPU win! cPU/gPU: 4.39
+	2 thread: gPU win! cPU/gPU: 2.86
+	3 thread: gPU win! cPU/gPU: 2.12
+	4 thread: gPU win! cPU/gPU: 1.68
+M:   69, N:  4096, K: 11008, blas_init:  16.089 ms, blas_compute:  17.617 ms, cpu_compute: 155.817 ms
+	1 thread: gPU win! cPU/gPU: 4.62
+	2 thread: gPU win! cPU/gPU: 3.04
+	3 thread: gPU win! cPU/gPU: 2.26
+	4 thread: gPU win! cPU/gPU: 1.80
+M:   70, N:  4096, K: 11008, blas_init:  16.118 ms, blas_compute:  19.042 ms, cpu_compute: 155.948 ms
+	1 thread: gPU win! cPU/gPU: 4.44
+	2 thread: gPU win! cPU/gPU: 2.88
+	3 thread: gPU win! cPU/gPU: 2.13
+	4 thread: gPU win! cPU/gPU: 1.69
+M:   71, N:  4096, K: 11008, blas_init:  16.217 ms, blas_compute:  20.556 ms, cpu_compute: 156.938 ms
+	1 thread: gPU win! cPU/gPU: 4.27
+	2 thread: gPU win! cPU/gPU: 2.74
+	3 thread: gPU win! cPU/gPU: 2.01
+	4 thread: gPU win! cPU/gPU: 1.59
+M:   72, N:  4096, K: 11008, blas_init:  16.131 ms, blas_compute:  18.446 ms, cpu_compute: 158.890 ms
+	1 thread: gPU win! cPU/gPU: 4.60
+	2 thread: gPU win! cPU/gPU: 3.00
+	3 thread: gPU win! cPU/gPU: 2.22
+	4 thread: gPU win! cPU/gPU: 1.77
+M:   73, N:  4096, K: 11008, blas_init:  16.186 ms, blas_compute:  18.396 ms, cpu_compute: 163.440 ms
+	1 thread: gPU win! cPU/gPU: 4.73
+	2 thread: gPU win! cPU/gPU: 3.09
+	3 thread: gPU win! cPU/gPU: 2.29
+	4 thread: gPU win! cPU/gPU: 1.82
+M:   74, N:  4096, K: 11008, blas_init:  16.098 ms, blas_compute:  19.745 ms, cpu_compute: 166.867 ms
+	1 thread: gPU win! cPU/gPU: 4.66
+	2 thread: gPU win! cPU/gPU: 3.00
+	3 thread: gPU win! cPU/gPU: 2.22
+	4 thread: gPU win! cPU/gPU: 1.76
+M:   75, N:  4096, K: 11008, blas_init:  16.076 ms, blas_compute:  21.394 ms, cpu_compute: 164.910 ms
+	1 thread: gPU win! cPU/gPU: 4.40
+	2 thread: gPU win! cPU/gPU: 2.80
+	3 thread: gPU win! cPU/gPU: 2.05
+	4 thread: gPU win! cPU/gPU: 1.62
+M:   76, N:  4096, K: 11008, blas_init:  16.172 ms, blas_compute:  18.706 ms, cpu_compute: 168.747 ms
+	1 thread: gPU win! cPU/gPU: 4.84
+	2 thread: gPU win! cPU/gPU: 3.15
+	3 thread: gPU win! cPU/gPU: 2.33
+	4 thread: gPU win! cPU/gPU: 1.85
+M:   77, N:  4096, K: 11008, blas_init:  16.212 ms, blas_compute:  20.480 ms, cpu_compute: 169.379 ms
+	1 thread: gPU win! cPU/gPU: 4.62
+	2 thread: gPU win! cPU/gPU: 2.96
+	3 thread: gPU win! cPU/gPU: 2.18
+	4 thread: gPU win! cPU/gPU: 1.73
+M:   78, N:  4096, K: 11008, blas_init:  16.180 ms, blas_compute:  19.412 ms, cpu_compute: 172.978 ms
+	1 thread: gPU win! cPU/gPU: 4.86
+	2 thread: gPU win! cPU/gPU: 3.14
+	3 thread: gPU win! cPU/gPU: 2.32
+	4 thread: gPU win! cPU/gPU: 1.84
+M:   79, N:  4096, K: 11008, blas_init:  16.158 ms, blas_compute:  19.424 ms, cpu_compute: 173.941 ms
+	1 thread: gPU win! cPU/gPU: 4.89
+	2 thread: gPU win! cPU/gPU: 3.16
+	3 thread: gPU win! cPU/gPU: 2.34
+	4 thread: gPU win! cPU/gPU: 1.85
+M:   80, N:  4096, K: 11008, blas_init:  16.238 ms, blas_compute:  20.506 ms, cpu_compute: 178.731 ms
+	1 thread: gPU win! cPU/gPU: 4.86
+	2 thread: gPU win! cPU/gPU: 3.12
+	3 thread: gPU win! cPU/gPU: 2.30
+	4 thread: gPU win! cPU/gPU: 1.82
+M:   81, N:  4096, K: 11008, blas_init:  16.045 ms, blas_compute:  21.279 ms, cpu_compute: 182.470 ms
+	1 thread: gPU win! cPU/gPU: 4.89
+	2 thread: gPU win! cPU/gPU: 3.11
+	3 thread: gPU win! cPU/gPU: 2.28
+	4 thread: gPU win! cPU/gPU: 1.80
+M:   82, N:  4096, K: 11008, blas_init:  16.166 ms, blas_compute:  21.586 ms, cpu_compute: 179.780 ms
+	1 thread: gPU win! cPU/gPU: 4.76
+	2 thread: gPU win! cPU/gPU: 3.03
+	3 thread: gPU win! cPU/gPU: 2.22
+	4 thread: gPU win! cPU/gPU: 1.75
+M:   83, N:  4096, K: 11008, blas_init:  16.063 ms, blas_compute:  22.794 ms, cpu_compute: 182.868 ms
+	1 thread: gPU win! cPU/gPU: 4.71
+	2 thread: gPU win! cPU/gPU: 2.97
+	3 thread: gPU win! cPU/gPU: 2.17
+	4 thread: gPU win! cPU/gPU: 1.71
+M:   84, N:  4096, K: 11008, blas_init:  16.137 ms, blas_compute:  20.960 ms, cpu_compute: 185.212 ms
+	1 thread: gPU win! cPU/gPU: 4.99
+	2 thread: gPU win! cPU/gPU: 3.19
+	3 thread: gPU win! cPU/gPU: 2.34
+	4 thread: gPU win! cPU/gPU: 1.85
+M:   85, N:  4096, K: 11008, blas_init:  16.054 ms, blas_compute:  21.228 ms, cpu_compute: 186.763 ms
+	1 thread: gPU win! cPU/gPU: 5.01
+	2 thread: gPU win! cPU/gPU: 3.19
+	3 thread: gPU win! cPU/gPU: 2.34
+	4 thread: gPU win! cPU/gPU: 1.85
+M:   86, N:  4096, K: 11008, blas_init:  16.131 ms, blas_compute:  21.350 ms, cpu_compute: 189.025 ms
+	1 thread: gPU win! cPU/gPU: 5.04
+	2 thread: gPU win! cPU/gPU: 3.21
+	3 thread: gPU win! cPU/gPU: 2.36
+	4 thread: gPU win! cPU/gPU: 1.86
+M:   87, N:  4096, K: 11008, blas_init:  16.213 ms, blas_compute:  23.091 ms, cpu_compute: 191.790 ms
+	1 thread: gPU win! cPU/gPU: 4.88
+	2 thread: gPU win! cPU/gPU: 3.07
+	3 thread: gPU win! cPU/gPU: 2.24
+	4 thread: gPU win! cPU/gPU: 1.77
+M:   88, N:  4096, K: 11008, blas_init:  16.307 ms, blas_compute:  21.874 ms, cpu_compute: 194.463 ms
+	1 thread: gPU win! cPU/gPU: 5.09
+	2 thread: gPU win! cPU/gPU: 3.24
+	3 thread: gPU win! cPU/gPU: 2.37
+	4 thread: gPU win! cPU/gPU: 1.87
+M:   89, N:  4096, K: 11008, blas_init:  16.058 ms, blas_compute:  22.996 ms, cpu_compute: 195.690 ms
+	1 thread: gPU win! cPU/gPU: 5.01
+	2 thread: gPU win! cPU/gPU: 3.15
+	3 thread: gPU win! cPU/gPU: 2.30
+	4 thread: gPU win! cPU/gPU: 1.81
+M:   90, N:  4096, K: 11008, blas_init:  16.120 ms, blas_compute:  23.547 ms, cpu_compute: 201.615 ms
+	1 thread: gPU win! cPU/gPU: 5.08
+	2 thread: gPU win! cPU/gPU: 3.19
+	3 thread: gPU win! cPU/gPU: 2.32
+	4 thread: gPU win! cPU/gPU: 1.83
+M:   91, N:  4096, K: 11008, blas_init:  16.104 ms, blas_compute:  23.180 ms, cpu_compute: 199.092 ms
+	1 thread: gPU win! cPU/gPU: 5.07
+	2 thread: gPU win! cPU/gPU: 3.19
+	3 thread: gPU win! cPU/gPU: 2.32
+	4 thread: gPU win! cPU/gPU: 1.83
+M:   92, N:  4096, K: 11008, blas_init:  16.073 ms, blas_compute:  22.753 ms, cpu_compute: 209.573 ms
+	1 thread: gPU win! cPU/gPU: 5.40
+	2 thread: gPU win! cPU/gPU: 3.40
+	3 thread: gPU win! cPU/gPU: 2.49
+	4 thread: gPU win! cPU/gPU: 1.96
+M:   93, N:  4096, K: 11008, blas_init:  16.261 ms, blas_compute:  23.159 ms, cpu_compute: 209.928 ms
+	1 thread: gPU win! cPU/gPU: 5.33
+	2 thread: gPU win! cPU/gPU: 3.35
+	3 thread: gPU win! cPU/gPU: 2.45
+	4 thread: gPU win! cPU/gPU: 1.93
+M:   94, N:  4096, K: 11008, blas_init:  16.025 ms, blas_compute:  22.753 ms, cpu_compute: 210.153 ms
+	1 thread: gPU win! cPU/gPU: 5.42
+	2 thread: gPU win! cPU/gPU: 3.42
+	3 thread: gPU win! cPU/gPU: 2.49
+	4 thread: gPU win! cPU/gPU: 1.96
+M:   95, N:  4096, K: 11008, blas_init:  16.314 ms, blas_compute:  23.130 ms, cpu_compute: 208.013 ms
+	1 thread: gPU win! cPU/gPU: 5.27
+	2 thread: gPU win! cPU/gPU: 3.32
+	3 thread: gPU win! cPU/gPU: 2.43
+	4 thread: gPU win! cPU/gPU: 1.91
+M:   96, N:  4096, K: 11008, blas_init:  16.234 ms, blas_compute:  23.589 ms, cpu_compute: 213.333 ms
+	1 thread: gPU win! cPU/gPU: 5.36
+	2 thread: gPU win! cPU/gPU: 3.36
+	3 thread: gPU win! cPU/gPU: 2.45
+	4 thread: gPU win! cPU/gPU: 1.93
+M:   97, N:  4096, K: 11008, blas_init:  16.400 ms, blas_compute:  23.787 ms, cpu_compute: 214.033 ms
+	1 thread: gPU win! cPU/gPU: 5.33
+	2 thread: gPU win! cPU/gPU: 3.35
+	3 thread: gPU win! cPU/gPU: 2.44
+	4 thread: gPU win! cPU/gPU: 1.92
+M:   98, N:  4096, K: 11008, blas_init:  16.282 ms, blas_compute:  24.922 ms, cpu_compute: 214.097 ms
+	1 thread: gPU win! cPU/gPU: 5.20
+	2 thread: gPU win! cPU/gPU: 3.24
+	3 thread: gPU win! cPU/gPU: 2.35
+	4 thread: gPU win! cPU/gPU: 1.85
+M:   99, N:  4096, K: 11008, blas_init:  16.100 ms, blas_compute:  24.148 ms, cpu_compute: 216.659 ms
+	1 thread: gPU win! cPU/gPU: 5.38
+	2 thread: gPU win! cPU/gPU: 3.36
+	3 thread: gPU win! cPU/gPU: 2.45
+	4 thread: gPU win! cPU/gPU: 1.92
+M:  100, N:  4096, K: 11008, blas_init:  16.191 ms, blas_compute:  25.879 ms, cpu_compute: 221.509 ms
+	1 thread: gPU win! cPU/gPU: 5.27
+	2 thread: gPU win! cPU/gPU: 3.26
+	3 thread: gPU win! cPU/gPU: 2.36
+	4 thread: gPU win! cPU/gPU: 1.85
+M:  101, N:  4096, K: 11008, blas_init:  16.555 ms, blas_compute:  22.834 ms, cpu_compute: 223.281 ms
+	1 thread: gPU win! cPU/gPU: 5.67
+	2 thread: gPU win! cPU/gPU: 3.59
+	3 thread: gPU win! cPU/gPU: 2.63
+	4 thread: gPU win! cPU/gPU: 2.07
+M:  102, N:  4096, K: 11008, blas_init:  16.173 ms, blas_compute:  25.958 ms, cpu_compute: 222.957 ms
+	1 thread: gPU win! cPU/gPU: 5.29
+	2 thread: gPU win! cPU/gPU: 3.27
+	3 thread: gPU win! cPU/gPU: 2.37
+	4 thread: gPU win! cPU/gPU: 1.86
+M:  103, N:  4096, K: 11008, blas_init:  16.204 ms, blas_compute:  23.102 ms, cpu_compute: 224.976 ms
+	1 thread: gPU win! cPU/gPU: 5.72
+	2 thread: gPU win! cPU/gPU: 3.60
+	3 thread: gPU win! cPU/gPU: 2.63
+	4 thread: gPU win! cPU/gPU: 2.07
+M:  104, N:  4096, K: 11008, blas_init:  16.229 ms, blas_compute:  24.708 ms, cpu_compute: 229.172 ms
+	1 thread: gPU win! cPU/gPU: 5.60
+	2 thread: gPU win! cPU/gPU: 3.49
+	3 thread: gPU win! cPU/gPU: 2.54
+	4 thread: gPU win! cPU/gPU: 1.99
+M:  105, N:  4096, K: 11008, blas_init:  16.044 ms, blas_compute:  25.299 ms, cpu_compute: 230.888 ms
+	1 thread: gPU win! cPU/gPU: 5.58
+	2 thread: gPU win! cPU/gPU: 3.46
+	3 thread: gPU win! cPU/gPU: 2.51
+	4 thread: gPU win! cPU/gPU: 1.97
+M:  106, N:  4096, K: 11008, blas_init:  16.052 ms, blas_compute:  26.318 ms, cpu_compute: 232.453 ms
+	1 thread: gPU win! cPU/gPU: 5.49
+	2 thread: gPU win! cPU/gPU: 3.38
+	3 thread: gPU win! cPU/gPU: 2.45
+	4 thread: gPU win! cPU/gPU: 1.92
+M:  107, N:  4096, K: 11008, blas_init:  16.429 ms, blas_compute:  26.012 ms, cpu_compute: 237.169 ms
+	1 thread: gPU win! cPU/gPU: 5.59
+	2 thread: gPU win! cPU/gPU: 3.46
+	3 thread: gPU win! cPU/gPU: 2.51
+	4 thread: gPU win! cPU/gPU: 1.97
+M:  108, N:  4096, K: 11008, blas_init:  15.944 ms, blas_compute:  25.577 ms, cpu_compute: 236.962 ms
+	1 thread: gPU win! cPU/gPU: 5.71
+	2 thread: gPU win! cPU/gPU: 3.53
+	3 thread: gPU win! cPU/gPU: 2.56
+	4 thread: gPU win! cPU/gPU: 2.00
+M:  109, N:  4096, K: 11008, blas_init:  16.054 ms, blas_compute:  26.398 ms, cpu_compute: 245.383 ms
+	1 thread: gPU win! cPU/gPU: 5.78
+	2 thread: gPU win! cPU/gPU: 3.56
+	3 thread: gPU win! cPU/gPU: 2.58
+	4 thread: gPU win! cPU/gPU: 2.02
+M:  110, N:  4096, K: 11008, blas_init:  16.106 ms, blas_compute:  24.231 ms, cpu_compute: 241.519 ms
+	1 thread: gPU win! cPU/gPU: 5.99
+	2 thread: gPU win! cPU/gPU: 3.74
+	3 thread: gPU win! cPU/gPU: 2.72
+	4 thread: gPU win! cPU/gPU: 2.14
+M:  111, N:  4096, K: 11008, blas_init:  16.032 ms, blas_compute:  25.612 ms, cpu_compute: 242.088 ms
+	1 thread: gPU win! cPU/gPU: 5.81
+	2 thread: gPU win! cPU/gPU: 3.60
+	3 thread: gPU win! cPU/gPU: 2.61
+	4 thread: gPU win! cPU/gPU: 2.04
+M:  112, N:  4096, K: 11008, blas_init:  16.037 ms, blas_compute:  26.584 ms, cpu_compute: 250.851 ms
+	1 thread: gPU win! cPU/gPU: 5.89
+	2 thread: gPU win! cPU/gPU: 3.62
+	3 thread: gPU win! cPU/gPU: 2.62
+	4 thread: gPU win! cPU/gPU: 2.05
+M:  113, N:  4096, K: 11008, blas_init:  16.118 ms, blas_compute:  26.268 ms, cpu_compute: 246.396 ms
+	1 thread: gPU win! cPU/gPU: 5.81
+	2 thread: gPU win! cPU/gPU: 3.59
+	3 thread: gPU win! cPU/gPU: 2.60
+	4 thread: gPU win! cPU/gPU: 2.03
+M:  114, N:  4096, K: 11008, blas_init:  16.038 ms, blas_compute:  29.030 ms, cpu_compute: 252.351 ms
+	1 thread: gPU win! cPU/gPU: 5.60
+	2 thread: gPU win! cPU/gPU: 3.41
+	3 thread: gPU win! cPU/gPU: 2.45
+	4 thread: gPU win! cPU/gPU: 1.91
+M:  115, N:  4096, K: 11008, blas_init:  16.071 ms, blas_compute:  27.704 ms, cpu_compute: 255.317 ms
+	1 thread: gPU win! cPU/gPU: 5.83
+	2 thread: gPU win! cPU/gPU: 3.57
+	3 thread: gPU win! cPU/gPU: 2.57
+	4 thread: gPU win! cPU/gPU: 2.01
+M:  116, N:  4096, K: 11008, blas_init:  16.009 ms, blas_compute:  28.038 ms, cpu_compute: 254.683 ms
+	1 thread: gPU win! cPU/gPU: 5.78
+	2 thread: gPU win! cPU/gPU: 3.53
+	3 thread: gPU win! cPU/gPU: 2.54
+	4 thread: gPU win! cPU/gPU: 1.99
+M:  117, N:  4096, K: 11008, blas_init:  16.116 ms, blas_compute:  26.329 ms, cpu_compute: 258.658 ms
+	1 thread: gPU win! cPU/gPU: 6.09
+	2 thread: gPU win! cPU/gPU: 3.76
+	3 thread: gPU win! cPU/gPU: 2.72
+	4 thread: gPU win! cPU/gPU: 2.13
+M:  118, N:  4096, K: 11008, blas_init:  16.185 ms, blas_compute:  25.395 ms, cpu_compute: 265.950 ms
+	1 thread: gPU win! cPU/gPU: 6.40
+	2 thread: gPU win! cPU/gPU: 3.97
+	3 thread: gPU win! cPU/gPU: 2.88
+	4 thread: gPU win! cPU/gPU: 2.26
+M:  119, N:  4096, K: 11008, blas_init:  16.200 ms, blas_compute:  28.542 ms, cpu_compute: 273.661 ms
+	1 thread: gPU win! cPU/gPU: 6.12
+	2 thread: gPU win! cPU/gPU: 3.73
+	3 thread: gPU win! cPU/gPU: 2.69
+	4 thread: gPU win! cPU/gPU: 2.10
+M:  120, N:  4096, K: 11008, blas_init:  16.170 ms, blas_compute:  28.782 ms, cpu_compute: 270.402 ms
+	1 thread: gPU win! cPU/gPU: 6.02
+	2 thread: gPU win! cPU/gPU: 3.67
+	3 thread: gPU win! cPU/gPU: 2.64
+	4 thread: gPU win! cPU/gPU: 2.06
+M:  121, N:  4096, K: 11008, blas_init:  16.062 ms, blas_compute:  27.833 ms, cpu_compute: 264.047 ms
+	1 thread: gPU win! cPU/gPU: 6.02
+	2 thread: gPU win! cPU/gPU: 3.68
+	3 thread: gPU win! cPU/gPU: 2.65
+	4 thread: gPU win! cPU/gPU: 2.07
+M:  122, N:  4096, K: 11008, blas_init:  16.083 ms, blas_compute:  28.344 ms, cpu_compute: 270.156 ms
+	1 thread: gPU win! cPU/gPU: 6.08
+	2 thread: gPU win! cPU/gPU: 3.71
+	3 thread: gPU win! cPU/gPU: 2.67
+	4 thread: gPU win! cPU/gPU: 2.09
+M:  123, N:  4096, K: 11008, blas_init:  16.027 ms, blas_compute:  30.388 ms, cpu_compute: 270.988 ms
+	1 thread: gPU win! cPU/gPU: 5.84
+	2 thread: gPU win! cPU/gPU: 3.53
+	3 thread: gPU win! cPU/gPU: 2.53
+	4 thread: gPU win! cPU/gPU: 1.97
+M:  124, N:  4096, K: 11008, blas_init:  16.062 ms, blas_compute:  29.578 ms, cpu_compute: 277.356 ms
+	1 thread: gPU win! cPU/gPU: 6.08
+	2 thread: gPU win! cPU/gPU: 3.69
+	3 thread: gPU win! cPU/gPU: 2.65
+	4 thread: gPU win! cPU/gPU: 2.06
+M:  125, N:  4096, K: 11008, blas_init:  16.285 ms, blas_compute:  28.387 ms, cpu_compute: 272.853 ms
+	1 thread: gPU win! cPU/gPU: 6.11
+	2 thread: gPU win! cPU/gPU: 3.73
+	3 thread: gPU win! cPU/gPU: 2.69
+	4 thread: gPU win! cPU/gPU: 2.10
+M:  126, N:  4096, K: 11008, blas_init:  16.170 ms, blas_compute:  28.012 ms, cpu_compute: 276.253 ms
+	1 thread: gPU win! cPU/gPU: 6.25
+	2 thread: gPU win! cPU/gPU: 3.83
+	3 thread: gPU win! cPU/gPU: 2.76
+	4 thread: gPU win! cPU/gPU: 2.15
+M:  127, N:  4096, K: 11008, blas_init:  16.023 ms, blas_compute:  28.320 ms, cpu_compute: 277.017 ms
+	1 thread: gPU win! cPU/gPU: 6.25
+	2 thread: gPU win! cPU/gPU: 3.81
+	3 thread: gPU win! cPU/gPU: 2.74
+	4 thread: gPU win! cPU/gPU: 2.14
+M:  128, N:  4096, K: 11008, blas_init:  16.050 ms, blas_compute:  28.850 ms, cpu_compute: 280.481 ms
+	1 thread: gPU win! cPU/gPU: 6.25
+	2 thread: gPU win! cPU/gPU: 3.80
+	3 thread: gPU win! cPU/gPU: 2.73
+	4 thread: gPU win! cPU/gPU: 2.13
+M:    1, N: 11008, K:  4096, blas_init:  36.410 ms, blas_compute:   6.838 ms, cpu_compute:   3.427 ms
+	1 thread: cPU win! cPU/gPU: 0.08
+	2 thread: cPU win! cPU/gPU: 0.07
+	3 thread: cPU win! cPU/gPU: 0.06
+	4 thread: cPU win! cPU/gPU: 0.05
+M:    2, N: 11008, K:  4096, blas_init:  16.919 ms, blas_compute:  19.541 ms, cpu_compute:   6.531 ms
+	1 thread: cPU win! cPU/gPU: 0.18
+	2 thread: cPU win! cPU/gPU: 0.12
+	3 thread: cPU win! cPU/gPU: 0.09
+	4 thread: cPU win! cPU/gPU: 0.07
+M:    3, N: 11008, K:  4096, blas_init:  16.964 ms, blas_compute:  16.756 ms, cpu_compute:   9.585 ms
+	1 thread: cPU win! cPU/gPU: 0.28
+	2 thread: cPU win! cPU/gPU: 0.19
+	3 thread: cPU win! cPU/gPU: 0.14
+	4 thread: cPU win! cPU/gPU: 0.11
+M:    4, N: 11008, K:  4096, blas_init:  16.970 ms, blas_compute:  16.254 ms, cpu_compute:  12.596 ms
+	1 thread: cPU win! cPU/gPU: 0.38
+	2 thread: cPU win! cPU/gPU: 0.25
+	3 thread: cPU win! cPU/gPU: 0.19
+	4 thread: cPU win! cPU/gPU: 0.15
+M:    5, N: 11008, K:  4096, blas_init:  16.791 ms, blas_compute:  18.198 ms, cpu_compute:  15.623 ms
+	1 thread: cPU win! cPU/gPU: 0.45
+	2 thread: cPU win! cPU/gPU: 0.29
+	3 thread: cPU win! cPU/gPU: 0.22
+	4 thread: cPU win! cPU/gPU: 0.17
+M:    6, N: 11008, K:  4096, blas_init:  17.019 ms, blas_compute:  16.857 ms, cpu_compute:  18.447 ms
+	1 thread: cPU win! cPU/gPU: 0.54
+	2 thread: cPU win! cPU/gPU: 0.36
+	3 thread: cPU win! cPU/gPU: 0.27
+	4 thread: cPU win! cPU/gPU: 0.22
+M:    7, N: 11008, K:  4096, blas_init:  16.703 ms, blas_compute:  18.721 ms, cpu_compute:  21.558 ms
+	1 thread: cPU win! cPU/gPU: 0.61
+	2 thread: cPU win! cPU/gPU: 0.40
+	3 thread: cPU win! cPU/gPU: 0.30
+	4 thread: cPU win! cPU/gPU: 0.24
+M:    8, N: 11008, K:  4096, blas_init:  16.664 ms, blas_compute:  15.625 ms, cpu_compute:  24.533 ms
+	1 thread: cPU win! cPU/gPU: 0.76
+	2 thread: cPU win! cPU/gPU: 0.51
+	3 thread: cPU win! cPU/gPU: 0.39
+	4 thread: cPU win! cPU/gPU: 0.31
+M:    9, N: 11008, K:  4096, blas_init:  16.888 ms, blas_compute:  15.809 ms, cpu_compute:  27.446 ms
+	1 thread: cPU win! cPU/gPU: 0.84
+	2 thread: cPU win! cPU/gPU: 0.57
+	3 thread: cPU win! cPU/gPU: 0.43
+	4 thread: cPU win! cPU/gPU: 0.34
+M:   10, N: 11008, K:  4096, blas_init:  16.709 ms, blas_compute:  16.235 ms, cpu_compute:  30.150 ms
+	1 thread: cPU win! cPU/gPU: 0.92
+	2 thread: cPU win! cPU/gPU: 0.61
+	3 thread: cPU win! cPU/gPU: 0.46
+	4 thread: cPU win! cPU/gPU: 0.37
+M:   11, N: 11008, K:  4096, blas_init:  16.838 ms, blas_compute:  18.068 ms, cpu_compute:  32.765 ms
+	1 thread: cPU win! cPU/gPU: 0.94
+	2 thread: cPU win! cPU/gPU: 0.62
+	3 thread: cPU win! cPU/gPU: 0.46
+	4 thread: cPU win! cPU/gPU: 0.37
+M:   12, N: 11008, K:  4096, blas_init:  16.594 ms, blas_compute:  19.425 ms, cpu_compute:  35.519 ms
+	1 thread: cPU win! cPU/gPU: 0.99
+	2 thread: cPU win! cPU/gPU: 0.64
+	3 thread: cPU win! cPU/gPU: 0.47
+	4 thread: cPU win! cPU/gPU: 0.38
+M:   13, N: 11008, K:  4096, blas_init:  16.822 ms, blas_compute:  16.768 ms, cpu_compute:  38.284 ms
+	1 thread: gPU win! cPU/gPU: 1.14
+	2 thread: cPU win! cPU/gPU: 0.76
+	3 thread: cPU win! cPU/gPU: 0.57
+	4 thread: cPU win! cPU/gPU: 0.46
+M:   14, N: 11008, K:  4096, blas_init:  16.611 ms, blas_compute:  16.715 ms, cpu_compute:  40.462 ms
+	1 thread: gPU win! cPU/gPU: 1.21
+	2 thread: cPU win! cPU/gPU: 0.81
+	3 thread: cPU win! cPU/gPU: 0.61
+	4 thread: cPU win! cPU/gPU: 0.48
+M:   15, N: 11008, K:  4096, blas_init:  16.576 ms, blas_compute:  18.639 ms, cpu_compute:  43.295 ms
+	1 thread: gPU win! cPU/gPU: 1.23
+	2 thread: cPU win! cPU/gPU: 0.80
+	3 thread: cPU win! cPU/gPU: 0.60
+	4 thread: cPU win! cPU/gPU: 0.48
+M:   16, N: 11008, K:  4096, blas_init:  16.557 ms, blas_compute:  18.139 ms, cpu_compute:  45.833 ms
+	1 thread: gPU win! cPU/gPU: 1.32
+	2 thread: cPU win! cPU/gPU: 0.87
+	3 thread: cPU win! cPU/gPU: 0.65
+	4 thread: cPU win! cPU/gPU: 0.51
+M:   17, N: 11008, K:  4096, blas_init:  16.819 ms, blas_compute:  19.704 ms, cpu_compute:  48.473 ms
+	1 thread: gPU win! cPU/gPU: 1.33
+	2 thread: cPU win! cPU/gPU: 0.86
+	3 thread: cPU win! cPU/gPU: 0.64
+	4 thread: cPU win! cPU/gPU: 0.51
+M:   18, N: 11008, K:  4096, blas_init:  16.786 ms, blas_compute:  17.215 ms, cpu_compute:  50.044 ms
+	1 thread: gPU win! cPU/gPU: 1.47
+	2 thread: cPU win! cPU/gPU: 0.98
+	3 thread: cPU win! cPU/gPU: 0.73
+	4 thread: cPU win! cPU/gPU: 0.58
+M:   19, N: 11008, K:  4096, blas_init:  16.552 ms, blas_compute:  18.241 ms, cpu_compute:  52.369 ms
+	1 thread: gPU win! cPU/gPU: 1.51
+	2 thread: cPU win! cPU/gPU: 0.99
+	3 thread: cPU win! cPU/gPU: 0.73
+	4 thread: cPU win! cPU/gPU: 0.59
+M:   20, N: 11008, K:  4096, blas_init:  16.628 ms, blas_compute:  17.996 ms, cpu_compute:  54.603 ms
+	1 thread: gPU win! cPU/gPU: 1.58
+	2 thread: gPU win! cPU/gPU: 1.04
+	3 thread: cPU win! cPU/gPU: 0.77
+	4 thread: cPU win! cPU/gPU: 0.62
+M:   21, N: 11008, K:  4096, blas_init:  16.498 ms, blas_compute:  19.616 ms, cpu_compute:  59.306 ms
+	1 thread: gPU win! cPU/gPU: 1.64
+	2 thread: gPU win! cPU/gPU: 1.06
+	3 thread: cPU win! cPU/gPU: 0.79
+	4 thread: cPU win! cPU/gPU: 0.62
+M:   22, N: 11008, K:  4096, blas_init:  17.186 ms, blas_compute:  20.140 ms, cpu_compute:  59.600 ms
+	1 thread: gPU win! cPU/gPU: 1.60
+	2 thread: gPU win! cPU/gPU: 1.04
+	3 thread: cPU win! cPU/gPU: 0.77
+	4 thread: cPU win! cPU/gPU: 0.61
+M:   23, N: 11008, K:  4096, blas_init:  16.937 ms, blas_compute:  19.235 ms, cpu_compute:  60.973 ms
+	1 thread: gPU win! cPU/gPU: 1.69
+	2 thread: gPU win! cPU/gPU: 1.10
+	3 thread: cPU win! cPU/gPU: 0.82
+	4 thread: cPU win! cPU/gPU: 0.65
+M:   24, N: 11008, K:  4096, blas_init:  16.572 ms, blas_compute:  20.431 ms, cpu_compute:  63.665 ms
+	1 thread: gPU win! cPU/gPU: 1.72
+	2 thread: gPU win! cPU/gPU: 1.11
+	3 thread: cPU win! cPU/gPU: 0.82
+	4 thread: cPU win! cPU/gPU: 0.65
+M:   25, N: 11008, K:  4096, blas_init:  16.554 ms, blas_compute:  20.786 ms, cpu_compute:  64.609 ms
+	1 thread: gPU win! cPU/gPU: 1.73
+	2 thread: gPU win! cPU/gPU: 1.11
+	3 thread: cPU win! cPU/gPU: 0.82
+	4 thread: cPU win! cPU/gPU: 0.65
+M:   26, N: 11008, K:  4096, blas_init:  16.533 ms, blas_compute:  19.644 ms, cpu_compute:  69.407 ms
+	1 thread: gPU win! cPU/gPU: 1.92
+	2 thread: gPU win! cPU/gPU: 1.24
+	3 thread: cPU win! cPU/gPU: 0.92
+	4 thread: cPU win! cPU/gPU: 0.73
+M:   27, N: 11008, K:  4096, blas_init:  16.538 ms, blas_compute:  21.323 ms, cpu_compute:  69.381 ms
+	1 thread: gPU win! cPU/gPU: 1.83
+	2 thread: gPU win! cPU/gPU: 1.17
+	3 thread: cPU win! cPU/gPU: 0.86
+	4 thread: cPU win! cPU/gPU: 0.68
+M:   28, N: 11008, K:  4096, blas_init:  16.728 ms, blas_compute:  20.192 ms, cpu_compute:  71.955 ms
+	1 thread: gPU win! cPU/gPU: 1.95
+	2 thread: gPU win! cPU/gPU: 1.26
+	3 thread: cPU win! cPU/gPU: 0.93
+	4 thread: cPU win! cPU/gPU: 0.74
+M:   29, N: 11008, K:  4096, blas_init:  16.659 ms, blas_compute:  19.732 ms, cpu_compute:  73.045 ms
+	1 thread: gPU win! cPU/gPU: 2.01
+	2 thread: gPU win! cPU/gPU: 1.30
+	3 thread: cPU win! cPU/gPU: 0.96
+	4 thread: cPU win! cPU/gPU: 0.76
+M:   30, N: 11008, K:  4096, blas_init:  16.623 ms, blas_compute:  19.023 ms, cpu_compute:  75.012 ms
+	1 thread: gPU win! cPU/gPU: 2.10
+	2 thread: gPU win! cPU/gPU: 1.37
+	3 thread: gPU win! cPU/gPU: 1.02
+	4 thread: cPU win! cPU/gPU: 0.81
+M:   31, N: 11008, K:  4096, blas_init:  16.582 ms, blas_compute:  21.325 ms, cpu_compute:  77.462 ms
+	1 thread: gPU win! cPU/gPU: 2.04
+	2 thread: gPU win! cPU/gPU: 1.31
+	3 thread: cPU win! cPU/gPU: 0.96
+	4 thread: cPU win! cPU/gPU: 0.76
+M:   32, N: 11008, K:  4096, blas_init:  16.472 ms, blas_compute:  20.726 ms, cpu_compute:  81.224 ms
+	1 thread: gPU win! cPU/gPU: 2.18
+	2 thread: gPU win! cPU/gPU: 1.40
+	3 thread: gPU win! cPU/gPU: 1.03
+	4 thread: cPU win! cPU/gPU: 0.82
+M:   33, N: 11008, K:  4096, blas_init:  16.816 ms, blas_compute:  21.436 ms, cpu_compute:  82.958 ms
+	1 thread: gPU win! cPU/gPU: 2.17
+	2 thread: gPU win! cPU/gPU: 1.39
+	3 thread: gPU win! cPU/gPU: 1.02
+	4 thread: cPU win! cPU/gPU: 0.81
+M:   34, N: 11008, K:  4096, blas_init:  16.545 ms, blas_compute:  19.736 ms, cpu_compute:  83.293 ms
+	1 thread: gPU win! cPU/gPU: 2.30
+	2 thread: gPU win! cPU/gPU: 1.49
+	3 thread: gPU win! cPU/gPU: 1.10
+	4 thread: cPU win! cPU/gPU: 0.87
+M:   35, N: 11008, K:  4096, blas_init:  16.535 ms, blas_compute:  20.971 ms, cpu_compute:  86.109 ms
+	1 thread: gPU win! cPU/gPU: 2.30
+	2 thread: gPU win! cPU/gPU: 1.47
+	3 thread: gPU win! cPU/gPU: 1.08
+	4 thread: cPU win! cPU/gPU: 0.86
+M:   36, N: 11008, K:  4096, blas_init:  16.672 ms, blas_compute:  19.732 ms, cpu_compute:  88.066 ms
+	1 thread: gPU win! cPU/gPU: 2.42
+	2 thread: gPU win! cPU/gPU: 1.57
+	3 thread: gPU win! cPU/gPU: 1.16
+	4 thread: cPU win! cPU/gPU: 0.92
+M:   37, N: 11008, K:  4096, blas_init:  16.679 ms, blas_compute:  20.863 ms, cpu_compute:  89.878 ms
+	1 thread: gPU win! cPU/gPU: 2.39
+	2 thread: gPU win! cPU/gPU: 1.54
+	3 thread: gPU win! cPU/gPU: 1.13
+	4 thread: cPU win! cPU/gPU: 0.90
+M:   38, N: 11008, K:  4096, blas_init:  16.575 ms, blas_compute:  23.257 ms, cpu_compute:  92.373 ms
+	1 thread: gPU win! cPU/gPU: 2.32
+	2 thread: gPU win! cPU/gPU: 1.46
+	3 thread: gPU win! cPU/gPU: 1.07
+	4 thread: cPU win! cPU/gPU: 0.84
+M:   39, N: 11008, K:  4096, blas_init:  16.649 ms, blas_compute:  22.543 ms, cpu_compute:  94.476 ms
+	1 thread: gPU win! cPU/gPU: 2.41
+	2 thread: gPU win! cPU/gPU: 1.53
+	3 thread: gPU win! cPU/gPU: 1.12
+	4 thread: cPU win! cPU/gPU: 0.88
+M:   40, N: 11008, K:  4096, blas_init:  16.558 ms, blas_compute:  20.861 ms, cpu_compute:  96.511 ms
+	1 thread: gPU win! cPU/gPU: 2.58
+	2 thread: gPU win! cPU/gPU: 1.66
+	3 thread: gPU win! cPU/gPU: 1.22
+	4 thread: cPU win! cPU/gPU: 0.97
+M:   41, N: 11008, K:  4096, blas_init:  16.477 ms, blas_compute:  22.156 ms, cpu_compute:  98.398 ms
+	1 thread: gPU win! cPU/gPU: 2.55
+	2 thread: gPU win! cPU/gPU: 1.62
+	3 thread: gPU win! cPU/gPU: 1.19
+	4 thread: cPU win! cPU/gPU: 0.94
+M:   42, N: 11008, K:  4096, blas_init:  17.003 ms, blas_compute:  21.369 ms, cpu_compute: 103.092 ms
+	1 thread: gPU win! cPU/gPU: 2.69
+	2 thread: gPU win! cPU/gPU: 1.73
+	3 thread: gPU win! cPU/gPU: 1.27
+	4 thread: gPU win! cPU/gPU: 1.01
+M:   43, N: 11008, K:  4096, blas_init:  16.463 ms, blas_compute:  22.297 ms, cpu_compute: 102.970 ms
+	1 thread: gPU win! cPU/gPU: 2.66
+	2 thread: gPU win! cPU/gPU: 1.69
+	3 thread: gPU win! cPU/gPU: 1.24
+	4 thread: cPU win! cPU/gPU: 0.97
+M:   44, N: 11008, K:  4096, blas_init:  16.619 ms, blas_compute:  20.527 ms, cpu_compute: 104.144 ms
+	1 thread: gPU win! cPU/gPU: 2.80
+	2 thread: gPU win! cPU/gPU: 1.81
+	3 thread: gPU win! cPU/gPU: 1.33
+	4 thread: gPU win! cPU/gPU: 1.05
+M:   45, N: 11008, K:  4096, blas_init:  16.547 ms, blas_compute:  21.439 ms, cpu_compute: 107.139 ms
+	1 thread: gPU win! cPU/gPU: 2.82
+	2 thread: gPU win! cPU/gPU: 1.80
+	3 thread: gPU win! cPU/gPU: 1.32
+	4 thread: gPU win! cPU/gPU: 1.05
+M:   46, N: 11008, K:  4096, blas_init:  17.502 ms, blas_compute:  22.974 ms, cpu_compute: 111.868 ms
+	1 thread: gPU win! cPU/gPU: 2.76
+	2 thread: gPU win! cPU/gPU: 1.76
+	3 thread: gPU win! cPU/gPU: 1.29
+	4 thread: gPU win! cPU/gPU: 1.02
+M:   47, N: 11008, K:  4096, blas_init:  16.505 ms, blas_compute:  21.702 ms, cpu_compute: 111.421 ms
+	1 thread: gPU win! cPU/gPU: 2.92
+	2 thread: gPU win! cPU/gPU: 1.86
+	3 thread: gPU win! cPU/gPU: 1.37
+	4 thread: gPU win! cPU/gPU: 1.08
+M:   48, N: 11008, K:  4096, blas_init:  16.739 ms, blas_compute:  19.757 ms, cpu_compute: 113.651 ms
+	1 thread: gPU win! cPU/gPU: 3.11
+	2 thread: gPU win! cPU/gPU: 2.02
+	3 thread: gPU win! cPU/gPU: 1.50
+	4 thread: gPU win! cPU/gPU: 1.19
+M:   49, N: 11008, K:  4096, blas_init:  16.520 ms, blas_compute:  23.452 ms, cpu_compute: 114.793 ms
+	1 thread: gPU win! cPU/gPU: 2.87
+	2 thread: gPU win! cPU/gPU: 1.81
+	3 thread: gPU win! cPU/gPU: 1.32
+	4 thread: gPU win! cPU/gPU: 1.04
+M:   50, N: 11008, K:  4096, blas_init:  16.456 ms, blas_compute:  23.304 ms, cpu_compute: 117.141 ms
+	1 thread: gPU win! cPU/gPU: 2.95
+	2 thread: gPU win! cPU/gPU: 1.86
+	3 thread: gPU win! cPU/gPU: 1.36
+	4 thread: gPU win! cPU/gPU: 1.07
+M:   51, N: 11008, K:  4096, blas_init:  16.507 ms, blas_compute:  22.225 ms, cpu_compute: 119.690 ms
+	1 thread: gPU win! cPU/gPU: 3.09
+	2 thread: gPU win! cPU/gPU: 1.96
+	3 thread: gPU win! cPU/gPU: 1.44
+	4 thread: gPU win! cPU/gPU: 1.14
+M:   52, N: 11008, K:  4096, blas_init:  16.756 ms, blas_compute:  24.350 ms, cpu_compute: 121.760 ms
+	1 thread: gPU win! cPU/gPU: 2.96
+	2 thread: gPU win! cPU/gPU: 1.86
+	3 thread: gPU win! cPU/gPU: 1.36
+	4 thread: gPU win! cPU/gPU: 1.07
+M:   53, N: 11008, K:  4096, blas_init:  16.572 ms, blas_compute:  22.064 ms, cpu_compute: 123.239 ms
+	1 thread: gPU win! cPU/gPU: 3.19
+	2 thread: gPU win! cPU/gPU: 2.03
+	3 thread: gPU win! cPU/gPU: 1.49
+	4 thread: gPU win! cPU/gPU: 1.18
+M:   54, N: 11008, K:  4096, blas_init:  16.535 ms, blas_compute:  22.470 ms, cpu_compute: 128.986 ms
+	1 thread: gPU win! cPU/gPU: 3.31
+	2 thread: gPU win! cPU/gPU: 2.10
+	3 thread: gPU win! cPU/gPU: 1.54
+	4 thread: gPU win! cPU/gPU: 1.21
+M:   55, N: 11008, K:  4096, blas_init:  16.678 ms, blas_compute:  21.833 ms, cpu_compute: 129.188 ms
+	1 thread: gPU win! cPU/gPU: 3.35
+	2 thread: gPU win! cPU/gPU: 2.14
+	3 thread: gPU win! cPU/gPU: 1.57
+	4 thread: gPU win! cPU/gPU: 1.24
+M:   56, N: 11008, K:  4096, blas_init:  16.643 ms, blas_compute:  23.278 ms, cpu_compute: 130.697 ms
+	1 thread: gPU win! cPU/gPU: 3.27
+	2 thread: gPU win! cPU/gPU: 2.07
+	3 thread: gPU win! cPU/gPU: 1.51
+	4 thread: gPU win! cPU/gPU: 1.19
+M:   57, N: 11008, K:  4096, blas_init:  16.583 ms, blas_compute:  23.352 ms, cpu_compute: 131.712 ms
+	1 thread: gPU win! cPU/gPU: 3.30
+	2 thread: gPU win! cPU/gPU: 2.08
+	3 thread: gPU win! cPU/gPU: 1.52
+	4 thread: gPU win! cPU/gPU: 1.20
+M:   58, N: 11008, K:  4096, blas_init:  16.473 ms, blas_compute:  23.270 ms, cpu_compute: 133.662 ms
+	1 thread: gPU win! cPU/gPU: 3.36
+	2 thread: gPU win! cPU/gPU: 2.12
+	3 thread: gPU win! cPU/gPU: 1.55
+	4 thread: gPU win! cPU/gPU: 1.22
+M:   59, N: 11008, K:  4096, blas_init:  16.521 ms, blas_compute:  24.439 ms, cpu_compute: 136.272 ms
+	1 thread: gPU win! cPU/gPU: 3.33
+	2 thread: gPU win! cPU/gPU: 2.08
+	3 thread: gPU win! cPU/gPU: 1.52
+	4 thread: gPU win! cPU/gPU: 1.19
+M:   60, N: 11008, K:  4096, blas_init:  16.493 ms, blas_compute:  25.256 ms, cpu_compute: 138.593 ms
+	1 thread: gPU win! cPU/gPU: 3.32
+	2 thread: gPU win! cPU/gPU: 2.07
+	3 thread: gPU win! cPU/gPU: 1.50
+	4 thread: gPU win! cPU/gPU: 1.18
+M:   61, N: 11008, K:  4096, blas_init:  16.728 ms, blas_compute:  22.875 ms, cpu_compute: 141.989 ms
+	1 thread: gPU win! cPU/gPU: 3.59
+	2 thread: gPU win! cPU/gPU: 2.27
+	3 thread: gPU win! cPU/gPU: 1.66
+	4 thread: gPU win! cPU/gPU: 1.31
+M:   62, N: 11008, K:  4096, blas_init:  16.831 ms, blas_compute:  24.788 ms, cpu_compute: 142.639 ms
+	1 thread: gPU win! cPU/gPU: 3.43
+	2 thread: gPU win! cPU/gPU: 2.15
+	3 thread: gPU win! cPU/gPU: 1.56
+	4 thread: gPU win! cPU/gPU: 1.23
+M:   63, N: 11008, K:  4096, blas_init:  16.589 ms, blas_compute:  24.947 ms, cpu_compute: 145.572 ms
+	1 thread: gPU win! cPU/gPU: 3.50
+	2 thread: gPU win! cPU/gPU: 2.19
+	3 thread: gPU win! cPU/gPU: 1.59
+	4 thread: gPU win! cPU/gPU: 1.25
+M:   64, N: 11008, K:  4096, blas_init:  16.685 ms, blas_compute:  25.620 ms, cpu_compute: 147.588 ms
+	1 thread: gPU win! cPU/gPU: 3.49
+	2 thread: gPU win! cPU/gPU: 2.17
+	3 thread: gPU win! cPU/gPU: 1.58
+	4 thread: gPU win! cPU/gPU: 1.24
+M:   65, N: 11008, K:  4096, blas_init:  16.751 ms, blas_compute:  25.682 ms, cpu_compute: 153.232 ms
+	1 thread: gPU win! cPU/gPU: 3.61
+	2 thread: gPU win! cPU/gPU: 2.25
+	3 thread: gPU win! cPU/gPU: 1.63
+	4 thread: gPU win! cPU/gPU: 1.28
+M:   66, N: 11008, K:  4096, blas_init:  16.580 ms, blas_compute:  25.734 ms, cpu_compute: 154.068 ms
+	1 thread: gPU win! cPU/gPU: 3.64
+	2 thread: gPU win! cPU/gPU: 2.26
+	3 thread: gPU win! cPU/gPU: 1.64
+	4 thread: gPU win! cPU/gPU: 1.29
+M:   67, N: 11008, K:  4096, blas_init:  16.536 ms, blas_compute:  26.703 ms, cpu_compute: 156.030 ms
+	1 thread: gPU win! cPU/gPU: 3.61
+	2 thread: gPU win! cPU/gPU: 2.23
+	3 thread: gPU win! cPU/gPU: 1.61
+	4 thread: gPU win! cPU/gPU: 1.26
+M:   68, N: 11008, K:  4096, blas_init:  16.586 ms, blas_compute:  28.373 ms, cpu_compute: 158.561 ms
+	1 thread: gPU win! cPU/gPU: 3.53
+	2 thread: gPU win! cPU/gPU: 2.16
+	3 thread: gPU win! cPU/gPU: 1.56
+	4 thread: gPU win! cPU/gPU: 1.22
+M:   69, N: 11008, K:  4096, blas_init:  16.601 ms, blas_compute:  25.428 ms, cpu_compute: 161.244 ms
+	1 thread: gPU win! cPU/gPU: 3.84
+	2 thread: gPU win! cPU/gPU: 2.39
+	3 thread: gPU win! cPU/gPU: 1.74
+	4 thread: gPU win! cPU/gPU: 1.36
+M:   70, N: 11008, K:  4096, blas_init:  16.786 ms, blas_compute:  25.406 ms, cpu_compute: 163.380 ms
+	1 thread: gPU win! cPU/gPU: 3.87
+	2 thread: gPU win! cPU/gPU: 2.42
+	3 thread: gPU win! cPU/gPU: 1.76
+	4 thread: gPU win! cPU/gPU: 1.38
+M:   71, N: 11008, K:  4096, blas_init:  16.844 ms, blas_compute:  26.401 ms, cpu_compute: 166.651 ms
+	1 thread: gPU win! cPU/gPU: 3.85
+	2 thread: gPU win! cPU/gPU: 2.39
+	3 thread: gPU win! cPU/gPU: 1.74
+	4 thread: gPU win! cPU/gPU: 1.36
+M:   72, N: 11008, K:  4096, blas_init:  16.663 ms, blas_compute:  25.714 ms, cpu_compute: 174.717 ms
+	1 thread: gPU win! cPU/gPU: 4.12
+	2 thread: gPU win! cPU/gPU: 2.57
+	3 thread: gPU win! cPU/gPU: 1.86
+	4 thread: gPU win! cPU/gPU: 1.46
+M:   73, N: 11008, K:  4096, blas_init:  16.789 ms, blas_compute:  26.447 ms, cpu_compute: 169.693 ms
+	1 thread: gPU win! cPU/gPU: 3.92
+	2 thread: gPU win! cPU/gPU: 2.44
+	3 thread: gPU win! cPU/gPU: 1.77
+	4 thread: gPU win! cPU/gPU: 1.38
+M:   74, N: 11008, K:  4096, blas_init:  16.667 ms, blas_compute:  27.631 ms, cpu_compute: 171.651 ms
+	1 thread: gPU win! cPU/gPU: 3.87
+	2 thread: gPU win! cPU/gPU: 2.39
+	3 thread: gPU win! cPU/gPU: 1.72
+	4 thread: gPU win! cPU/gPU: 1.35
+M:   75, N: 11008, K:  4096, blas_init:  16.688 ms, blas_compute:  26.197 ms, cpu_compute: 173.590 ms
+	1 thread: gPU win! cPU/gPU: 4.05
+	2 thread: gPU win! cPU/gPU: 2.51
+	3 thread: gPU win! cPU/gPU: 1.82
+	4 thread: gPU win! cPU/gPU: 1.43
+M:   76, N: 11008, K:  4096, blas_init:  16.590 ms, blas_compute:  27.702 ms, cpu_compute: 175.646 ms
+	1 thread: gPU win! cPU/gPU: 3.97
+	2 thread: gPU win! cPU/gPU: 2.44
+	3 thread: gPU win! cPU/gPU: 1.76
+	4 thread: gPU win! cPU/gPU: 1.38
+M:   77, N: 11008, K:  4096, blas_init:  16.881 ms, blas_compute:  26.959 ms, cpu_compute: 181.189 ms
+	1 thread: gPU win! cPU/gPU: 4.13
+	2 thread: gPU win! cPU/gPU: 2.56
+	3 thread: gPU win! cPU/gPU: 1.85
+	4 thread: gPU win! cPU/gPU: 1.45
+M:   78, N: 11008, K:  4096, blas_init:  16.512 ms, blas_compute:  27.406 ms, cpu_compute: 178.833 ms
+	1 thread: gPU win! cPU/gPU: 4.07
+	2 thread: gPU win! cPU/gPU: 2.51
+	3 thread: gPU win! cPU/gPU: 1.81
+	4 thread: gPU win! cPU/gPU: 1.42
+M:   79, N: 11008, K:  4096, blas_init:  16.466 ms, blas_compute:  27.331 ms, cpu_compute: 183.162 ms
+	1 thread: gPU win! cPU/gPU: 4.18
+	2 thread: gPU win! cPU/gPU: 2.58
+	3 thread: gPU win! cPU/gPU: 1.86
+	4 thread: gPU win! cPU/gPU: 1.46
+M:   80, N: 11008, K:  4096, blas_init:  16.574 ms, blas_compute:  27.225 ms, cpu_compute: 189.449 ms
+	1 thread: gPU win! cPU/gPU: 4.33
+	2 thread: gPU win! cPU/gPU: 2.67
+	3 thread: gPU win! cPU/gPU: 1.93
+	4 thread: gPU win! cPU/gPU: 1.51
+M:   81, N: 11008, K:  4096, blas_init:  17.960 ms, blas_compute:  29.575 ms, cpu_compute: 189.527 ms
+	1 thread: gPU win! cPU/gPU: 3.99
+	2 thread: gPU win! cPU/gPU: 2.46
+	3 thread: gPU win! cPU/gPU: 1.78
+	4 thread: gPU win! cPU/gPU: 1.39
+M:   82, N: 11008, K:  4096, blas_init:  22.889 ms, blas_compute:  35.072 ms, cpu_compute: 197.513 ms
+	1 thread: gPU win! cPU/gPU: 3.41
+	2 thread: gPU win! cPU/gPU: 2.12
+	3 thread: gPU win! cPU/gPU: 1.54
+	4 thread: gPU win! cPU/gPU: 1.21
+M:   83, N: 11008, K:  4096, blas_init:  17.601 ms, blas_compute:  30.678 ms, cpu_compute: 197.061 ms
+	1 thread: gPU win! cPU/gPU: 4.08
+	2 thread: gPU win! cPU/gPU: 2.50
+	3 thread: gPU win! cPU/gPU: 1.80
+	4 thread: gPU win! cPU/gPU: 1.40
+M:   84, N: 11008, K:  4096, blas_init:  17.351 ms, blas_compute:  29.066 ms, cpu_compute: 229.860 ms
+	1 thread: gPU win! cPU/gPU: 4.95
+	2 thread: gPU win! cPU/gPU: 3.05
+	3 thread: gPU win! cPU/gPU: 2.20
+	4 thread: gPU win! cPU/gPU: 1.72
+M:   85, N: 11008, K:  4096, blas_init:  18.719 ms, blas_compute:  31.221 ms, cpu_compute: 209.992 ms
+	1 thread: gPU win! cPU/gPU: 4.20
+	2 thread: gPU win! cPU/gPU: 2.59
+	3 thread: gPU win! cPU/gPU: 1.87
+	4 thread: gPU win! cPU/gPU: 1.46
+M:   86, N: 11008, K:  4096, blas_init:  23.948 ms, blas_compute:  39.313 ms, cpu_compute: 208.906 ms
+	1 thread: gPU win! cPU/gPU: 3.30
+	2 thread: gPU win! cPU/gPU: 2.04
+	3 thread: gPU win! cPU/gPU: 1.47
+	4 thread: gPU win! cPU/gPU: 1.15
+M:   87, N: 11008, K:  4096, blas_init:  18.130 ms, blas_compute:  32.270 ms, cpu_compute: 202.579 ms
+	1 thread: gPU win! cPU/gPU: 4.02
+	2 thread: gPU win! cPU/gPU: 2.45
+	3 thread: gPU win! cPU/gPU: 1.76
+	4 thread: gPU win! cPU/gPU: 1.38
+M:   88, N: 11008, K:  4096, blas_init:  17.285 ms, blas_compute:  30.656 ms, cpu_compute: 203.571 ms
+	1 thread: gPU win! cPU/gPU: 4.25
+	2 thread: gPU win! cPU/gPU: 2.59
+	3 thread: gPU win! cPU/gPU: 1.86
+	4 thread: gPU win! cPU/gPU: 1.46
+M:   89, N: 11008, K:  4096, blas_init:  16.896 ms, blas_compute:  31.768 ms, cpu_compute: 206.908 ms
+	1 thread: gPU win! cPU/gPU: 4.25
+	2 thread: gPU win! cPU/gPU: 2.57
+	3 thread: gPU win! cPU/gPU: 1.84
+	4 thread: gPU win! cPU/gPU: 1.44
+M:   90, N: 11008, K:  4096, blas_init:  18.382 ms, blas_compute:  37.329 ms, cpu_compute: 219.626 ms
+	1 thread: gPU win! cPU/gPU: 3.94
+	2 thread: gPU win! cPU/gPU: 2.36
+	3 thread: gPU win! cPU/gPU: 1.68
+	4 thread: gPU win! cPU/gPU: 1.31
+M:   91, N: 11008, K:  4096, blas_init:  16.471 ms, blas_compute:  29.384 ms, cpu_compute: 217.355 ms
+	1 thread: gPU win! cPU/gPU: 4.74
+	2 thread: gPU win! cPU/gPU: 2.89
+	3 thread: gPU win! cPU/gPU: 2.08
+	4 thread: gPU win! cPU/gPU: 1.62
+M:   92, N: 11008, K:  4096, blas_init:  16.603 ms, blas_compute:  30.235 ms, cpu_compute: 209.031 ms
+	1 thread: gPU win! cPU/gPU: 4.46
+	2 thread: gPU win! cPU/gPU: 2.71
+	3 thread: gPU win! cPU/gPU: 1.95
+	4 thread: gPU win! cPU/gPU: 1.52
+M:   93, N: 11008, K:  4096, blas_init:  17.618 ms, blas_compute:  30.495 ms, cpu_compute: 210.485 ms
+	1 thread: gPU win! cPU/gPU: 4.37
+	2 thread: gPU win! cPU/gPU: 2.68
+	3 thread: gPU win! cPU/gPU: 1.93
+	4 thread: gPU win! cPU/gPU: 1.51
+M:   94, N: 11008, K:  4096, blas_init:  16.596 ms, blas_compute:  29.598 ms, cpu_compute: 216.740 ms
+	1 thread: gPU win! cPU/gPU: 4.69
+	2 thread: gPU win! cPU/gPU: 2.86
+	3 thread: gPU win! cPU/gPU: 2.06
+	4 thread: gPU win! cPU/gPU: 1.61
+M:   95, N: 11008, K:  4096, blas_init:  16.629 ms, blas_compute:  31.344 ms, cpu_compute: 217.235 ms
+	1 thread: gPU win! cPU/gPU: 4.53
+	2 thread: gPU win! cPU/gPU: 2.74
+	3 thread: gPU win! cPU/gPU: 1.96
+	4 thread: gPU win! cPU/gPU: 1.53
+M:   96, N: 11008, K:  4096, blas_init:  17.836 ms, blas_compute:  35.459 ms, cpu_compute: 249.136 ms
+	1 thread: gPU win! cPU/gPU: 4.67
+	2 thread: gPU win! cPU/gPU: 2.81
+	3 thread: gPU win! cPU/gPU: 2.01
+	4 thread: gPU win! cPU/gPU: 1.56
+M:   97, N: 11008, K:  4096, blas_init:  17.029 ms, blas_compute:  31.614 ms, cpu_compute: 223.474 ms
+	1 thread: gPU win! cPU/gPU: 4.59
+	2 thread: gPU win! cPU/gPU: 2.78
+	3 thread: gPU win! cPU/gPU: 2.00
+	4 thread: gPU win! cPU/gPU: 1.56
+M:   98, N: 11008, K:  4096, blas_init:  21.070 ms, blas_compute:  41.949 ms, cpu_compute: 239.330 ms
+	1 thread: gPU win! cPU/gPU: 3.80
+	2 thread: gPU win! cPU/gPU: 2.28
+	3 thread: gPU win! cPU/gPU: 1.63
+	4 thread: gPU win! cPU/gPU: 1.27
+M:   99, N: 11008, K:  4096, blas_init:  19.412 ms, blas_compute:  40.669 ms, cpu_compute: 242.192 ms
+	1 thread: gPU win! cPU/gPU: 4.03
+	2 thread: gPU win! cPU/gPU: 2.40
+	3 thread: gPU win! cPU/gPU: 1.71
+	4 thread: gPU win! cPU/gPU: 1.33
+M:  100, N: 11008, K:  4096, blas_init:  27.096 ms, blas_compute:  47.257 ms, cpu_compute: 252.734 ms
+	1 thread: gPU win! cPU/gPU: 3.40
+	2 thread: gPU win! cPU/gPU: 2.08
+	3 thread: gPU win! cPU/gPU: 1.50
+	4 thread: gPU win! cPU/gPU: 1.17
+M:  101, N: 11008, K:  4096, blas_init:  20.448 ms, blas_compute:  40.048 ms, cpu_compute: 292.116 ms
+	1 thread: gPU win! cPU/gPU: 4.83
+	2 thread: gPU win! cPU/gPU: 2.91
+	3 thread: gPU win! cPU/gPU: 2.08
+	4 thread: gPU win! cPU/gPU: 1.62
+M:  102, N: 11008, K:  4096, blas_init:  20.752 ms, blas_compute:  44.896 ms, cpu_compute: 261.386 ms
+	1 thread: gPU win! cPU/gPU: 3.98
+	2 thread: gPU win! cPU/gPU: 2.36
+	3 thread: gPU win! cPU/gPU: 1.68
+	4 thread: gPU win! cPU/gPU: 1.30
+M:  103, N: 11008, K:  4096, blas_init:  22.824 ms, blas_compute:  49.099 ms, cpu_compute: 298.111 ms
+	1 thread: gPU win! cPU/gPU: 4.14
+	2 thread: gPU win! cPU/gPU: 2.46
+	3 thread: gPU win! cPU/gPU: 1.75
+	4 thread: gPU win! cPU/gPU: 1.36
+M:  104, N: 11008, K:  4096, blas_init:  21.687 ms, blas_compute:  35.381 ms, cpu_compute: 245.430 ms
+	1 thread: gPU win! cPU/gPU: 4.30
+	2 thread: gPU win! cPU/gPU: 2.65
+	3 thread: gPU win! cPU/gPU: 1.92
+	4 thread: gPU win! cPU/gPU: 1.50
+M:  105, N: 11008, K:  4096, blas_init:  16.689 ms, blas_compute:  35.065 ms, cpu_compute: 239.458 ms
+	1 thread: gPU win! cPU/gPU: 4.63
+	2 thread: gPU win! cPU/gPU: 2.76
+	3 thread: gPU win! cPU/gPU: 1.96
+	4 thread: gPU win! cPU/gPU: 1.53
+M:  106, N: 11008, K:  4096, blas_init:  16.563 ms, blas_compute:  34.667 ms, cpu_compute: 241.492 ms
+	1 thread: gPU win! cPU/gPU: 4.71
+	2 thread: gPU win! cPU/gPU: 2.81
+	3 thread: gPU win! cPU/gPU: 2.00
+	4 thread: gPU win! cPU/gPU: 1.56
+M:  107, N: 11008, K:  4096, blas_init:  17.526 ms, blas_compute:  37.234 ms, cpu_compute: 252.407 ms
+	1 thread: gPU win! cPU/gPU: 4.61
+	2 thread: gPU win! cPU/gPU: 2.74
+	3 thread: gPU win! cPU/gPU: 1.95
+	4 thread: gPU win! cPU/gPU: 1.52
+M:  108, N: 11008, K:  4096, blas_init:  16.532 ms, blas_compute:  34.020 ms, cpu_compute: 247.095 ms
+	1 thread: gPU win! cPU/gPU: 4.89
+	2 thread: gPU win! cPU/gPU: 2.92
+	3 thread: gPU win! cPU/gPU: 2.08
+	4 thread: gPU win! cPU/gPU: 1.62
+M:  109, N: 11008, K:  4096, blas_init:  16.877 ms, blas_compute:  32.913 ms, cpu_compute: 246.311 ms
+	1 thread: gPU win! cPU/gPU: 4.95
+	2 thread: gPU win! cPU/gPU: 2.98
+	3 thread: gPU win! cPU/gPU: 2.13
+	4 thread: gPU win! cPU/gPU: 1.66
+M:  110, N: 11008, K:  4096, blas_init:  16.565 ms, blas_compute:  31.235 ms, cpu_compute: 247.454 ms
+	1 thread: gPU win! cPU/gPU: 5.18
+	2 thread: gPU win! cPU/gPU: 3.13
+	3 thread: gPU win! cPU/gPU: 2.24
+	4 thread: gPU win! cPU/gPU: 1.75
+M:  111, N: 11008, K:  4096, blas_init:  16.464 ms, blas_compute:  33.499 ms, cpu_compute: 256.079 ms
+	1 thread: gPU win! cPU/gPU: 5.13
+	2 thread: gPU win! cPU/gPU: 3.07
+	3 thread: gPU win! cPU/gPU: 2.19
+	4 thread: gPU win! cPU/gPU: 1.70
+M:  112, N: 11008, K:  4096, blas_init:  16.561 ms, blas_compute:  33.363 ms, cpu_compute: 257.418 ms
+	1 thread: gPU win! cPU/gPU: 5.16
+	2 thread: gPU win! cPU/gPU: 3.09
+	3 thread: gPU win! cPU/gPU: 2.21
+	4 thread: gPU win! cPU/gPU: 1.72
+M:  113, N: 11008, K:  4096, blas_init:  16.597 ms, blas_compute:  33.010 ms, cpu_compute: 252.501 ms
+	1 thread: gPU win! cPU/gPU: 5.09
+	2 thread: gPU win! cPU/gPU: 3.06
+	3 thread: gPU win! cPU/gPU: 2.18
+	4 thread: gPU win! cPU/gPU: 1.70
+M:  114, N: 11008, K:  4096, blas_init:  16.733 ms, blas_compute:  33.262 ms, cpu_compute: 262.436 ms
+	1 thread: gPU win! cPU/gPU: 5.25
+	2 thread: gPU win! cPU/gPU: 3.15
+	3 thread: gPU win! cPU/gPU: 2.25
+	4 thread: gPU win! cPU/gPU: 1.75
+M:  115, N: 11008, K:  4096, blas_init:  16.551 ms, blas_compute:  32.756 ms, cpu_compute: 267.475 ms
+	1 thread: gPU win! cPU/gPU: 5.42
+	2 thread: gPU win! cPU/gPU: 3.26
+	3 thread: gPU win! cPU/gPU: 2.33
+	4 thread: gPU win! cPU/gPU: 1.81
+M:  116, N: 11008, K:  4096, blas_init:  16.572 ms, blas_compute:  35.028 ms, cpu_compute: 263.278 ms
+	1 thread: gPU win! cPU/gPU: 5.10
+	2 thread: gPU win! cPU/gPU: 3.04
+	3 thread: gPU win! cPU/gPU: 2.16
+	4 thread: gPU win! cPU/gPU: 1.68
+M:  117, N: 11008, K:  4096, blas_init:  16.851 ms, blas_compute:  34.702 ms, cpu_compute: 268.643 ms
+	1 thread: gPU win! cPU/gPU: 5.21
+	2 thread: gPU win! cPU/gPU: 3.11
+	3 thread: gPU win! cPU/gPU: 2.22
+	4 thread: gPU win! cPU/gPU: 1.73
+M:  118, N: 11008, K:  4096, blas_init:  16.708 ms, blas_compute:  34.196 ms, cpu_compute: 269.058 ms
+	1 thread: gPU win! cPU/gPU: 5.29
+	2 thread: gPU win! cPU/gPU: 3.16
+	3 thread: gPU win! cPU/gPU: 2.26
+	4 thread: gPU win! cPU/gPU: 1.75
+M:  119, N: 11008, K:  4096, blas_init:  16.976 ms, blas_compute:  36.184 ms, cpu_compute: 266.846 ms
+	1 thread: gPU win! cPU/gPU: 5.02
+	2 thread: gPU win! cPU/gPU: 2.99
+	3 thread: gPU win! cPU/gPU: 2.13
+	4 thread: gPU win! cPU/gPU: 1.65
+M:  120, N: 11008, K:  4096, blas_init:  17.117 ms, blas_compute:  33.975 ms, cpu_compute: 273.392 ms
+	1 thread: gPU win! cPU/gPU: 5.35
+	2 thread: gPU win! cPU/gPU: 3.21
+	3 thread: gPU win! cPU/gPU: 2.30
+	4 thread: gPU win! cPU/gPU: 1.79
+M:  121, N: 11008, K:  4096, blas_init:  16.463 ms, blas_compute:  34.596 ms, cpu_compute: 270.169 ms
+	1 thread: gPU win! cPU/gPU: 5.29
+	2 thread: gPU win! cPU/gPU: 3.15
+	3 thread: gPU win! cPU/gPU: 2.25
+	4 thread: gPU win! cPU/gPU: 1.74
+M:  122, N: 11008, K:  4096, blas_init:  16.679 ms, blas_compute:  34.286 ms, cpu_compute: 275.806 ms
+	1 thread: gPU win! cPU/gPU: 5.41
+	2 thread: gPU win! cPU/gPU: 3.24
+	3 thread: gPU win! cPU/gPU: 2.31
+	4 thread: gPU win! cPU/gPU: 1.79
+M:  123, N: 11008, K:  4096, blas_init:  16.622 ms, blas_compute:  34.843 ms, cpu_compute: 277.567 ms
+	1 thread: gPU win! cPU/gPU: 5.39
+	2 thread: gPU win! cPU/gPU: 3.22
+	3 thread: gPU win! cPU/gPU: 2.29
+	4 thread: gPU win! cPU/gPU: 1.78
+M:  124, N: 11008, K:  4096, blas_init:  16.495 ms, blas_compute:  35.076 ms, cpu_compute: 277.343 ms
+	1 thread: gPU win! cPU/gPU: 5.38
+	2 thread: gPU win! cPU/gPU: 3.20
+	3 thread: gPU win! cPU/gPU: 2.28
+	4 thread: gPU win! cPU/gPU: 1.77
+M:  125, N: 11008, K:  4096, blas_init:  16.642 ms, blas_compute:  34.783 ms, cpu_compute: 279.904 ms
+	1 thread: gPU win! cPU/gPU: 5.44
+	2 thread: gPU win! cPU/gPU: 3.25
+	3 thread: gPU win! cPU/gPU: 2.31
+	4 thread: gPU win! cPU/gPU: 1.80
+M:  126, N: 11008, K:  4096, blas_init:  16.977 ms, blas_compute:  35.221 ms, cpu_compute: 281.213 ms
+	1 thread: gPU win! cPU/gPU: 5.39
+	2 thread: gPU win! cPU/gPU: 3.22
+	3 thread: gPU win! cPU/gPU: 2.29
+	4 thread: gPU win! cPU/gPU: 1.78
+M:  127, N: 11008, K:  4096, blas_init:  16.478 ms, blas_compute:  35.678 ms, cpu_compute: 306.046 ms
+	1 thread: gPU win! cPU/gPU: 5.87
+	2 thread: gPU win! cPU/gPU: 3.48
+	3 thread: gPU win! cPU/gPU: 2.48
+	4 thread: gPU win! cPU/gPU: 1.92
+M:  128, N: 11008, K:  4096, blas_init:  16.699 ms, blas_compute:  35.376 ms, cpu_compute: 300.834 ms
+	1 thread: gPU win! cPU/gPU: 5.78
+	2 thread: gPU win! cPU/gPU: 3.44
+	3 thread: gPU win! cPU/gPU: 2.45
+	4 thread: gPU win! cPU/gPU: 1.90
