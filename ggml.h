@@ -304,7 +304,6 @@ extern "C" {
     struct ggml_compute_schedule {
         enum ggml_device_type device;
         int                   stage_flags[3]; // bit 0: valid, bit 1: need worker(s), bit 2: idle_wait
-        bool                  can_use_blas;
         int                   n_threads;
         size_t                work_size;
     };
@@ -340,7 +339,7 @@ extern "C" {
         int64_t perf_time_us;
 
         void * data;
-        char padding[17];
+        char padding[21];
     };
 
     // computation graph

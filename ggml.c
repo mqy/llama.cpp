@@ -4191,7 +4191,7 @@ static inline void ggml_mulmat_perf_set(struct ggml_tensor * node, int64_t time_
     int64_t M = node->ne[1];
     int64_t N = node->ne[0];
     int64_t K = node->src1->ne[0];
-    enum ggml_type T =node->src0->type;
+    enum ggml_type T = node->src0->type;
     int64_t key = GMGML_MULMAT_PERF_KEY(M, N, K, T);
 
     struct ggml_mulmat_perf_kv * e = NULL;
@@ -4714,7 +4714,6 @@ struct ggml_tensor * ggml_new_tensor_impl(
         .sched          = {
                             .device       = GGML_DEVICE_AUTO,
                             .stage_flags  = { 0, 0, 0 },
-                            .can_use_blas = false,
                             .n_threads    = 0,
                             .work_size    = 0,
                           },
@@ -4722,7 +4721,7 @@ struct ggml_tensor * ggml_new_tensor_impl(
         /*.perf_cycles  =*/ 0,
         /*.perf_time_us =*/ 0,
         /*.data         =*/ (data == NULL && !ctx->no_alloc) ? (void *)(result + 1) : data,
-        /*.padding      =*/ { 17 },
+        /*.padding      =*/ { 21 },
     };
 
     // TODO: this should not be needed as long as we don't rely on aligned SIMD loads
@@ -8329,48 +8328,48 @@ static void ggml_compute_forward_rms_norm(
     }
 }
 
-static inline enum ggml_device_type ggml_mulmat_get_device(struct ggml_tensor *node) {
-    int64_t M = node->ne[1];
-    int64_t N = node->ne[0];
-    int64_t K = node->src1->ne[0];
+static inline void ggml_mulmat_adjust_device(struct ggml_tensor *node) {
+    GGML_ASSERT(node->op == GGML_OP_MUL_MAT);
 
-    GGML_MULMAT_DEVICE_PRINT("%s: M: %3lld, N: %5lld, K: %5lld, T: %2d, ", __func__, M, N, K, node->src0->type);
+    if (node->sched.device == GGML_DEVICE_CPU) {
+        node->sched.device = GGML_DEVICE_CPU;
+    } else { // AUTO or GPU
+        if (!ggml_is_contiguous(node->src0) || !ggml_is_contiguous(node->src1)) {
+            GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, can not use blas\n", GGML_DEVICE_CPU);
+            node->sched.device = GGML_DEVICE_CPU;
+        } else if (node->sched.device == GGML_DEVICE_AUTO) {
+            int64_t M = node->ne[1];
+            int64_t N = node->ne[0];
+            int64_t K = node->src1->ne[0];
 
-    if (!node->sched.can_use_blas) {
-        GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, can not use blas\n", GGML_DEVICE_CPU);
-        return GGML_DEVICE_CPU;
-    }
-
-    if (M < 32 || N < 32 || K < 32) {
-        GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, too small\n", GGML_DEVICE_CPU);
-        return GGML_DEVICE_CPU;
-    }
-
+            if (M < 32 || N < 32 || K < 32) {
+                GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, GGML_DEVICE_AUTO && too small\n", GGML_DEVICE_CPU);
+                node->sched.device = GGML_DEVICE_CPU;
+            } else {
+                node->sched.device = GGML_DEVICE_GPU;
 #if defined(GGML_MULMAT_PERF)
-    int64_t key = GMGML_MULMAT_PERF_KEY(M, N, K, node->src0->type);
+                int64_t key = GMGML_MULMAT_PERF_KEY(M, N, K, node->src0->type);
 
-    // TODO: when M/N/K are big, don't test for CPU
+                // TODO: when M/N/K are big, don't test for CPU?
 
-    struct ggml_mulmat_perf_kv * e = ggml_mulmat_perf_get_v(key);
-    if (e != NULL) {
-        if (e->cpu[3] == -1) {
-            GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, no cpu perf yet\n", GGML_DEVICE_CPU);
-            return GGML_DEVICE_CPU;
-        }
-
-        if (e->gpu[3] == -1) {
-            GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, no gpu perf yet\n", GGML_DEVICE_CPU);
-            return GGML_DEVICE_GPU;
-        }
-
-        enum ggml_device_type device = e->cpu[3] < e->gpu[3]? GGML_DEVICE_CPU : GGML_DEVICE_GPU;
-        GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, choose the fastest. cpu time: %lld, gpu time: %lld\n", device, e->cpu[3], e->gpu[3]);
-        return device;
-    }
+                struct ggml_mulmat_perf_kv * e = ggml_mulmat_perf_get_v(key);
+                if (e != NULL) {
+                    if (e->cpu[3] == -1) {
+                        GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, no cpu perf yet\n", GGML_DEVICE_CPU);
+                        node->sched.device = GGML_DEVICE_CPU;
+                    } else if (e->gpu[3] == -1) {
+                        GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, no gpu perf yet\n", GGML_DEVICE_CPU);
+                        node->sched.device = GGML_DEVICE_GPU;
+                    } else {
+                        enum ggml_device_type device = e->cpu[3] < e->gpu[3]? GGML_DEVICE_CPU : GGML_DEVICE_GPU;
+                        GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, choose the fastest. cpu time: %lld, gpu time: %lld\n", device, e->cpu[3], e->gpu[3]);
+                        node->sched.device = device;
+                    }
+                }
 #endif
-
-    GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, >=32, perf disabled or no key yet\n", GGML_DEVICE_GPU);
-    return GGML_DEVICE_GPU;
+            }
+        }
+    }
 }
 
 // ggml_compute_forward_mul_mat
@@ -8381,9 +8380,7 @@ static void ggml_compute_forward_mul_mat_f32(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        if (dst->sched.device == GGML_DEVICE_AUTO) {
-            dst->sched.device = ggml_mulmat_get_device(dst);
-        }
+        ggml_mulmat_adjust_device(dst);
 
         if (dst->sched.device == GGML_DEVICE_GPU) {
             dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 1);
@@ -8583,7 +8580,7 @@ static void ggml_compute_forward_mul_mat_f16_f32(
     if (params->type == GGML_TASK_PLAN) {
         bool is_auto_device = false;
         if (dst->sched.device == GGML_DEVICE_AUTO) {
-            dst->sched.device = ggml_mulmat_get_device(dst);
+            ggml_mulmat_adjust_device(dst);
             is_auto_device = true;
         }
 
@@ -8851,7 +8848,7 @@ static void ggml_compute_forward_mul_mat_q_f32(
     if (params->type == GGML_TASK_PLAN) {
         bool is_auto_device = false;
         if (dst->sched.device == GGML_DEVICE_AUTO) {
-            dst->sched.device = ggml_mulmat_get_device(dst);
+            ggml_mulmat_adjust_device(dst);
             is_auto_device = true;
         }
 
@@ -8954,6 +8951,10 @@ static void ggml_compute_forward_mul_mat_q_f32(
 
     // nb01 >= nb00 - src0 is not transposed
     //   compute by src0 rows
+
+    int64_t M = dst->ne[1];
+    int64_t N = dst->ne[0];
+    int64_t K = dst->src1->ne[0];
 
     if (dst->sched.device == GGML_DEVICE_GPU) {
         GGML_ASSERT(ggml_is_contiguous(src0) && ggml_is_contiguous(src1));
@@ -9076,7 +9077,7 @@ static void ggml_compute_forward_mul_mat_q_f32(
         GGML_ASSERT(ggml_is_contiguous(src0) && ggml_is_contiguous(src1));
 
         if (params->type == GGML_TASK_INIT) {
-//int64_t t__0 = ggml_time_us();
+int64_t t__0 = ggml_time_us();
             // rows per thread
             const int dr = (ne01 + nth - 1)/nth;
 
@@ -9093,11 +9094,11 @@ static void ggml_compute_forward_mul_mat_q_f32(
                     }
                 }
             }
-//printf("\n====== INIT: %d-th, %lld\n", ith, ggml_time_us() - t__0);
+printf("====== BLAS INIT: M: %5lld, N: %5lld, K: %5lld, %d-th, %6lld\n", M, N, K, ith, ggml_time_us() - t__0);
             return;
         }
 
-//int64_t t__0 = ggml_time_us();
+int64_t t__0 = ggml_time_us();
 
         GGML_ASSERT(nth == 1);
 
@@ -9116,7 +9117,7 @@ static void ggml_compute_forward_mul_mat_q_f32(
             }
         }
 
-//printf("\n====== COMP: %lld\n", ggml_time_us() - t__0);
+printf("====== BLAS COMP: M: %5lld, N: %5lld, K: %5lld, %d-th, %6lld\n", M, N, K, ith, ggml_time_us() - t__0);
 
         return;
 #else
@@ -9129,6 +9130,7 @@ static void ggml_compute_forward_mul_mat_q_f32(
     GGML_ASSERT (params->type == GGML_TASK_INIT || params->type == GGML_TASK_COMPUTE);
 
     if (params->type == GGML_TASK_INIT) {
+int64_t t__0 = ggml_time_us();
         GGML_ASSERT(params->nth == 1);
 
         char * wdata = params->wdata;
@@ -9142,9 +9144,11 @@ static void ggml_compute_forward_mul_mat_q_f32(
                 }
             }
         }
-
+printf("====== CPU  INIT: M: %5lld, N: %5lld, K: %5lld, %d-th, %6lld\n", M, N, K, ith, ggml_time_us() - t__0);
         return;
     }
+
+int64_t t__0 = ggml_time_us();
 
     GGML_ASSERT(params->type == GGML_TASK_COMPUTE);
 
@@ -9188,6 +9192,8 @@ static void ggml_compute_forward_mul_mat_q_f32(
         }
     }
 
+printf("====== CPU  COMP: M: %5lld, N: %5lld, K: %5lld, %d-th, %6lld\n", M, N, K, ith, ggml_time_us() - t__0);
+
     //int64_t t1 = ggml_time_us();
     //static int64_t acc = 0;
     //acc += t1 - t0;
@@ -9216,7 +9222,15 @@ static void ggml_compute_forward_mul_mat(
         case GGML_TYPE_Q8_0:
         case GGML_TYPE_Q8_1:
             {
-                ggml_compute_forward_mul_mat_q_f32(params, src0, src1, dst);
+                // TODO: remove.
+                if (params->type != GGML_TASK_PLAN) {
+                    dst->sched.device = GGML_DEVICE_CPU;
+                    ggml_compute_forward_mul_mat_q_f32(params, src0, src1, dst);
+                    dst->sched.device = GGML_DEVICE_GPU;
+                    ggml_compute_forward_mul_mat_q_f32(params, src0, src1, dst);
+                } else {
+                    ggml_compute_forward_mul_mat_q_f32(params, src0, src1, dst);
+                }
             } break;
         case GGML_TYPE_F16:
             {
@@ -11774,41 +11788,65 @@ struct ggml_cgraph ggml_build_backward(struct ggml_context * ctx, struct ggml_cg
 // I tried using spin locks, but not sure how to use them correctly - the things I tried were slower than busy loops
 //
 
-// TODO: compare parallel gain. // init / compute
-static void ggml_graph_compute_plan(struct ggml_context * ctx,
-        struct ggml_cgraph * cgraph,
-        enum ggml_device_type incoming_device) {
-    if (cgraph->n_threads > 1 && ggml_cpu_has_blas() && (incoming_device == GGML_DEVICE_AUTO || incoming_device == GGML_DEVICE_GPU)) {
-        if (ggml_cpu_has_cublas()) {
-            cgraph->n_threads = 1;
-            printf("\ncublas: n_threads changed to %d\n", cgraph->n_threads);
-        } else {
-            // TODO: set n_threads based on mul_mat perf (if enabled): overall gain.
-            int n_gpu = 0;
-            for (int i = 0; i < cgraph->n_nodes; i++) {
-                struct ggml_tensor * node = cgraph->nodes[i];
-                if (node->op == GGML_OP_MUL_MAT && ggml_is_contiguous(node->src0) && ggml_is_contiguous(node->src1)) {
-                    node->sched.can_use_blas = true;
-                    if (ggml_mulmat_get_device(node) == GGML_DEVICE_GPU) {
-                        n_gpu++;
-                        break;
-                    }
-                }
-            }
+//////////////
+// TODO: count size and bench: blas init, blas compute, cpu init, cpu compute
+// TODO: dynamic per node n_threads
+// TODO: n_thread = 1 for node OP other than MUL_MAT.
+//////////////
 
-            if (n_gpu > 0) {
-                cgraph->n_threads = 2;
-                printf("\naccelerate/openblas: n_threads changed to %d\n", cgraph->n_threads);
-            }
-        }
-    }
+static void ggml_graph_compute_plan(struct ggml_context * ctx, struct ggml_cgraph * cgraph) {
+    ///////////////
+    // TODO: set n_threads based on mul_mat perf (if enabled): overall gain.
+    ///////////////
+
+//     int n_gpu = 0;
+
+//     for (int i = 0; i < cgraph->n_nodes; i++) {
+//         struct ggml_tensor * node = cgraph->nodes[i];
+//         node->sched.device = cgraph->device;
+        
+//         if (node->op == GGML_OP_MUL_MAT) {
+//             if (cgraph->device == GGML_DEVICE_AUTO || cgraph->device == GGML_DEVICE_GPU) {
+//                 ggml_mulmat_adjust_device(node);
+//             }
+    
+//             if (node->sched.device == GGML_DEVICE_GPU) {
+//                 n_gpu++;
+//             }
+// if (true) {
+//             int64_t M = node->ne[1];
+//             int64_t N = node->ne[0];
+//             int64_t K = node->src1->ne[0];
+//             enum ggml_type T = node->src0->type;
+
+//             printf("\n==== M: %lld, N: %lld, K: %lld, src0 type: %d\n", M,  N, K, T);
+// }
+//         }
+//     }
+
+//     if (cgraph->n_threads > 1) {
+//         if (ggml_cpu_has_cublas()) {
+//             cgraph->n_threads = 1;
+//             printf("\ncublas: n_threads changed to %d\n", cgraph->n_threads);
+//         } else if (n_gpu > 0) {
+//              cgraph->n_threads = 2;
+//             printf("\naccelerate/openblas: n_threads changed to %d\n", cgraph->n_threads);
+//         }
+//     }
+
+    cgraph->n_threads = 1;
+    printf("\nDEBUG: n_threads changed to %d\n", cgraph->n_threads);
 
     int n_threads = cgraph->n_threads;
     size_t work_size = 0;
 
     for (int i = 0; i < cgraph->n_nodes; i++) {
         struct ggml_tensor * node = cgraph->nodes[i];
-        node->sched.device = incoming_device;
+
+        ////////////
+        // TODO: fix audo NODE device.
+        ////////////
+        node->sched.device = cgraph->device;
 
         node->sched.work_size = 0;
         for (int j = 0; j < 3; j++) {
@@ -11954,18 +11992,6 @@ static thread_ret_t ggml_graph_compute_thread(void * args) {
             break;
         }
 
-// #if defined(GGML_IDLE_COND_WAIT)
-//         if (shared->n_wait > 0) {
-//             pthread_mutex_lock(&shared->mutex);
-//             while (id < shared->n_wait) {
-//                 shared->n_waiting++;
-//                 pthread_cond_wait(&shared->cond, &shared->mutex);
-//                 shared->n_waiting--;
-//             }
-//             pthread_mutex_unlock(&shared->mutex);
-//         }
-// #endif
-
         ggml_compute_spin_lock(&shared->spin);
         if (shared->next < shared->n_tasks) {
             task = &shared->tasks[shared->next];
@@ -12010,8 +12036,8 @@ static thread_ret_t ggml_graph_compute_thread(void * args) {
 void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) {
     GGML_ASSERT(cgraph->n_threads > 0);
     GGML_ASSERT(cgraph->n_nodes > 0);
- 
-    ggml_graph_compute_plan(ctx, cgraph, cgraph->device);
+
+    ggml_graph_compute_plan(ctx, cgraph);
 
     int n_threads = cgraph->n_threads;
 
@@ -12295,6 +12321,10 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
 
         // This is the params for main thread.
         struct ggml_compute_params params;
+
+        ////////////////////////////////////////////////
+        // TODO: use only one step when n_threads == 1.
+        ////////////////////////////////////////////////
 
         for (int k = GGML_TASK_INIT; k <= GGML_TASK_FINALIZE; k++) {
             enum ggml_task_type type = k;
