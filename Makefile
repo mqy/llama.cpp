@@ -101,7 +101,19 @@ ifndef LLAMA_NO_ACCELERATE
 endif
 ifdef LLAMA_OPENBLAS
 	CFLAGS  += -DGGML_USE_OPENBLAS -I/usr/local/include/openblas
+ifneq ($(UNAME_S),Linux)
 	LDFLAGS += -lopenblas
+endif
+ifeq ($(UNAME_S),Darwin)
+	# openblas installed with Homebew on macOS.
+	CFLAGS  += -I/usr/local/opt/openblas/include/
+	LDFLAGS += -L/usr/local/opt/openblas/lib/
+endif
+ifeq ($(UNAME_S),Linux)
+	# libopenblas64-pthread-dev on ubunntu.
+	CFLAGS  += -I/usr/include/x86_64-linux-gnu/openblas64-pthread/
+	LDFLAGS += -L/usr/lib/x86_64-linux-gnu/openblas64-pthread/
+endif
 endif
 ifdef LLAMA_CUBLAS
 	CFLAGS    += -DGGML_USE_CUBLAS -I/usr/local/cuda/include
