@@ -22,10 +22,8 @@
 // - It's almost true that: cpu is fast when M < 16; gpu is fast when M > 64.
 // - Most of the time, when M < 32 cpu is fast.
 // But when n_threads > 1, when M in range [8, 80], either cpu or gpu.
-#define M_MAX 96
+#define NUM_M 11
 #define M_STEP 8
-
-#define NUM_M (M_MAX / M_STEP + 1)
 
 #define NUM_NK_PAIRS 3
 
@@ -42,28 +40,8 @@
 
 #define UNUSED(x) (void)(x)
 
-struct bench_nk {
-    int32_t N;
-    int32_t K;
-
-    int64_t cpu_init[NUM_BENCH];
-    int64_t cpu_comp[NUM_BENCH];
-
-    int64_t gpu_init[NUM_BENCH];
-    int64_t gpu_comp[NUM_BENCH];
-};
-
-struct bench_m {
-    int32_t M;
-    struct bench_nk bnk[NUM_NK_PAIRS];
-};
-
-struct bench {
-    struct bench_m m[NUM_M];
-};
-
 // TODO: remove bench, bench_m, bench_nk
-struct bench_dat_stat {
+struct bench_data_stats {
     int64_t cpu_init[NUM_BENCH];
     int64_t cpu_comp[NUM_BENCH];
 
@@ -72,7 +50,7 @@ struct bench_dat_stat {
 };
 
 // sub data record to write/read to/from file.
-struct bench_dat_item {
+struct bench_data_item {
     int32_t M;
 
     // avg.
@@ -81,22 +59,26 @@ struct bench_dat_item {
     int64_t gpu_init;
     int64_t gpu_comp;
 
-    struct bench_dat_stat stat;
+    struct bench_data_stats stats;
 };
 
 // sub data record to write/read to/from file.
-struct bench_dat_shape {
+struct bench_data_shape {
     int32_t N;
     int32_t K;
 
-    int32_t n_items;
-    struct bench_dat_item *items;
+    // M range: m_step * [1..num_m]
+    int32_t m_step;
+
+    int32_t num_m;
+    struct bench_data_item *items;
 };
 
 // top bench data to write/read to/from file.
-struct bench_dat {
+struct bench_data {
+    char model[4];
     int32_t n_shapes;
-    struct bench_dat_shape *shapes;
+    struct bench_data_shape *shapes;
 };
 
 struct nk_pair {
@@ -117,15 +99,16 @@ const struct nk_pair nk_pairs_13b[] = {
 };
 
 static int64_t time_us(void);
-static int64_t get_bench_time(int64_t *a, int len);
-static void write_benches_csv(struct bench_dat *bd, FILE *file);
-static void write_benches_txt(struct bench_dat *bd, FILE *file);
-static void write_benches_dat(struct bench_dat *bd, FILE *file);
-static void load_benches_dat(struct bench_dat *bd, FILE *file);
-static int64_t estimate_cpu_time(struct bench_dat *bd, int M, int N, int K,
-                                 int nth);
-static int64_t estimate_gpu_time_blas(struct bench_dat *bd, int M, int N,
-                                          int K, int nth);
+static int64_t bench_time_avg(int64_t *a, int len);
+static void write_bench_data_csv(struct bench_data *bd, FILE *file);
+static void write_bench_data(struct bench_data *bd, FILE *file);
+static void read_bench_data(struct bench_data *bd, FILE *file);
+
+static int64_t estimate_time(struct bench_data *bd, int M, int N, int K,
+                                 int nth, bool is_cpu);
+
+static void test_compare_bench_data(struct bench_data *bd,
+                                    struct bench_data *bd2);
 static void test_estimate_xpu_time(void);
 
 static void usage(char *prog) {
@@ -139,8 +122,10 @@ int main(int argc, char **argv) {
     exit(1);
 #endif
 
-    test_estimate_xpu_time();
-    exit(0);
+    // if (true) {
+    //     test_estimate_xpu_time();
+    //     exit(0);
+    // }
 
     if (argc != 2) {
         usage(argv[0]);
@@ -151,9 +136,9 @@ int main(int argc, char **argv) {
 
     char *model = argv[1];
 
-    if (strcmp(model, "7B") == 0 || strcmp(model, "7b") == 0) {
+    if (strcmp(model, "7B") == 0) {
         nk_pairs = nk_pairs_7b;
-    } else if (strcmp(model, "13B") == 0 || strcmp(model, "13b") == 0) {
+    } else if (strcmp(model, "13B") == 0) {
         nk_pairs = nk_pairs_13b;
     } else {
         usage(argv[0]);
@@ -190,33 +175,39 @@ int main(int argc, char **argv) {
         }
     }
 
-    const float alpha = 1.0f;
-    const float beta = 0.0f;
+    struct bench_data bd = {
+        .n_shapes = NUM_NK_PAIRS,
+        .shapes = NULL,
+    };
+    strncpy(bd.model, model, strlen(model));
 
-    struct bench bench;
+    size_t sz = sizeof(struct bench_data_shape) * NUM_NK_PAIRS;
+    bd.shapes = malloc(sz);
+    memset(bd.shapes, 0, sz);
 
-    int32_t M;
-    for (int im = 0; im < NUM_M; im++) {
-        if (im > 0) {
-            M = M_STEP * im;
-        } else {
-            M = 1;
-        }
+    for (int i = 0; i < NUM_NK_PAIRS; i++) {
+        int N = nk_pairs[i].N;
+        int K = nk_pairs[i].K;
 
-        struct bench_m *bm = &bench.m[im];
-        bm->M = M;
+        const int lda = K;
+        const int ldb = K;
+        const int ldc = N;
 
-        for (int i = 0; i < NUM_NK_PAIRS; i++) {
-            int N = nk_pairs[i].N;
-            int K = nk_pairs[i].K;
+        struct bench_data_shape *bench_shape = &bd.shapes[i];
+        bench_shape->N = N;
+        bench_shape->K = K;
+        bench_shape->m_step = M_STEP;
+        bench_shape->num_m = NUM_M;
 
-            const int lda = K;
-            const int ldb = K;
-            const int ldc = N;
+        sz = sizeof(struct bench_data_item) * NUM_M;
+        bench_shape->items = malloc(sz);
+        memset(bench_shape->items, 0, sz);
 
-            struct bench_nk *bnk = &bm->bnk[i];
-            bnk->N = N;
-            bnk->K = K;
+        int32_t M;
+        for (int im = 0; im < NUM_M; im++) {
+            M = M_STEP * (im + 1);
+            struct bench_data_item *bench_item = &bench_shape->items[im];
+            bench_item->M = M;
 
             size_t ctx_size = K * N * ggml_type_sizef(GGML_TYPE_F32) +
                               K * sizeof(float) + 1024 * 1024 * 300;
@@ -250,7 +241,7 @@ int main(int argc, char **argv) {
 
             memset(wdata, 0, wdata_size);
 
-            size_t sizeC = M_MAX * N * sizeof(float);
+            size_t sizeC = M * N * sizeof(float);
             void *C = malloc(sizeC);
             memset(C, 0, sizeC);
 
@@ -261,7 +252,7 @@ int main(int argc, char **argv) {
                     quantize_row_q((float *)((char *)src1->data + m * K),
                                    (char *)wdata + m * src1->nb[1], K);
                 }
-                bnk->cpu_init[nb] = time_us() - t0;
+                bench_item->stats.cpu_init[nb] = time_us() - t0;
             }
 
             memset(wdata, 0, wdata_size);
@@ -276,7 +267,7 @@ int main(int argc, char **argv) {
                                   (float *)wdata + m * K + n);
                     }
                 }
-                bnk->cpu_comp[nb] = time_us() - t0;
+                bench_item->stats.cpu_comp[nb] = time_us() - t0;
             }
 
             // gpu init (support multi-threads)
@@ -286,9 +277,11 @@ int main(int argc, char **argv) {
                     dequantize_row_q((const float *)src0->data + n * K,
                                      (float *)wdata + n * K, K);
                 }
-                bnk->gpu_init[nb] = time_us() - t0;
+                bench_item->stats.gpu_init[nb] = time_us() - t0;
             }
 
+            const float alpha = 1.0f;
+            const float beta = 0.0f;
             const float *A = (float *)src1->data;
             const float *B = (float *)wdata;
 
@@ -297,7 +290,7 @@ int main(int argc, char **argv) {
                 int64_t t0 = time_us();
                 cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasTrans, M, N, K,
                             alpha, A, lda, B, ldb, beta, (float *)C, ldc);
-                bnk->gpu_comp[nb] = time_us() - t0;
+                bench_item->stats.gpu_comp[nb] = time_us() - t0;
             }
 
             ggml_free(ctx);
@@ -308,30 +301,14 @@ int main(int argc, char **argv) {
     free(wdata);
     free(q4_0_buf);
 
-    struct bench_dat bd = {.n_shapes = NUM_NK_PAIRS, .shapes = NULL};
-    size_t sz = sizeof(struct bench_dat_shape) * NUM_NK_PAIRS;
-    bd.shapes = malloc(sz);
-    memset(bd.shapes, 0, sz);
-
-    // convert `bench` to `bd`.
+    // stats -> avg.
     for (int i = 0; i < NUM_NK_PAIRS; i++) {
-        bd.shapes[i].N = bench.m[0].bnk[i].N;
-        bd.shapes[i].K = bench.m[0].bnk[i].K;
-
-        bd.shapes[i].n_items = NUM_M;
-        sz = sizeof(struct bench_dat_item) * NUM_M;
-        bd.shapes[i].items = malloc(sz);
-        memset(bd.shapes[i].items, 0, sz);
-
         for (int j = 0; j < NUM_M; j++) {
-            struct bench_dat_item *item = &bd.shapes[i].items[j];
-            struct bench_nk *bnk = &bench.m[j].bnk[i];
-
-            item->M = bench.m[j].M;
-            item->cpu_init = get_bench_time(bnk->cpu_init, NUM_BENCH);
-            item->cpu_comp = get_bench_time(bnk->cpu_comp, NUM_BENCH);
-            item->gpu_init = get_bench_time(bnk->gpu_init, NUM_BENCH);
-            item->gpu_comp = get_bench_time(bnk->gpu_comp, NUM_BENCH);
+            struct bench_data_item *item = &bd.shapes[i].items[j];
+            item->cpu_init = bench_time_avg(item->stats.cpu_init, NUM_BENCH);
+            item->cpu_comp = bench_time_avg(item->stats.cpu_comp, NUM_BENCH);
+            item->gpu_init = bench_time_avg(item->stats.gpu_init, NUM_BENCH);
+            item->gpu_comp = bench_time_avg(item->stats.gpu_comp, NUM_BENCH);
         }
     }
 
@@ -339,128 +316,40 @@ int main(int argc, char **argv) {
 
     printf("\n====== print as csv: \n\n");
 
-    write_benches_csv(&bd, stdout);
+    write_bench_data_csv(&bd, stdout);
 
     printf("\n====== print as txt: \n\n");
-    write_benches_txt(&bd, stdout);
+    write_bench_data(&bd, stdout);
 
-    char bin_file[10];
-    snprintf(bin_file, sizeof(bin_file), "%s.dat", model);
+    if (true) {
+        char file_name[64];
+        snprintf(file_name, sizeof(file_name), "q4_0-mulmat-bench.%s.txt",
+                 model);
 
-    printf("\n====== write to bin file: %s", bin_file);
-    FILE *bin_fp = fopen(bin_file, "w");
-    write_benches_dat(&bd, bin_fp);
-    fclose(bin_fp);
+        printf("\n====== write to txt file: %s", file_name);
+        FILE *fp = fopen(file_name, "w");
+        write_bench_data(&bd, fp);
+        fclose(fp);
 
-    printf("\n====== read from bin file: %s", bin_file);
-    bin_fp = fopen(bin_file, "r");
-    struct bench_dat bd2;
-    load_benches_dat(&bd2, bin_fp);
+        struct bench_data bd2;
 
-    printf("\n====== print bin dat as txt: \n\n");
-    write_benches_txt(&bd2, stdout);
-    fclose(bin_fp);
+        printf("\n====== read from txt file: %s", file_name);
+        fp = fopen(file_name, "r");
+        read_bench_data(&bd2, fp);
+        fclose(fp);
+        write_bench_data(&bd2, stdout);
 
-    // compare bd and bd2
-    {
-        BENCH_ASSERT(bd.n_shapes == bd2.n_shapes);
-
-        for (int i = 0; i < bd.n_shapes; i++) {
-            struct bench_dat_shape *s1 = &bd.shapes[i];
-            struct bench_dat_shape *s2 = &bd2.shapes[i];
-            BENCH_ASSERT(s1->N == s2->N);
-            BENCH_ASSERT(s1->K == s2->K);
-
-            BENCH_ASSERT(s1->n_items == s2->n_items);
-
-            for (int j = 0; j < s1->n_items; j++) {
-                struct bench_dat_item *item1 = &s1->items[j];
-                struct bench_dat_item *item2 = &s2->items[j];
-
-                BENCH_ASSERT(item1->M == item2->M);
-                BENCH_ASSERT(item1->cpu_init == item2->cpu_init);
-                BENCH_ASSERT(item1->cpu_comp == item2->cpu_comp);
-                BENCH_ASSERT(item1->gpu_init == item2->gpu_init);
-                BENCH_ASSERT(item1->gpu_comp == item2->gpu_comp);
-            }
-        }
+        // compare bd and bd2
+        test_compare_bench_data(&bd, &bd2);
     }
 
     return 0;
 }
 
-static void test_estimate_xpu_time(void) {
-    struct bench_dat bd;
-
-    const char *data_file = "7b.dat";
-
-    FILE *fp = fopen(data_file, "r");
-    BENCH_ASSERT(fp);
-
-    load_benches_dat(&bd, fp);
-    fclose(fp);
-
-    printf("\n====== estimate CPU time\n");
-    printf("M:  8, N, 4096, K: 4096, nth: 1, time: %lld\n",
-           estimate_cpu_time(&bd, 8, 4096, 4096, 1));
-    printf("M: 16, N, 4096, K: 4096, nth: 1: %lld\n",
-           estimate_cpu_time(&bd, 16, 4096, 4096, 1));
-    printf("M: 12, N, 4096, K: 4096, nth: 1: %lld\n",
-           estimate_cpu_time(&bd, 12, 4096, 4096, 1));
-
-    printf("\n====== estimate GPU time\n");
-
-    printf("M:  8, N, 4096, K: 4096, nth: 1, time: %lld\n",
-           estimate_gpu_time_blas(&bd, 8, 4096, 4096, 1));
-    printf("M: 16, N, 4096, K: 4096, nth: 1: %lld\n",
-           estimate_gpu_time_blas(&bd, 16, 4096, 4096, 1));
-    printf("M: 12, N, 4096, K: 4096, nth: 1: %lld\n",
-           estimate_gpu_time_blas(&bd, 12, 4096, 4096, 1));
-}
-
-// for given work load and number of threads, estimate cpu time.
-static int64_t estimate_cpu_time(struct bench_dat *bd, int M, int N, int K,
-                                 int nth) {
-    struct bench_dat_shape *shape = NULL;
-    for (int i = 0; i < bd->n_shapes; i++) {
-        if (bd->shapes[i].N == N && bd->shapes[i].K == K) {
-            shape = &bd->shapes[i];
-            break;
-        }
-    }
-
-    if (shape == NULL) {
-        return -1;
-    }
-
-    for (int i = 0; i < shape->n_items; i++) {
-        struct bench_dat_item *item = &shape->items[i];
-        if (item->M == M) {
-            return item->cpu_init + item->cpu_comp / nth;
-        }
-    }
-
-    for (int i = 0; i < shape->n_items - 1; i++) {
-        struct bench_dat_item *prev = &shape->items[i];
-        struct bench_dat_item *next = &shape->items[i + 1];
-        // interpolate.
-        if (M > prev->M && M < next->M) {
-            double x = 1.0 * (M - prev->M) / (next->M - prev->M);
-            double init =
-                prev->cpu_init + (next->cpu_init - prev->cpu_init) * x;
-            double comp =
-                prev->cpu_comp + (next->cpu_comp - prev->cpu_comp) * x / nth;
-            return (int64_t)(init + comp);
-        }
-    }
-
-    return -1;
-}
-
 // for given work load and number of threads, estimate gpu time.
-static int64_t estimate_gpu_time_blas(struct bench_dat *bd, int M, int N,
-                                          int K, int nth) {
-    struct bench_dat_shape *shape = NULL;
+static int64_t estimate_time(struct bench_data *bd, int M, int N, int K,
+                                 int nth, bool is_cpu) {
+    struct bench_data_shape *shape = NULL;
     for (int i = 0; i < bd->n_shapes; i++) {
         if (bd->shapes[i].N == N && bd->shapes[i].K == K) {
             shape = &bd->shapes[i];
@@ -469,29 +358,55 @@ static int64_t estimate_gpu_time_blas(struct bench_dat *bd, int M, int N,
     }
 
     if (shape == NULL) {
-        // abort();
         return -1;
     }
 
-    for (int i = 0; i < shape->n_items; i++) {
-        struct bench_dat_item *item = &shape->items[i];
-        if (item->M == M) {
-            return item->gpu_init / nth + item->gpu_comp;
-        }
+    if (M < shape->m_step || M > shape->m_step * shape->num_m) {
+        return -1;
     }
 
-    for (int i = 0; i < shape->n_items - 1; i++) {
-        struct bench_dat_item *prev = &shape->items[i];
-        struct bench_dat_item *next = &shape->items[i + 1];
+    if (is_cpu) {
+        for (int i = 0; i < shape->num_m; i++) {
+            struct bench_data_item *item = &shape->items[i];
+            if (item->M == M) {
+                return item->cpu_init + item->cpu_comp / nth;
+            }
+        }
 
-        // interpolate.
-        if (M > prev->M && M < next->M) {
-            double x = 1.0 * (M - prev->M) / (next->M - prev->M);
-            double init =
-                prev->gpu_init + (next->gpu_init - prev->gpu_init) * x / nth;
-            double comp =
-                prev->gpu_comp + (next->gpu_comp - prev->gpu_comp) * x;
-            return (int64_t)(init + comp);
+        for (int i = 0; i < shape->num_m - 1; i++) {
+            struct bench_data_item *prev = &shape->items[i];
+            struct bench_data_item *next = &shape->items[i + 1];
+            // interpolate.
+            if (M > prev->M && M < next->M) {
+                double x = 1.0 * (M - prev->M) / (next->M - prev->M);
+                double init =
+                    prev->cpu_init + (next->cpu_init - prev->cpu_init) * x;
+                double comp =
+                    prev->cpu_comp + (next->cpu_comp - prev->cpu_comp) * x / nth;
+                return (int64_t)(init + comp);
+            }
+        }
+    } else {
+        for (int i = 0; i < shape->num_m; i++) {
+            struct bench_data_item *item = &shape->items[i];
+            if (item->M == M) {
+                return item->gpu_init / nth + item->gpu_comp;
+            }
+        }
+
+        for (int i = 0; i < shape->num_m - 1; i++) {
+            struct bench_data_item *prev = &shape->items[i];
+            struct bench_data_item *next = &shape->items[i + 1];
+
+            // interpolate.
+            if (M > prev->M && M < next->M) {
+                double x = 1.0 * (M - prev->M) / (next->M - prev->M);
+                double init =
+                    prev->gpu_init + (next->gpu_init - prev->gpu_init) * x / nth;
+                double comp =
+                    prev->gpu_comp + (next->gpu_comp - prev->gpu_comp) * x;
+                return (int64_t)(init + comp);
+            }
         }
     }
 
@@ -504,7 +419,7 @@ static int64_t time_us(void) {
     return (int64_t)ts.tv_sec * 1000000 + (int64_t)ts.tv_nsec / 1000;
 }
 
-static int64_t get_bench_time(int64_t *a, int len) {
+static int64_t bench_time_avg(int64_t *a, int len) {
     // bubble sort `a`.
     for (int i = 0; i < len - 1; i++) {
         for (int j = i + 1; j < len; j++) {
@@ -525,20 +440,20 @@ static int64_t get_bench_time(int64_t *a, int len) {
 }
 
 // print benchmark of gpu_comp as csv: for plotting lines.
-static void write_benches_csv(struct bench_dat *bd, FILE *fp) {
-    int n_items = bd->shapes[0].n_items;
-    BENCH_ASSERT(n_items == NUM_M);
+static void write_bench_data_csv(struct bench_data *bd, FILE *fp) {
+    int num_m = bd->shapes[0].num_m;
+    BENCH_ASSERT(num_m == NUM_M);
 
     fprintf(fp, "M");
-    for (int i = 0; i < n_items; i++) {
-        fprintf(fp, ";%3d", bd->shapes[0].items[i].M);
+    for (int i = 0; i < num_m; i++) {
+        fprintf(fp, ";%2d", bd->shapes[0].items[i].M);
     }
     fprintf(fp, "\n");
 
     for (int i = 0; i < bd->n_shapes; i++) {
-        struct bench_dat_shape *s = &bd->shapes[i];
+        struct bench_data_shape *s = &bd->shapes[i];
         fprintf(fp, "NxK=%dx%d", s->N, s->K);
-        for (int j = 0; j < n_items; j++) {
+        for (int j = 0; j < num_m; j++) {
             fprintf(fp, ";%6.3f", s->items[j].gpu_comp / 1000.0);
         }
         fprintf(fp, "\n");
@@ -546,66 +461,122 @@ static void write_benches_csv(struct bench_dat *bd, FILE *fp) {
 }
 
 // print benchmark as binary file: for load by llama.
-static void write_benches_txt(struct bench_dat *bd, FILE *fp) {
-    fprintf(fp, "%d\n", bd->n_shapes);
+static void write_bench_data(struct bench_data *bd, FILE *fp) {
+    fprintf(fp, "%s %d\n", bd->model, bd->n_shapes);
 
     for (int i = 0; i < bd->n_shapes; i++) {
-        struct bench_dat_shape *s = &bd->shapes[i];
+        struct bench_data_shape *s = &bd->shapes[i];
 
-        fprintf(fp, "%5d %d\n", s->N, s->K);
-        fprintf(fp, "%d\n", s->n_items);
+        fprintf(fp, "%d %d %d %d\n", s->N, s->K, s->m_step, s->num_m);
 
-        for (int j = 0; j < s->n_items; j++) {
-            struct bench_dat_item *item = &s->items[j];
-            fprintf(fp, "%3d %6lld %6lld %6lld %6lld\n", item->M,
+        for (int j = 0; j < s->num_m; j++) {
+            struct bench_data_item *item = &s->items[j];
+            fprintf(fp, "%2d %6lld %6lld %6lld %6lld\n", item->M,
                     item->cpu_init, item->cpu_comp, item->gpu_init,
                     item->gpu_comp);
         }
     }
 }
 
-static void write_benches_dat(struct bench_dat *bd, FILE *fp) {
-    fwrite(&bd->n_shapes, sizeof(int32_t), 1, fp);
+static void read_bench_data(struct bench_data *bd, FILE *fp) {
+    fscanf(fp, "%s %d", bd->model, &bd->n_shapes);
+    bd->shapes = malloc(sizeof(struct bench_data_shape) * bd->n_shapes);
 
     for (int i = 0; i < bd->n_shapes; i++) {
-        struct bench_dat_shape *s = &bd->shapes[i];
+        struct bench_data_shape *s = &bd->shapes[i];
 
-        fwrite(&s->N, sizeof(int32_t), 1, fp);
-        fwrite(&s->K, sizeof(int32_t), 1, fp);
+        fscanf(fp, "%d", &s->N);
+        fscanf(fp, "%d", &s->K);
+        fscanf(fp, "%d", &s->m_step);
+        fscanf(fp, "%d", &s->num_m);
 
-        fwrite(&s->n_items, sizeof(int32_t), 1, fp);
+        s->items = malloc(sizeof(struct bench_data_item) * s->num_m);
 
-        for (int j = 0; j < s->n_items; j++) {
-            struct bench_dat_item *item = &s->items[j];
-            fwrite(&item->M, sizeof(int32_t), 1, fp);
-            fwrite(&item->cpu_init, sizeof(int64_t), 1, fp);
-            fwrite(&item->cpu_comp, sizeof(int64_t), 1, fp);
-            fwrite(&item->gpu_init, sizeof(int64_t), 1, fp);
-            fwrite(&item->gpu_comp, sizeof(int64_t), 1, fp);
+        for (int j = 0; j < s->num_m; j++) {
+            struct bench_data_item *item = &s->items[j];
+            fscanf(fp, "%d", &item->M);
+            fscanf(fp, "%lld", &item->cpu_init);
+            fscanf(fp, "%lld", &item->cpu_comp);
+            fscanf(fp, "%lld", &item->gpu_init);
+            fscanf(fp, "%lld", &item->gpu_comp);
         }
     }
 }
 
-static void load_benches_dat(struct bench_dat *bd, FILE *fp) {
-    fread(&bd->n_shapes, sizeof(int32_t), 1, fp);
-    bd->shapes = malloc(sizeof(struct bench_dat_shape) * bd->n_shapes);
+static void test_compare_bench_data(struct bench_data *bd,
+                                    struct bench_data *bd2) {
+    BENCH_ASSERT(bd->n_shapes == bd2->n_shapes);
 
     for (int i = 0; i < bd->n_shapes; i++) {
-        struct bench_dat_shape *s = &bd->shapes[i];
+        struct bench_data_shape *s1 = &bd->shapes[i];
+        struct bench_data_shape *s2 = &bd2->shapes[i];
+        BENCH_ASSERT(s1->N == s2->N);
+        BENCH_ASSERT(s1->K == s2->K);
 
-        fread(&s->N, sizeof(int32_t), 1, fp);
-        fread(&s->K, sizeof(int32_t), 1, fp);
-        fread(&s->n_items, sizeof(int32_t), 1, fp);
+        BENCH_ASSERT(s1->num_m == s2->num_m);
 
-        s->items = malloc(sizeof(struct bench_dat_item) * s->n_items);
+        for (int j = 0; j < s1->num_m; j++) {
+            struct bench_data_item *item1 = &s1->items[j];
+            struct bench_data_item *item2 = &s2->items[j];
 
-        for (int j = 0; j < s->n_items; j++) {
-            struct bench_dat_item *item = &s->items[j];
-            fread(&item->M, sizeof(int32_t), 1, fp);
-            fread(&item->cpu_init, sizeof(int64_t), 1, fp);
-            fread(&item->cpu_comp, sizeof(int64_t), 1, fp);
-            fread(&item->gpu_init, sizeof(int64_t), 1, fp);
-            fread(&item->gpu_comp, sizeof(int64_t), 1, fp);
+            BENCH_ASSERT(item1->M == item2->M);
+            BENCH_ASSERT(item1->cpu_init == item2->cpu_init);
+            BENCH_ASSERT(item1->cpu_comp == item2->cpu_comp);
+            BENCH_ASSERT(item1->gpu_init == item2->gpu_init);
+            BENCH_ASSERT(item1->gpu_comp == item2->gpu_comp);
         }
+    }
+}
+
+static void test_estimate_xpu_time(void) {
+    struct bench_data bd;
+
+    const char *data_file = "q4_0-mulmat-bench.7B.txt";
+
+    FILE *fp = fopen(data_file, "r");
+    BENCH_ASSERT(fp);
+
+    read_bench_data(&bd, fp);
+    fclose(fp);
+
+    const double error_bound = 0.01;
+
+    // These can be read from data file.
+    const int nth = 1;
+    const int N = bd.shapes[0].N;
+    const int K = bd.shapes[0].K;
+    const int num_m = bd.shapes[0].num_m;
+    const int m_step = bd.shapes[0].m_step;
+
+    BENCH_ASSERT(num_m > 2);
+    BENCH_ASSERT(m_step % 2 == 0);
+
+    const int m_max = m_step * num_m;
+
+    const int num_tests = 4;
+
+    const int Ms[num_tests] = {m_step, m_step + m_step / 2,
+                               m_step * 2, m_max + 1};
+
+    int64_t T[num_tests];
+
+    for (int i = 0; i < 2; i++) {
+        printf("\n====== test: estimate %s time\n", i == 0 ? "CPU" : "GPU");
+
+        for (int j = 0; j < num_tests; j++) {
+            int M = Ms[j];
+            T[j] = (i == 0) ? estimate_time(&bd, M, N, K, nth, true)
+                            : estimate_time(&bd, M, N, K, nth, false);
+            printf("M: %2d, N: %5d, K: %5d, nth: %d, time: %6lld\n", M, N, K,
+                   nth, T[j]);
+        }
+
+        int64_t sum = T[0] + T[2];
+        double diff = sum - 2 * T[1];
+        if (diff < 0) {
+            diff = -diff;
+        }
+        BENCH_ASSERT((diff / sum) < error_bound);
+        BENCH_ASSERT(T[3] == -1);
     }
 }

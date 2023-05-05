@@ -36,7 +36,7 @@ endif
 # keep standard at C11 and C++11
 CFLAGS   = -I.              -O3 -DNDEBUG -std=c11   -fPIC #-DGGML_IDLE_COND_WAIT=20 -DGGML_MULMAT_PERF -DGGML_MULMAT_DEVICE_DEBUG
 CXXFLAGS = -I. -I./examples -O3 -DNDEBUG -std=c++11 -fPIC
-LDFLAGS  =
+LDFLAGS  = -lm
 
 # warnings
 CFLAGS   += -Wall -Wextra -Wpedantic -Wcast-qual -Wdouble-promotion -Wshadow -Wstrict-prototypes -Wpointer-arith
@@ -106,13 +106,13 @@ ifneq ($(UNAME_S),Linux)
 endif
 ifeq ($(UNAME_S),Darwin)
 	# openblas installed with Homebew on macOS.
-	CFLAGS  += -I/usr/local/opt/openblas/include/
-	LDFLAGS += -L/usr/local/opt/openblas/lib/
+	CFLAGS  += -I/usr/local/opt/openblas/include
+	LDFLAGS += -L/usr/local/opt/openblas/lib
 endif
 ifeq ($(UNAME_S),Linux)
 	# libopenblas64-pthread-dev on ubunntu.
-	CFLAGS  += -I/usr/include/x86_64-linux-gnu/openblas64-pthread/
-	LDFLAGS += -L/usr/lib/x86_64-linux-gnu/openblas64-pthread/
+	CFLAGS  += -I/usr/include/x86_64-linux-gnu/openblas64-pthread
+	LDFLAGS += -lopenblas64 -L/usr/lib/x86_64-linux-gnu/openblas64-pthread
 endif
 endif
 ifdef LLAMA_CUBLAS
