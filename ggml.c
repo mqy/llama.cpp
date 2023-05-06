@@ -4223,8 +4223,8 @@ static inline void ggml_mulmat_perf_set(struct ggml_tensor * node, int64_t time_
     }
 
     GGML_MULMAT_DEVICE_PRINT("%s: num keys: %3d, device: %1d, "
-        "M: %5lld, N: %5lld, K: %5lld, T: %2d, "
-        "v[0]: %6lld, v[1]: %6lld, v[2]: %6lld, v[3]: %6lld\n",
+        "M: %5" PRId64 ", N: %5" PRId64 ", K: %5" PRId64 ", T: %2d, "
+        "v[0]: %6" PRId64 ", v[1]: %6" PRId64 ", v[2]: %6" PRId64 ", v[3]: %6" PRId64 "\n",
         __func__, perf->len, device, M, N, K, T, v[0],v [1], v[2], v[3]);
 }
 
@@ -8362,7 +8362,7 @@ static inline void ggml_mulmat_adjust_device(struct ggml_tensor *node) {
                         node->sched.device = GGML_DEVICE_GPU;
                     } else {
                         enum ggml_device_type device = e->cpu[3] < e->gpu[3]? GGML_DEVICE_CPU : GGML_DEVICE_GPU;
-                        GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, choose the fastest. cpu time: %lld, gpu time: %lld\n", device, e->cpu[3], e->gpu[3]);
+                        GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, choose the fastest. cpu time: %" PRId64 ", gpu time: %" PRId64 "\n", device, e->cpu[3], e->gpu[3]);
                         node->sched.device = device;
                     }
                 }
@@ -8584,7 +8584,8 @@ static void ggml_compute_forward_mul_mat_f16_f32(
             is_auto_device = true;
         }
 
-        size_t work_size_cpu, work_size_gpu;
+        size_t work_size_cpu = 0;
+        size_t work_size_gpu = 0;
 
         if (dst->sched.work_size == 0) {
             work_size_gpu = GGML_TYPE_SIZE[GGML_TYPE_F32]*(src0->ne[0]*src0->ne[1]);
@@ -9094,7 +9095,7 @@ int64_t t__0 = ggml_time_us();
                     }
                 }
             }
-printf("====== BLAS INIT: M: %5lld, N: %5lld, K: %5lld, %d-th, %6lld\n", M, N, K, ith, ggml_time_us() - t__0);
+printf("====== BLAS INIT: M: %5" PRId64 ", N: %5" PRId64 ", K: %5" PRId64 ", %d-th, %6" PRId64 "\n", M, N, K, ith, ggml_time_us() - t__0);
             return;
         }
 
@@ -9117,7 +9118,7 @@ int64_t t__0 = ggml_time_us();
             }
         }
 
-printf("====== BLAS COMP: M: %5lld, N: %5lld, K: %5lld, %d-th, %6lld\n", M, N, K, ith, ggml_time_us() - t__0);
+printf("====== BLAS COMP: M: %5" PRId64 ", N: %5" PRId64 ", K: %5" PRId64 ", %d-th, %6" PRId64 "\n", M, N, K, ith, ggml_time_us() - t__0);
 
         return;
 #else
@@ -9144,7 +9145,7 @@ int64_t t__0 = ggml_time_us();
                 }
             }
         }
-printf("====== CPU  INIT: M: %5lld, N: %5lld, K: %5lld, %d-th, %6lld\n", M, N, K, ith, ggml_time_us() - t__0);
+printf("====== CPU  INIT: M: %5" PRId64 ", N: %5" PRId64 ", K: %5" PRId64 ", %d-th, %6" PRId64 "\n", M, N, K, ith, ggml_time_us() - t__0);
         return;
     }
 
@@ -9192,7 +9193,7 @@ int64_t t__0 = ggml_time_us();
         }
     }
 
-printf("====== CPU  COMP: M: %5lld, N: %5lld, K: %5lld, %d-th, %6lld\n", M, N, K, ith, ggml_time_us() - t__0);
+printf("====== CPU  COMP: M: %5" PRId64 ", N: %5" PRId64 ", K: %5" PRId64 ", %d-th, %6" PRId64 "\n", M, N, K, ith, ggml_time_us() - t__0);
 
     //int64_t t1 = ggml_time_us();
     //static int64_t acc = 0;
@@ -11811,7 +11812,7 @@ static void ggml_graph_compute_plan(struct ggml_context * ctx, struct ggml_cgrap
 //             int64_t K = node->src1->ne[0];
 //             enum ggml_type T = node->src0->type;
 
-//             printf("\n==== M: %lld, N: %lld, K: %lld, src0 type: %d\n", M,  N, K, T);
+//             printf("\n==== M: %" PRId64 ", N: %" PRId64 ", K: %" PRId64 ", src0 type: %d\n", M,  N, K, T);
 // }
 //         }
 //     }
