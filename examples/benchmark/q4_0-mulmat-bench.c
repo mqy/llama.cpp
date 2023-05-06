@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 // Build Apple Accelerate:
-//     LLAMA_NO_ACCELERATE= LLAMA_OPENBLAS=   make q4_0-mulmat-bench
+//     LLAMA_NO_ACCELERATE=  LLAMA_OPENBLAS=   make q4_0-mulmat-bench
 
 // Build OPENBLAS:
 //     LLAMA_NO_ACCELERATE=1 LLAMA_OPENBLAS=1 make q4_0-mulmat-bench
@@ -42,11 +42,11 @@
 #define NUM_BENCH 5
 
 struct bench_params {
-    const char *model;
+    char *model;
     const struct model_nk_shape *shapes;
-    const int n_shapes;
-    const int m_step;
-    const int num_m;
+    int n_shapes;
+    int m_step;
+    int num_m;
 };
 
 struct bench_data_stats {
@@ -133,7 +133,8 @@ struct ggml_compute_params {
 };
 
 static int64_t time_us(void);
-static bool yes_no(const char *prompt);
+static bool util__yes_no(const char *prompt);
+static void util__progress(int i, int max);
 
 static int64_t bench_time_avg(int64_t *a, int len);
 static void write_bench_data(struct bench_data *bd, FILE *file);
@@ -194,6 +195,12 @@ int main(int argc, char **argv) {
             .shapes = NULL,
         };
 
+        if (false) {
+            // for M from 16 through 512.
+            params.m_step = 32;
+            params.num_m = 16;
+        }
+
         params.model = argv[2];
 
         const char *data_file = NULL;
@@ -214,7 +221,7 @@ int main(int argc, char **argv) {
                              "%s: data file '%s' exists, override? (Y|n)", cmd,
                              data_file);
 
-                    if (!yes_no(prompt)) {
+                    if (!util__yes_no(prompt)) {
                         printf("Aborted.\n");
                         exit(1);
                     }
@@ -346,7 +353,9 @@ void cmd_bench(const struct bench_params *params, struct bench_data *bd) {
 
     {
         BENCH_ASSERT(params->model);
-        strncpy(bd->model, params->model, strlen(params->model));
+        size_t n = strlen(params->model);
+        strncpy(bd->model, params->model, n);
+        bd->model[n] = '\0';
         bd->n_shapes = params->n_shapes;
         bd->shapes = NULL;
 
@@ -376,7 +385,8 @@ void cmd_bench(const struct bench_params *params, struct bench_data *bd) {
         int32_t M;
         for (int im = 0; im < bench_shape->num_m; im++) {
             M = params->m_step * (im + 1);
-            printf("%5d, %5d, %3d\n", N, K, M);
+            printf("%5d %5d %3d ", N, K, M);
+            fflush(stdout);
 
             struct ggml_context *ctx = NULL;
             {
@@ -435,6 +445,7 @@ void cmd_bench(const struct bench_params *params, struct bench_data *bd) {
                     mock__ggml_compute_forward_mul_mat_q_f32(
                         &compute_params, src0, src1, dst, M, N, K);
                     bench_item->stats.cpu_init[nb] = time_us() - t0;
+                    util__progress(nb, NUM_BENCH);
                 }
 
                 compute_params.type = GGML_TASK_COMPUTE;
@@ -445,6 +456,7 @@ void cmd_bench(const struct bench_params *params, struct bench_data *bd) {
                     mock__ggml_compute_forward_mul_mat_q_f32(
                         &compute_params, src0, src1, dst, M, N, K);
                     bench_item->stats.cpu_comp[nb] = time_us() - t0;
+                    util__progress(nb, NUM_BENCH);
                 }
             }
 
@@ -458,6 +470,7 @@ void cmd_bench(const struct bench_params *params, struct bench_data *bd) {
                     mock__ggml_compute_forward_mul_mat_q_f32(
                         &compute_params, src0, src1, dst, M, N, K);
                     bench_item->stats.gpu_init[nb] = time_us() - t0;
+                    util__progress(nb, NUM_BENCH);
                 }
 
                 compute_params.type = GGML_TASK_COMPUTE;
@@ -467,8 +480,10 @@ void cmd_bench(const struct bench_params *params, struct bench_data *bd) {
                     mock__ggml_compute_forward_mul_mat_q_f32(
                         &compute_params, src0, src1, dst, M, N, K);
                     bench_item->stats.gpu_comp[nb] = time_us() - t0;
+                    util__progress(nb, NUM_BENCH);
                 }
             }
+            printf("\n");
 
             ggml_free(ctx);
         }
@@ -625,7 +640,7 @@ static int64_t time_us(void) {
     return (int64_t)ts.tv_sec * 1000000 + (int64_t)ts.tv_nsec / 1000;
 }
 
-static bool yes_no(const char *prompt) {
+static bool util__yes_no(const char *prompt) {
     char buf[2];
     while (true) {
         fprintf(stderr, "%s\n", prompt);
@@ -651,6 +666,19 @@ static bool yes_no(const char *prompt) {
             }
         }
     }
+}
+
+static void util__progress(int i, int n) {
+    char tokens[4] = {'|', '/', '-', '\\'};
+    if (i > 0) {
+        putchar('\b');
+    }
+    if (i + 1 < n) {
+        putchar(tokens[i % 4]);
+    } else {
+        putchar('.');
+    }
+    fflush(stdout);
 }
 
 static int64_t bench_time_avg(int64_t *a, int len) {
@@ -784,7 +812,6 @@ static void cmd_analyze(struct bench_data *bd) {
             struct bench_data_shape *s = &bd->shapes[i];
             printf("#NxK=%dx%d,M", s->N, s->K);
 
-            printf("M");
             for (int j = 0; j < s->num_m; j++) {
                 printf(";%3d", s->items[j].M);
             }
