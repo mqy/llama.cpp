@@ -9,12 +9,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-// Build Apple Accelerate:
-//     LLAMA_NO_ACCELERATE=  LLAMA_OPENBLAS=   make q4_0-mulmat-bench
-
-// Build OPENBLAS:
-//     LLAMA_NO_ACCELERATE=1 LLAMA_OPENBLAS=1 make q4_0-mulmat-bench
-
 #if defined(GGML_USE_ACCELERATE)
 #include <Accelerate/Accelerate.h>
 #elif defined(GGML_USE_OPENBLAS)
@@ -167,7 +161,11 @@ int main(int argc, char **argv) {
     printf("\n");
 
 #if !(defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS))
-    fprintf(stderr, "GGML_USE_ACCELERATE or GGML_USE_OPENBLAS: undefined\n");
+    fprintf(stderr, "GGML_USE_ACCELERATE or GGML_USE_OPENBLAS: undefined\n"
+                    "build with accelerate: LLAMA_NO_ACCELERATE=  "
+                    "LLAMA_OPENBLAS=   make q4_0-mulmat-bench"
+                    "build with openblas:   LLAMA_NO_ACCELERATE=1 "
+                    "LLAMA_OPENBLAS=1  make q4_0-mulmat-bench");
     exit(1);
 #endif
 
@@ -212,7 +210,7 @@ int main(int argc, char **argv) {
                 int rc = stat(data_file, &st);
                 UNUSED(st);
                 if (rc == 0) { // prompt
-                    size_t len = strlen(data_file) + 100;
+                    size_t len = strlen(data_file) + 40;
                     char *prompt = malloc(len);
                     BENCH_ASSERT(prompt);
                     snprintf(prompt, len,
@@ -221,7 +219,7 @@ int main(int argc, char **argv) {
 
                     if (!util__yes_no(prompt)) {
                         printf("Aborted.\n");
-                        exit(1);
+                        exit(2);
                     }
                     free(prompt);
                 }
@@ -244,18 +242,16 @@ int main(int argc, char **argv) {
         struct bench_data bd;
         cmd_bench(&params, &bd);
 
-        if (fp == NULL) {
-            fp = stdout;
-        }
-
-        write_bench_data(&bd, fp);
-
         printf("\n");
+        write_bench_data(&bd, fp == NULL ? stdout : fp);
         if (fp != NULL) {
-            printf("%s: the result was written to %s\n", cmd, data_file);
             fclose(fp);
         }
-        printf("%s: done!\n", cmd);
+
+        if (data_file != NULL) {
+            printf("%s: result was written to %s\n", cmd, data_file);
+        }
+        printf("\n%s: done!\n", cmd);
     } else if (strcmp(cmd, "analyze") == 0) {
         if (argc < 3) {
             fprintf(stderr, "%s: too few args", cmd);
@@ -743,60 +739,83 @@ static void cmd_analyze(struct bench_data *bd) {
     {
         int num_m = bd->shapes[0].num_m;
 
-        printf("M");
+        printf("#M");
         for (int i = 0; i < num_m; i++) {
-            printf(";%2d", bd->shapes[0].items[i].M);
+            printf(";%3d", bd->shapes[0].items[i].M);
         }
         printf("\n");
 
+        // Nothing but for pretty align.
+        size_t buf_slot_size = 24;
+        char * buf = malloc(buf_slot_size * bd->n_shapes);
+
+        size_t max_nxk_len = 0;
         for (int i = 0; i < bd->n_shapes; i++) {
             struct bench_data_shape *s = &bd->shapes[i];
-            printf("NxK=%dx%d", s->N, s->K);
+            size_t offset = i*buf_slot_size;
+            snprintf(&buf[offset], buf_slot_size, "NxK=%dx%d", s->N, s->K);
+            size_t len = strlen(&buf[offset]);
+            if (len > max_nxk_len) {
+                max_nxk_len = len;
+            }
+        }
+
+        for (int i = 0; i < bd->n_shapes; i++) {
+            struct bench_data_shape *s = &bd->shapes[i];
+
+            size_t offset = i*buf_slot_size;
+            printf("%s", &buf[offset]);
+            for (int j = 0; j < max_nxk_len - strlen(&buf[offset]); j++) {
+                printf(" ");
+            }
+
             for (int j = 0; j < num_m; j++) {
-                printf(";%7.3f", s->items[j].gpu_comp_avg / 1000.0);
+                printf(";%8.3f", s->items[j].gpu_comp_avg / 1000.0);
             }
             printf("\n");
         }
+
+        free(buf);
     }
 
     printf("\ndetails for each shape: \n\n");
     {
         for (int i = 0; i < bd->n_shapes; i++) {
             struct bench_data_shape *s = &bd->shapes[i];
-            printf("#NxK=%dx%d,M", s->N, s->K);
+            printf("#M@NxK=%dx%d", s->N, s->K);
 
             for (int j = 0; j < s->num_m; j++) {
-                printf(";%2d", s->items[j].M);
+                printf(";%3d", s->items[j].M);
             }
             printf("\n");
 
             printf("cpu_init");
             for (int j = 0; j < s->num_m; j++) {
-                printf(";%7.3f", s->items[j].cpu_init_avg / 1000.0);
+                printf(";%8.3f", s->items[j].cpu_init_avg / 1000.0);
             }
             printf("\n");
 
             printf("cpu_comp");
             for (int j = 0; j < s->num_m; j++) {
-                printf(";%7.3f", s->items[j].cpu_comp_avg / 1000.0);
+                printf(";%8.3f", s->items[j].cpu_comp_avg / 1000.0);
             }
             printf("\n");
 
             printf("gpu_init");
             for (int j = 0; j < s->num_m; j++) {
-                printf(";%7.3f", s->items[j].gpu_init_avg / 1000.0);
+                printf(";%8.3f", s->items[j].gpu_init_avg / 1000.0);
             }
             printf("\n");
 
             printf("gpu_comp");
             for (int j = 0; j < s->num_m; j++) {
-                printf(";%7.3f", s->items[j].gpu_comp_avg / 1000.0);
+                printf(";%8.3f", s->items[j].gpu_comp_avg / 1000.0);
             }
             printf("\n\n");
         }
     }
 
-    printf("\nn_threads affects: \n\n");
+    printf("n_threads affects: \n\n");
     {
         const int nth_list[5] = {1, 2, 4, 6, 8};
         for (int i = 0; i < bd->n_shapes; i++) {
@@ -804,7 +823,7 @@ static void cmd_analyze(struct bench_data *bd) {
                 printf("\n");
             }
             struct bench_data_shape *s = &bd->shapes[i];
-            printf("#NxK=%dx%d,M", s->N, s->K);
+            printf("#M@NxK=%dx%d", s->N, s->K);
 
             for (int j = 0; j < s->num_m; j++) {
                 printf(";%3d", s->items[j].M);
@@ -816,7 +835,7 @@ static void cmd_analyze(struct bench_data *bd) {
 
                 printf("cpu_nth_%d", nth);
                 for (int j = 0; j < s->num_m; j++) {
-                    printf(";%7.3f", (s->items[j].cpu_init_avg +
+                    printf(";%8.3f", (s->items[j].cpu_init_avg +
                                       s->items[j].cpu_comp_avg / nth) /
                                          1000.0);
                 }
@@ -824,7 +843,7 @@ static void cmd_analyze(struct bench_data *bd) {
 
                 printf("gpu_nth_%d", nth);
                 for (int j = 0; j < s->num_m; j++) {
-                    printf(";%7.3f", (s->items[j].gpu_init_avg / nth +
+                    printf(";%8.3f", (s->items[j].gpu_init_avg / nth +
                                       s->items[j].gpu_comp_avg) /
                                          1000.0);
                 }
