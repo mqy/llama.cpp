@@ -765,7 +765,7 @@ static void cmd_analyze(struct bench_data *bd) {
 
             size_t offset = i*buf_slot_size;
             printf("%s", &buf[offset]);
-            for (int j = 0; j < max_nxk_len - strlen(&buf[offset]); j++) {
+            for (int j = 0; j < (int)(max_nxk_len - strlen(&buf[offset])); j++) {
                 printf(" ");
             }
 
