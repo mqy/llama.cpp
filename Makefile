@@ -117,10 +117,17 @@ endif
 endif
 ifdef LLAMA_CUBLAS
 	CFLAGS    += -DGGML_USE_CUBLAS -I/usr/local/cuda/include
-	LDFLAGS   += -lcublas -lculibos -lcudart -lcublasLt -lpthread -ldl -lrt -L/usr/local/cuda/lib64
+	# add -lstdc++ fixed: /usr/bin/ld: ggml-cuda.o:(.data.rel.local.DW.ref.__gxx_personality_v0[DW.ref.__gxx_personality_v0]+0x0): undefined reference to `__gxx_personality_v0'
+collect2: error: ld returned 1 exit status
+	LDFLAGS   += -lstdc++ -lcublas -lculibos -lcudart -lcublasLt -lpthread -ldl -lrt -L/usr/local/cuda/lib64
+ifeq ($(UNAME_S),Linux)
+	# Ubuntu: sudo apt install nvidia-cuda-dev nvidia-cuda-toolkit
+	LDFLAGS += -L/usr/lib/x86_64-linux-gnu
+endif
 	OBJS      += ggml-cuda.o
 	NVCC      = nvcc
-	NVCCFLAGS = --forward-unknown-to-host-compiler -arch=native
+	# nvcc fatal   : Value 'native' is not defined for option 'gpu-architecture'
+	NVCCFLAGS = --forward-unknown-to-host-compiler -arch=ms_87
 ggml-cuda.o: ggml-cuda.cu ggml-cuda.h
 	$(NVCC) $(NVCCFLAGS) $(CXXFLAGS) -Wno-pedantic -c $< -o $@
 endif

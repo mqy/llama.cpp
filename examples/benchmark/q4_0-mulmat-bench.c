@@ -13,6 +13,8 @@
 #include <Accelerate/Accelerate.h>
 #elif defined(GGML_USE_OPENBLAS)
 #include <cblas.h>
+#elif defined(GGML_USE_CUBLAS)
+#include "ggml-cuda.h"
 #endif
 
 // For single thread:
@@ -35,6 +37,7 @@
 
 struct bench_params {
     char *model;
+    char *gpu_impl;
     const struct model_nk_shape *shapes;
     int n_shapes;
     int m_step;
@@ -48,6 +51,9 @@ struct bench_data_stats {
     int gpu_init[NUM_BENCH];
     int gpu_comp[NUM_BENCH];
 };
+
+// TODO: config task stages(init, compute, finalize) for cpu, gpu(accelerate,
+// openblas, cublas)
 
 struct bench_data_item {
     int M;
@@ -76,6 +82,7 @@ struct bench_data_shape {
 // top bench data to write/read to/from file.
 struct bench_data {
     char model[4]; // 7B | 13B
+    char gpu_impl[20];
     int n_shapes;
     struct bench_data_shape *shapes;
 };
@@ -97,36 +104,10 @@ const struct model_nk_shape model_nk_shape_13b[] = {
     {13824, 5120},
 };
 
-// enum ggml_device_type {
-//     GGML_DEVICE_CPU = 1,
-//     GGML_DEVICE_GPU = 2,
-// }
-
-// copied from ggml.c
-enum ggml_task_type {
-    GGML_TASK_INIT = 0,
-    GGML_TASK_COMPUTE,
-    GGML_TASK_FINALIZE,
-};
-
-// copied from ggml.c
-struct ggml_compute_params {
-    enum ggml_task_type type;
-    int n_threads;
-
-    int ith, nth;
-
-    // work buffer for all threads
-    size_t wsize;
-    void *wdata;
-
-    // add device
-    enum ggml_device_type device;
-};
-
 static int64_t time_us(void);
 static bool util__yes_no(const char *prompt);
 static void util__progress(int i, int max);
+static void util__envs_for_gpu_feature(int feature, char *buf, int buf_len);
 
 static int bench_time_avg(int *a, int len);
 static void write_bench_data(struct bench_data *bd, FILE *file);
@@ -135,39 +116,44 @@ static void read_bench_data(struct bench_data *bd, FILE *file);
 static int estimate_time(struct bench_data *bd, int M, int N, int K, int nth,
                          bool is_cpu);
 
-static void mock__ggml_compute_forward_mul_mat_q_f32(
-    const struct ggml_compute_params *params, const struct ggml_tensor *src0,
-    const struct ggml_tensor *src1, struct ggml_tensor *dst, int M, int N,
-    int K);
-
 static void cmd_bench(const struct bench_params *params, struct bench_data *bd);
 static void cmd_analyze(struct bench_data *bd);
 static void cmd_test(struct bench_data *bd);
 
 static void usage(char *prog) {
     fprintf(stderr,
-            "usage: %s <command args ...>\n"
-            "\t%s bench   <model> [data-file], where: model is 7B or 13B, the "
+            "usage:\n"
+            "* %s bench   <model> [data-file], where: model is 7B or 13B, the "
             "optional data-file is used to write bench result to\n"
-            "\t%s analyze <data-file>,         where: data-file is used to "
+            "* %s analyze <data-file>,         where: data-file is used to "
             "read bench result from\n"
-            "\t%s test    <data-file>,         where: data-file is used to "
+            "* %s test    <data-file>,         where: data-file is used to "
             "read bench result from\n",
-            prog, prog, prog, prog);
+            prog, prog, prog);
 }
 
 // main
 int main(int argc, char **argv) {
     printf("\n");
 
-#if !(defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS))
-    fprintf(stderr, "GGML_USE_ACCELERATE or GGML_USE_OPENBLAS: undefined\n"
-                    "build with accelerate: LLAMA_NO_ACCELERATE=  "
-                    "LLAMA_OPENBLAS=   make q4_0-mulmat-bench"
-                    "build with openblas:   LLAMA_NO_ACCELERATE=1 "
-                    "LLAMA_OPENBLAS=1  make q4_0-mulmat-bench");
-    exit(1);
-#endif
+    if (!ggml_cpu_has_blas()) {
+        const char *make_target = "q4_0-mulmat-bench";
+        fprintf(stderr, "GGML_USE_ACCELERATE, GGML_USE_OPENBLAS, LLAMA_CUBLAS: "
+                        "undefined.\n");
+
+        char buf[100];
+        util__envs_for_gpu_feature(1, buf, 100);
+        fprintf(stderr, "* build with accelerate: %s make %s\n", buf,
+                make_target);
+        util__envs_for_gpu_feature(2, buf, 100);
+        fprintf(stderr, "* build with openBLAS:   %s make %s\n", buf,
+                make_target);
+        util__envs_for_gpu_feature(3, buf, 100);
+        fprintf(stderr, "* build with cuBLAS:     %s make %s\n", buf,
+                make_target);
+
+        exit(1);
+    }
 
     if (argc < 2) {
         fprintf(stderr, "need sub command");
@@ -198,6 +184,13 @@ int main(int argc, char **argv) {
         }
 
         params.model = argv[2];
+#if defined(GGML_USE_ACCELERATE)
+        params.gpu_impl = "ACCELERATE";
+#elif defined(GGML_USE_OPENBLAS)
+        params.gpu_impl = "OPENBLAS";
+#elif defined(GGML_USE_CUBLAS)
+        params.gpu_impl = "CUBLAS";
+#endif
 
         const char *data_file = NULL;
         FILE *fp = NULL;
@@ -234,6 +227,7 @@ int main(int argc, char **argv) {
         } else if (strcmp(params.model, "13B") == 0) {
             params.shapes = model_nk_shape_13b;
         } else {
+            // TODO: support 30B and 65B.
             fprintf(stderr, "%s: unsupported model: %s", cmd, params.model);
             usage(argv[0]);
             exit(1);
@@ -309,7 +303,7 @@ int main(int argc, char **argv) {
         cmd_test(&bd);
         printf("\n%s: done!\n", cmd);
     } else {
-        fprintf(stderr, "unknown command: %s", cmd);
+        fprintf(stderr, "unknown command: %s.\n", cmd);
         usage(argv[0]);
         exit(1);
     }
@@ -346,9 +340,12 @@ void cmd_bench(const struct bench_params *params, struct bench_data *bd) {
     }
 
     {
-        BENCH_ASSERT(params->model);
-        memset(bd->model, 0, 4);
+        memset(bd->model, 0, sizeof(bd->model));
         strncpy(bd->model, params->model, sizeof(bd->model) - 1);
+
+        memset(bd->gpu_impl, 0, sizeof(bd->gpu_impl));
+        strncpy(bd->gpu_impl, params->gpu_impl, sizeof(bd->gpu_impl) - 1);
+
         bd->n_shapes = params->n_shapes;
         bd->shapes = NULL;
 
@@ -359,6 +356,7 @@ void cmd_bench(const struct bench_params *params, struct bench_data *bd) {
     }
 
     for (int i = 0; i < params->n_shapes; i++) {
+        int M;
         int N = params->shapes[i].N;
         int K = params->shapes[i].K;
 
@@ -375,7 +373,6 @@ void cmd_bench(const struct bench_params *params, struct bench_data *bd) {
             memset(bench_shape->items, 0, sz);
         }
 
-        int M;
         for (int im = 0; im < bench_shape->num_m; im++) {
             M = params->m_step * (im + 1);
             printf("%5d %5d %3d ", N, K, M);
@@ -423,55 +420,55 @@ void cmd_bench(const struct bench_params *params, struct bench_data *bd) {
             bench_item->M = M;
 
             struct ggml_compute_params compute_params = {
+                .n_threads = 1,
+                .ith = 0,
+                .nth = 1,
                 .wsize = wdata_size,
                 .wdata = wdata,
             };
 
             {
-                compute_params.device = GGML_DEVICE_CPU;
+                dst->sched.device = GGML_DEVICE_CPU;
 
-                compute_params.type = GGML_TASK_INIT;
+                // without this, the first run may be significant slow.
                 memset(wdata, 0, wdata_size);
 
+                compute_params.type = GGML_TASK_INIT;
                 for (int nb = 0; nb < NUM_BENCH; nb++) {
                     int t0 = (int)time_us();
-                    mock__ggml_compute_forward_mul_mat_q_f32(
-                        &compute_params, src0, src1, dst, M, N, K);
+                    ggml_compute_forward_mul_mat_q_f32(&compute_params, src0,
+                                                       src1, dst);
                     bench_item->stats.cpu_init[nb] = (int)time_us() - t0;
                     util__progress(nb, NUM_BENCH);
                 }
 
                 compute_params.type = GGML_TASK_COMPUTE;
-                memset(wdata, 0, wdata_size);
-
                 for (int nb = 0; nb < NUM_BENCH; nb++) {
                     int t0 = (int)time_us();
-                    mock__ggml_compute_forward_mul_mat_q_f32(
-                        &compute_params, src0, src1, dst, M, N, K);
+                    ggml_compute_forward_mul_mat_q_f32(&compute_params, src0,
+                                                       src1, dst);
                     bench_item->stats.cpu_comp[nb] = (int)time_us() - t0;
                     util__progress(nb, NUM_BENCH);
                 }
             }
 
             {
-                compute_params.device = GGML_DEVICE_GPU;
+                dst->sched.device = GGML_DEVICE_GPU;
 
                 compute_params.type = GGML_TASK_INIT;
-
                 for (int nb = 0; nb < NUM_BENCH; nb++) {
                     int t0 = (int)time_us();
-                    mock__ggml_compute_forward_mul_mat_q_f32(
-                        &compute_params, src0, src1, dst, M, N, K);
+                    ggml_compute_forward_mul_mat_q_f32(&compute_params, src0,
+                                                       src1, dst);
                     bench_item->stats.gpu_init[nb] = (int)time_us() - t0;
                     util__progress(nb, NUM_BENCH);
                 }
 
                 compute_params.type = GGML_TASK_COMPUTE;
-                // gpu comp (single thread).
                 for (int nb = 0; nb < NUM_BENCH; nb++) {
                     int t0 = (int)time_us();
-                    mock__ggml_compute_forward_mul_mat_q_f32(
-                        &compute_params, src0, src1, dst, M, N, K);
+                    ggml_compute_forward_mul_mat_q_f32(&compute_params, src0,
+                                                       src1, dst);
                     bench_item->stats.gpu_comp[nb] = (int)time_us() - t0;
                     util__progress(nb, NUM_BENCH);
                 }
@@ -498,63 +495,6 @@ void cmd_bench(const struct bench_params *params, struct bench_data *bd) {
             item->gpu_comp_avg =
                 bench_time_avg(item->stats.gpu_comp, NUM_BENCH);
         }
-    }
-}
-
-static void mock__ggml_compute_forward_mul_mat_q_f32(
-    const struct ggml_compute_params *params, const struct ggml_tensor *src0,
-    const struct ggml_tensor *src1, struct ggml_tensor *dst, int M, int N,
-    int K) {
-
-    quantize_fns_t funcs = ggml_internal_get_quantize_fn(GGML_TYPE_Q4_0);
-    dequantize_row_q_t dequantize_row_q = funcs.dequantize_row_q;
-    quantize_row_q_t quantize_row_q = funcs.quantize_row_q;
-    vec_dot_q_t vec_dot_q = funcs.vec_dot_q;
-
-    if (params->device == GGML_DEVICE_CPU) {
-        if (params->type == GGML_TASK_INIT) {
-            for (int m = 0; m < M; m++) {
-                quantize_row_q((float *)((char *)src1->data + m * K),
-                               (char *)params->wdata + m * src1->nb[1], K);
-            }
-        } else if (params->type == GGML_TASK_COMPUTE) {
-            for (int m = 0; m < M; m++) {
-                float *src0_row = (float *)src0->data + m * N;
-                for (int n = 0; n < N; n++) {
-                    vec_dot_q(K, (float *)dst->data + m * N, src0_row,
-                              (float *)params->wdata + m * K + n);
-                }
-            }
-        } else {
-            abort();
-        }
-    } else if (params->device == GGML_DEVICE_GPU) {
-        if (params->type == GGML_TASK_INIT) {
-            for (int n = 0; n < N; n++) {
-                dequantize_row_q((const float *)src0->data + n * K,
-                                 (float *)params->wdata + n * K, K);
-            }
-        } else if (params->type == GGML_TASK_COMPUTE) {
-            const int lda = K;
-            const int ldb = K;
-            const int ldc = N;
-
-            const float alpha = 1.0f;
-            const float beta = 0.0f;
-
-            const float *A = (float *)src1->data;
-            const float *B = (float *)params->wdata;
-            float *C = (float *)dst->data;
-
-#if (defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS))
-            cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasTrans, M, N, K, alpha,
-                        A, lda, B, ldb, beta, C, ldc);
-#endif
-        } else {
-            abort();
-        }
-    } else {
-        abort();
     }
 }
 
@@ -600,6 +540,7 @@ static int estimate_time(struct bench_data *bd, int M, int N, int K, int nth,
             }
         }
     } else {
+#if defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS)
         for (int i = 0; i < shape->num_m; i++) {
             struct bench_data_item *item = &shape->items[i];
             if (item->M == M) {
@@ -622,6 +563,10 @@ static int estimate_time(struct bench_data *bd, int M, int N, int K, int nth,
                 return (int)(init + comp);
             }
         }
+#elif defined(GGML_USE_CUBLAS)
+        // TODO: support cuBLAS
+        abort();
+#endif
     }
 
     return -1;
@@ -631,6 +576,17 @@ static int64_t time_us(void) {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (int64_t)ts.tv_sec * 1000000 + (int64_t)ts.tv_nsec / 1000;
+}
+
+// feature: 1: apple accelerate, 2: openBLAS, 3: cuBLAS
+static void util__envs_for_gpu_feature(int feature, char *buf, int buf_len) {
+    memset(buf, 0, buf_len);
+    const char *LLAMA_NO_ACCELERATE = feature == 1 ? "" : "1";
+    const char *LLAMA_OPENBLAS = feature == 2 ? "1" : "";
+    const char *LLAMA_CUBLAS = feature == 3 ? "1" : "";
+    snprintf(buf, buf_len,
+             "LLAMA_NO_ACCELERATE=%s LLAMA_OPENBLAS=%s LLAMA_CUBLAS=%s",
+             LLAMA_NO_ACCELERATE, LLAMA_OPENBLAS, LLAMA_CUBLAS);
 }
 
 static bool util__yes_no(const char *prompt) {
@@ -695,7 +651,7 @@ static int bench_time_avg(int *a, int len) {
 }
 
 static void write_bench_data(struct bench_data *bd, FILE *fp) {
-    fprintf(fp, "%s %d\n", bd->model, bd->n_shapes);
+    fprintf(fp, "%s %d %s\n", bd->model, bd->n_shapes, bd->gpu_impl);
 
     for (int i = 0; i < bd->n_shapes; i++) {
         struct bench_data_shape *s = &bd->shapes[i];
@@ -711,7 +667,7 @@ static void write_bench_data(struct bench_data *bd, FILE *fp) {
 }
 
 static void read_bench_data(struct bench_data *bd, FILE *fp) {
-    int rc = fscanf(fp, "%s %d", bd->model, &bd->n_shapes);
+    int rc = fscanf(fp, "%s %d %s", bd->model, &bd->n_shapes, bd->gpu_impl);
     BENCH_ASSERT(rc > 0);
 
     bd->shapes = malloc(sizeof(struct bench_data_shape) * bd->n_shapes);
@@ -747,12 +703,12 @@ static void cmd_analyze(struct bench_data *bd) {
 
         // Nothing but for pretty align.
         size_t buf_slot_size = 24;
-        char * buf = malloc(buf_slot_size * bd->n_shapes);
+        char *buf = malloc(buf_slot_size * bd->n_shapes);
 
         size_t max_nxk_len = 0;
         for (int i = 0; i < bd->n_shapes; i++) {
             struct bench_data_shape *s = &bd->shapes[i];
-            size_t offset = i*buf_slot_size;
+            size_t offset = i * buf_slot_size;
             snprintf(&buf[offset], buf_slot_size, "NxK=%dx%d", s->N, s->K);
             size_t len = strlen(&buf[offset]);
             if (len > max_nxk_len) {
@@ -763,9 +719,10 @@ static void cmd_analyze(struct bench_data *bd) {
         for (int i = 0; i < bd->n_shapes; i++) {
             struct bench_data_shape *s = &bd->shapes[i];
 
-            size_t offset = i*buf_slot_size;
+            size_t offset = i * buf_slot_size;
             printf("%s", &buf[offset]);
-            for (int j = 0; j < (int)(max_nxk_len - strlen(&buf[offset])); j++) {
+            for (int j = 0; j < (int)(max_nxk_len - strlen(&buf[offset]));
+                 j++) {
                 printf(" ");
             }
 
@@ -858,7 +815,6 @@ static void cmd_test(struct bench_data *bd) {
 
     const double error_bound = 0.01;
 
-    // These can be read from data file.
     const int nth = 1;
     const int N = shape->N;
     const int K = shape->K;

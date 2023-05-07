@@ -328,6 +328,24 @@ cudaStream_t g_cudaStream = NULL;
 
 void ggml_init_cublas(void) {
     if (g_cublasH == NULL) {
+        // $ nvidia-detector returns None
+        int count = 0;
+        cudaError_t err = cudaGetDeviceCount(&count);
+        if (err != cudaSuccess) {
+            if (err == cudaErrorNoDevice) {
+                fprintf(stderr, "cuda: no device\n");
+            } else if (err == cudaErrorInsufficientDriver) {
+            fprintf(stderr, "cuda: no device\n");
+            } else {
+            fprintf(stderr, "cudaGetDeviceCount() returns error %d\n", err);
+            }
+            exit(1);
+        }
+        if (count == 0) {
+            fprintf(stderr, "cuda device not found\n");
+            exit(1);
+        }
+
         // create cublas handle, bind a stream
         CUBLAS_CHECK(cublasCreate(&g_cublasH));
 

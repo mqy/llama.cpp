@@ -4270,24 +4270,24 @@ struct ggml_context_container {
 // compute types
 //
 
-enum ggml_task_type {
-    GGML_TASK_INIT = 0,
-    GGML_TASK_COMPUTE,
-    GGML_TASK_FINALIZE,
+// enum ggml_task_type {
+//     GGML_TASK_INIT = 0,
+//     GGML_TASK_COMPUTE,
+//     GGML_TASK_FINALIZE,
 
-    GGML_TASK_PLAN = 10,
-};
+//     GGML_TASK_PLAN = 10,
+// };
 
-struct ggml_compute_params {
-    enum ggml_task_type type;
-    int n_threads;
+// struct ggml_compute_params {
+//     enum ggml_task_type type;
+//     int n_threads;
 
-    int ith, nth;
+//     int ith, nth;
 
-    // work buffer for all threads
-    size_t wsize;
-    void * wdata;
-};
+//     // work buffer for all threads
+//     size_t wsize;
+//     void * wdata;
+// };
 
 //
 // ggml state
@@ -8841,7 +8841,7 @@ static void ggml_compute_forward_mul_mat_f16_f32(
     //}
 }
 
-static void ggml_compute_forward_mul_mat_q_f32(
+void ggml_compute_forward_mul_mat_q_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
@@ -8862,8 +8862,7 @@ static void ggml_compute_forward_mul_mat_q_f32(
 
         if (dst->sched.device == GGML_DEVICE_GPU) {
 #if defined(GGML_USE_CUBLAS)
-            dst->sched.stage_flags[GGML_TASK_COMPUTE].n_tasks = 1;
-            dst->sched.stage_flags[GGML_TASK_COMPUTE].idle_wait = true;
+            dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 1);
             if (dst->sched.work_size == 0) {
                 dst->sched.work_size = work_size_cublas;
             }
@@ -8952,10 +8951,6 @@ static void ggml_compute_forward_mul_mat_q_f32(
 
     // nb01 >= nb00 - src0 is not transposed
     //   compute by src0 rows
-
-    int64_t M = dst->ne[1];
-    int64_t N = dst->ne[0];
-    int64_t K = dst->src1->ne[0];
 
     if (dst->sched.device == GGML_DEVICE_GPU) {
         GGML_ASSERT(ggml_is_contiguous(src0) && ggml_is_contiguous(src1));
@@ -9047,38 +9042,10 @@ static void ggml_compute_forward_mul_mat_q_f32(
 
         return;
 #elif defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS)
-        // GGML_ASSERT(nth == 1);
-        // GGML_ASSERT(params->type == GGML_TASK_COMPUTE);
-
-        // for (int64_t i03 = 0; i03 < ne03; i03++) {
-        //     for (int64_t i02 = 0; i02 < ne02; i02++) {
-        //         const float * y = (float *) ((char *) src1->data + i02*nb12 + i03*nb13);
-
-        //         float * d = (float *) ((char *) dst->data + i02*nb2 + i03*nb3);
-
-        //         {
-        //             size_t id = 0;
-        //             for (int64_t i01 = 0; i01 < ne01; ++i01) {
-        //                 dequantize_row_q((char *) src0->data + i03*nb03 + i02*nb02 + i01*nb01, wdata + id, ne00);
-        //                 id += ne00;
-        //             }
-        //         }
-        //         const float * x = wdata;
-
-        //         // zT = y * xT
-        //         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasTrans,
-        //                 ne11, ne01, ne10,
-        //                 1.0f,    y, ne10,
-        //                          x, ne00,
-        //                 0.0f,    d, ne01);
-        //     }
-        // }
-
         GGML_ASSERT(params->type == GGML_TASK_INIT || params->type == GGML_TASK_COMPUTE);
         GGML_ASSERT(ggml_is_contiguous(src0) && ggml_is_contiguous(src1));
 
         if (params->type == GGML_TASK_INIT) {
-int64_t t__0 = ggml_time_us();
             // rows per thread
             const int dr = (ne01 + nth - 1)/nth;
 
@@ -9095,11 +9062,8 @@ int64_t t__0 = ggml_time_us();
                     }
                 }
             }
-printf("====== BLAS INIT: M: %5" PRId64 ", N: %5" PRId64 ", K: %5" PRId64 ", %d-th, %6" PRId64 "\n", M, N, K, ith, ggml_time_us() - t__0);
             return;
         }
-
-int64_t t__0 = ggml_time_us();
 
         GGML_ASSERT(nth == 1);
 
@@ -9118,8 +9082,6 @@ int64_t t__0 = ggml_time_us();
             }
         }
 
-printf("====== BLAS COMP: M: %5" PRId64 ", N: %5" PRId64 ", K: %5" PRId64 ", %d-th, %6" PRId64 "\n", M, N, K, ith, ggml_time_us() - t__0);
-
         return;
 #else
         GGML_ASSERT(false);
@@ -9131,7 +9093,6 @@ printf("====== BLAS COMP: M: %5" PRId64 ", N: %5" PRId64 ", K: %5" PRId64 ", %d-
     GGML_ASSERT (params->type == GGML_TASK_INIT || params->type == GGML_TASK_COMPUTE);
 
     if (params->type == GGML_TASK_INIT) {
-int64_t t__0 = ggml_time_us();
         GGML_ASSERT(params->nth == 1);
 
         char * wdata = params->wdata;
@@ -9145,11 +9106,8 @@ int64_t t__0 = ggml_time_us();
                 }
             }
         }
-printf("====== CPU  INIT: M: %5" PRId64 ", N: %5" PRId64 ", K: %5" PRId64 ", %d-th, %6" PRId64 "\n", M, N, K, ith, ggml_time_us() - t__0);
         return;
     }
-
-int64_t t__0 = ggml_time_us();
 
     GGML_ASSERT(params->type == GGML_TASK_COMPUTE);
 
@@ -9192,8 +9150,6 @@ int64_t t__0 = ggml_time_us();
             vec_dot_q(ne00, &dst_col[ic*ne0], src0_row, (void *) (src1_col + ic*row_size));
         }
     }
-
-printf("====== CPU  COMP: M: %5" PRId64 ", N: %5" PRId64 ", K: %5" PRId64 ", %d-th, %6" PRId64 "\n", M, N, K, ith, ggml_time_us() - t__0);
 
     //int64_t t1 = ggml_time_us();
     //static int64_t acc = 0;

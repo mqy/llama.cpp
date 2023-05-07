@@ -308,6 +308,26 @@ extern "C" {
         size_t                work_size;
     };
 
+
+    enum ggml_task_type {
+        GGML_TASK_INIT = 0,
+        GGML_TASK_COMPUTE,
+        GGML_TASK_FINALIZE,
+
+        GGML_TASK_PLAN = 10,
+    };
+
+    struct ggml_compute_params {
+        enum ggml_task_type type;
+        int n_threads;
+
+        int ith, nth;
+
+        // work buffer for all threads
+        size_t wsize;
+        void * wdata;
+    };
+
     // n-dimensional tensor
     struct ggml_tensor {
         enum ggml_type type;
@@ -375,6 +395,11 @@ extern "C" {
         void * mem_buffer; // if NULL, memory will be allocated internally
         bool   no_alloc;   // don't allocate memory for the tensor data
     };
+
+void ggml_compute_forward_mul_mat_q_f32(const struct ggml_compute_params * params,
+        const struct ggml_tensor * src0,
+        const struct ggml_tensor * src1,
+              struct ggml_tensor * dst);
 
     // misc
 
