@@ -219,8 +219,8 @@ benchmark: examples/benchmark/benchmark-q4_0-matmult.c ggml.o $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ -o benchmark-q4_0-matmult $(LDFLAGS)
 	./benchmark-q4_0-matmult
 
-q4_0-mulmat-bench: examples/benchmark/q4_0-mulmat-bench.c ggml.o $(OBJS)
-	$(CC) $(CFLAGS) $^ -o q4_0-mulmat-bench $(LDFLAGS)
+q40-mulmat-device-bench: examples/benchmark/q40-mulmat-device-bench/main.c ggml.o $(OBJS)
+	$(CC) $(CFLAGS) $^ -o q40-mulmat-device-bench $(LDFLAGS)
 
 .PHONY: tests
 tests:

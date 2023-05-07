@@ -9,19 +9,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#if defined(GGML_USE_ACCELERATE)
-#include <Accelerate/Accelerate.h>
-#elif defined(GGML_USE_OPENBLAS)
-#include <cblas.h>
-#elif defined(GGML_USE_CUBLAS)
-#include "ggml-cuda.h"
-#endif
-
-// For single thread:
-// - It's almost true that: cpu is fast when M < 16; gpu is fast when M > 64.
-// - Most of the time, when M < 32 cpu is fast.
-// But when n_threads > 1, when M in range [8, 88], either cpu or gpu wins.
-
 #define BENCH_ASSERT(x)                                                        \
     do {                                                                       \
         if (!(x)) {                                                            \
@@ -34,9 +21,6 @@
 #define UNUSED(x) (void)(x)
 
 #define NUM_BENCH 5
-
-// TODO: config task stages(init, compute, finalize) for cpu, gpu(accelerate,
-// openblas, cublas)
 
 struct bench_data_item {
     int M;
@@ -57,12 +41,11 @@ struct bench_data_shape {
 
 // top bench data to write/read to/from file.
 struct bench_data {
-    char version[10]; // TODO
+    int version;
 
-    char model[4]; // 7B | 13B
-    char gpu_impl[20];
+    char model[4];     // 7B | 13B
+    char gpu_impl[20]; // ACCELERATE, OPENBLAS, CUBLAS
     int n_shapes;
-
     int m_step;
     int num_m;
 
@@ -115,14 +98,14 @@ int main(int argc, char **argv) {
 
         char buf[100];
         util__envs_for_gpu_feature(1, buf, 100);
-        fprintf(stderr, "* build with accelerate: %s make %s\n", buf,
-                make_target);
+        fprintf(stderr, "* build with accelerate: make clean; %s make %s\n",
+                buf, make_target);
         util__envs_for_gpu_feature(2, buf, 100);
-        fprintf(stderr, "* build with openBLAS:   %s make %s\n", buf,
-                make_target);
+        fprintf(stderr, "* build with openBLAS:   make clean; %s make %s\n",
+                buf, make_target);
         util__envs_for_gpu_feature(3, buf, 100);
-        fprintf(stderr, "* build with cuBLAS:     %s make %s\n", buf,
-                make_target);
+        fprintf(stderr, "* build with cuBLAS:     make clean; %s make %s\n",
+                buf, make_target);
 
         exit(1);
     }
@@ -137,12 +120,13 @@ int main(int argc, char **argv) {
 
     if (strcmp(cmd, "bench") == 0) {
         if (argc < 3) {
-            fprintf(stderr, "bench: too few args");
+            fprintf(stderr, "%s: too few args", cmd);
             usage(argv[0]);
             exit(1);
         }
 
         struct bench_data bd = {
+            .version = 1,
             .m_step = 8,
             .num_m = 11,
             .cpu_stages = {1, (2 | 1), 0},
@@ -168,12 +152,13 @@ int main(int argc, char **argv) {
         if (argc == 4) {
             data_file = argv[3];
 
+            // TODO: -y to always answer "Yes".
             {
                 struct stat st;
                 int rc = stat(data_file, &st);
                 UNUSED(st);
                 if (rc == 0) { // prompt
-                    size_t len = strlen(data_file) + 40;
+                    size_t len = strlen(data_file) + 50;
                     char *prompt = malloc(len);
                     BENCH_ASSERT(prompt);
                     snprintf(prompt, len,
@@ -234,7 +219,6 @@ int main(int argc, char **argv) {
 
         cmd_bench(&bd);
 
-        printf("\n");
         write_bench_data(&bd, fp == NULL ? stdout : fp);
         if (fp != NULL) {
             fclose(fp);
@@ -353,7 +337,7 @@ void cmd_bench(struct bench_data *bd) {
         for (int im = 0; im < bd->num_m; im++) {
             M = bd->m_step * (im + 1);
             int line_len = 16;
-            printf("%5d %5d %3d ", N, K, M);
+            printf("%d %d %d ", N, K, M);
             fflush(stdout);
 
             struct ggml_context *ctx = NULL;
@@ -618,8 +602,18 @@ static int bench_time_avg(int *a, int len) {
 }
 
 static void write_bench_data(struct bench_data *bd, FILE *fp) {
-    fprintf(fp, "%s %s %d %d %d\n", bd->model, bd->gpu_impl, bd->n_shapes,
-            bd->m_step, bd->num_m);
+    fprintf(fp, "%d %s %s %d %d %d", bd->version, bd->model, bd->gpu_impl,
+            bd->n_shapes, bd->m_step, bd->num_m);
+
+    for (int i = 0; i < 3; i++) {
+        fprintf(fp, "%2d", bd->cpu_stages[i]);
+    }
+
+    for (int i = 0; i < 3; i++) {
+        fprintf(fp, "%2d", bd->gpu_stages[i]);
+    }
+
+    fprintf(fp, "\n");
 
     for (int i = 0; i < bd->n_shapes; i++) {
         struct bench_data_shape *s = &bd->shapes[i];
@@ -649,9 +643,19 @@ static void write_bench_data(struct bench_data *bd, FILE *fp) {
 }
 
 static void read_bench_data(struct bench_data *bd, FILE *fp) {
-    int rc = fscanf(fp, "%s %s %d %d %d", bd->model, bd->gpu_impl,
-                    &bd->n_shapes, &bd->m_step, &bd->num_m);
+    int rc = fscanf(fp, "%d %s %s %d %d %d", &bd->version, bd->model,
+                    bd->gpu_impl, &bd->n_shapes, &bd->m_step, &bd->num_m);
     BENCH_ASSERT(rc > 0);
+
+    for (int i = 0; i < 3; i++) {
+        rc = fscanf(fp, "%1d", &bd->cpu_stages[i]);
+        BENCH_ASSERT(rc > 0);
+    }
+
+    for (int i = 0; i < 3; i++) {
+        rc = fscanf(fp, "%d", &bd->gpu_stages[i]);
+        BENCH_ASSERT(rc > 0);
+    }
 
     bd->shapes = malloc(sizeof(struct bench_data_shape) * bd->n_shapes);
 
@@ -675,7 +679,7 @@ static void read_bench_data(struct bench_data *bd, FILE *fp) {
 }
 
 static void cmd_analyze(struct bench_data *bd) {
-    printf("\ngpu_comp for all shapes:\n\n");
+    printf("\n== gpu compute stage for all shapes ==\n\n");
     {
         int num_m = bd->num_m;
 
@@ -719,37 +723,42 @@ static void cmd_analyze(struct bench_data *bd) {
         free(buf);
     }
 
-    printf("\ndetails for each shape: \n\n");
+    printf("\n== details for each shape ==\n\n");
     {
         for (int i = 0; i < bd->n_shapes; i++) {
             struct bench_data_shape *s = &bd->shapes[i];
-            printf("#M@NxK=%dx%d", s->N, s->K);
+            printf("#M@%dx%d", s->N, s->K);
 
             for (int j = 0; j < bd->num_m; j++) {
                 printf(";%3d", s->items[j].M);
             }
             printf("\n");
 
-            for (int j = 0; j < 3; j++) {
-                printf("CPU[%d]", j);
-                for (int k = 0; k < bd->num_m; k++) {
-                    printf(";%8.3f", s->items[k].cpu_time[j] / 1000.0);
+            for (int j = GGML_TASK_INIT; j <= GGML_TASK_FINALIZE; j++) {
+                if (bd->cpu_stages[j] & 1) {
+                    printf("cpu_%d", j);
+                    for (int k = 0; k < bd->num_m; k++) {
+                        printf(";%8.3f", s->items[k].cpu_time[j] / 1000.0);
+                    }
+                    printf("\n");
                 }
             }
+
+            for (int j = GGML_TASK_INIT; j <= GGML_TASK_FINALIZE; j++) {
+                if (bd->gpu_stages[j] & 1) {
+                    printf("gpu_%d", j);
+                    for (int k = 0; k < bd->num_m; k++) {
+                        printf(";%8.3f", s->items[k].gpu_time[j] / 1000.0);
+                    }
+                    printf("\n");
+                }
+            }
+
             printf("\n");
-
-            for (int j = 0; j < 3; j++) {
-                printf("GPU[%d]", j);
-                for (int k = 0; k < bd->num_m; k++) {
-                    printf(";%8.3f", s->items[k].gpu_time[j] / 1000.0);
-                }
-            }
-
-            printf("\n\n");
         }
     }
 
-    printf("n_threads affects: \n\n");
+    printf("== n_threads affects ==\n\n");
     {
         const int nth_list[5] = {1, 2, 4, 6, 8};
         for (int i = 0; i < bd->n_shapes; i++) {
@@ -757,7 +766,7 @@ static void cmd_analyze(struct bench_data *bd) {
                 printf("\n");
             }
             struct bench_data_shape *s = &bd->shapes[i];
-            printf("#M@NxK=%dx%d", s->N, s->K);
+            printf("#M@%dx%d", s->N, s->K);
 
             for (int j = 0; j < bd->num_m; j++) {
                 printf(";%3d", s->items[j].M);
@@ -775,9 +784,9 @@ static void cmd_analyze(struct bench_data *bd) {
                         if (bd->cpu_stages[stage] & 1) {
                             int t = s->items[j].cpu_time[stage];
                             if (bd->cpu_stages[stage] & ((1 << 1))) {
-                                t /= (nth * 1000.0);
+                                t /= nth;
                             }
-                            total += t;
+                            total += t / 1000.0;
                         }
                     }
                     printf(";%8.3f", total);
@@ -792,9 +801,9 @@ static void cmd_analyze(struct bench_data *bd) {
                         if (bd->gpu_stages[stage] & 1) {
                             int t = s->items[j].gpu_time[stage];
                             if (bd->gpu_stages[stage] & (1 << 1)) {
-                                t /= (nth * 1000.0);
+                                t /= nth;
                             }
-                            total += t;
+                            total += t / 1000.0;
                         }
                     }
                     printf(";%8.3f", total);
