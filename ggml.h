@@ -365,8 +365,7 @@ extern "C" {
         int n_leafs;
         int n_threads;
 
-        enum ggml_device_type device;
-        struct ggml_mulmat_bench_data *mulmat_bench;
+        struct ggml_mulmat_bench *mulmat_bench;
 
         size_t work_size;
         struct ggml_tensor * work;

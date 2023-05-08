@@ -4137,10 +4137,6 @@ static_assert(sizeof(struct ggml_object)%GGML_MEM_ALIGN == 0, "ggml_object size 
 static_assert(sizeof(struct ggml_tensor)%GGML_MEM_ALIGN == 0, "ggml_tensor size must be a multiple of GGML_MEM_ALIGN");
 
 #define GGML_TASK_SPIN_PAUSE      1
-//#define GGML_MULMAT_PERF          1
-
-// TODO: adjust according to benchmark.
-#define GGML_IDLE_COND_WAIT       1
 
 //#define GGML_MULMAT_DEVICE_DEBUG  1
 
@@ -4150,96 +4146,12 @@ static_assert(sizeof(struct ggml_tensor)%GGML_MEM_ALIGN == 0, "ggml_tensor size 
 #define GGML_MULMAT_DEVICE_PRINT(...)
 #endif
 
-#define GGML_COMPUTE_FLAG(valid, need_worker, idle_wait) (valid | (need_worker << 1) | (idle_wait << 2))
-#define GGML_COMPUTE_FLAG_VALID(flag)       ((flag & 0x1) == 0x1)
-#define GGML_COMPUTE_FLAG_NEED_WORKER(flag) ((flag & 0x2) == 0x2)
-#define GGML_COMPUTE_FLAG_IDLE_WAIT(flag)   ((flag & 0x4) == 0x4)
+#define GGML_COMPUTE_FLAG(valid, need_worker) (valid | (need_worker << 1))
+#define GGML_COMPUTE_FLAG_SLOW(valid, need_worker) (valid | (need_worker << 1) | (1 << 2))
 
-#if defined(GGML_MULMAT_PERF)
-
-const int op_perf_data_cap = 1024; // TODO: may be too small
-
-struct ggml_mulmat_perf_kv {
-    int64_t key;
-
-    // init, compute, finalize, total.
-    // Average is not used to avoid too much overhead.
-    int64_t cpu[4];
-    int64_t gpu[4];
-};
-
-struct ggml_mulmat_perf {
-    struct ggml_mulmat_perf_kv data[op_perf_data_cap];
-    int len;
-};
-
-// Use the global `__mulmat_perf_db` to avoid cold starting between `ggml_graph_compute`
-// calls. TODO: add to session ctx.
-static struct ggml_mulmat_perf __mulmat_perf_db;
-
-// M x K of src1, K x N of src0. T: ggml_type of src0.
-#define GMGML_MULMAT_PERF_KEY(M, N, K, T) (K << 48 | N << 24 | M << 8 | T)
-
-// Thread safe because it is called only by main thread.
-static inline void ggml_mulmat_perf_set(struct ggml_tensor * node, int64_t time_us[3]) {
-    enum ggml_device_type device = node->sched.device;
-
-    GGML_ASSERT(device == GGML_DEVICE_CPU || device == GGML_DEVICE_GPU);
-
-    struct ggml_mulmat_perf *perf = &__mulmat_perf_db;
-
-    int64_t M = node->ne[1];
-    int64_t N = node->ne[0];
-    int64_t K = node->src1->ne[0];
-    enum ggml_type T = node->src0->type;
-    int64_t key = GMGML_MULMAT_PERF_KEY(M, N, K, T);
-
-    struct ggml_mulmat_perf_kv * e = NULL;
-
-    for (int i = 0; i < perf->len; i++) {
-        if (perf->data[i].key == key) {
-            e = &perf->data[i];
-            break;
-        }
-    }
-
-    if (e == NULL) {
-        GGML_ASSERT(perf->len < op_perf_data_cap);
-        e = &perf->data[perf->len];
-        e->key = key;
-        for (int i = 0; i < 4; i++) {
-            e->cpu[i] = -1;
-            e->gpu[i] = -1;
-        }
-        perf->len++;
-    }
-
-    int64_t * v = (device == GGML_DEVICE_CPU) ? e->cpu: e->gpu;
-
-    v[3] = 0;
-    for (int i = 0; i < 3; i++) {
-        v[i] = time_us[i];
-        v[3] += v[i];
-    }
-
-    GGML_MULMAT_DEVICE_PRINT("%s: num keys: %3d, device: %1d, "
-        "M: %5" PRId64 ", N: %5" PRId64 ", K: %5" PRId64 ", T: %2d, "
-        "v[0]: %6" PRId64 ", v[1]: %6" PRId64 ", v[2]: %6" PRId64 ", v[3]: %6" PRId64 "\n",
-        __func__, perf->len, device, M, N, K, T, v[0],v [1], v[2], v[3]);
-}
-
-// Thread safe because it is called only by main thread.
-static inline struct ggml_mulmat_perf_kv * ggml_mulmat_perf_get_v(int64_t key) {
-    struct ggml_mulmat_perf *perf = &__mulmat_perf_db;
-    for (int i = 0; i < perf->len; i++) {
-        struct ggml_mulmat_perf_kv *kv = &perf->data[i];
-        if (kv->key == key) {
-            return kv;
-        }
-    }
-    return NULL;
-}
-#endif
+#define GGML_COMPUTE_FLAG_IS_VALID(flag)       (flag & 0x1)
+#define GGML_COMPUTE_FLAG_IS_NEED_WORKER(flag) (flag & 0x2)
+#define GGML_COMPUTE_FLAG_IS_SLOW(flag)        (flag & 0x4)
 
 //
 // ggml context
@@ -4712,7 +4624,7 @@ struct ggml_tensor * ggml_new_tensor_impl(
         /*.src1         =*/ NULL,
         /*.opt          =*/ { NULL },
         .sched          = {
-                            .device       = GGML_DEVICE_AUTO,
+                            .device       = GGML_DEVICE_CPU,
                             .stage_flags  = { 0, 0, 0 },
                             .n_threads    = 0,
                             .work_size    = 0,
@@ -6460,7 +6372,7 @@ static void ggml_compute_forward_dup_f16(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         if (ggml_is_quantized(dst->type)) {
             dst->sched.work_size = GGML_TYPE_SIZE[GGML_TYPE_F32] * dst->ne[0] * params->n_threads;
         }
@@ -6764,7 +6676,7 @@ static void ggml_compute_forward_dup_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -7084,7 +6996,7 @@ static void ggml_compute_forward_add_f32(
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         if (ggml_is_quantized(src0->type)) {
             dst->sched.work_size = GGML_TYPE_SIZE[GGML_TYPE_F32] * src0->ne[0] * params->n_threads;
         }
@@ -7146,7 +7058,7 @@ static void ggml_compute_forward_add_f16_f32(
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -7197,7 +7109,7 @@ static void ggml_compute_forward_add_f16_f16(
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -7395,7 +7307,7 @@ static void ggml_compute_forward_sub_f32(
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -7445,7 +7357,7 @@ static void ggml_compute_forward_mul_f32(
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -7494,7 +7406,7 @@ static void ggml_compute_forward_div_f32(
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -7542,7 +7454,7 @@ static void ggml_compute_forward_sqr_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -7587,7 +7499,7 @@ static void ggml_compute_forward_sqrt_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -7632,7 +7544,7 @@ static void ggml_compute_forward_sum_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -7690,7 +7602,7 @@ static void ggml_compute_forward_mean_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -7763,7 +7675,7 @@ static void ggml_compute_forward_repeat_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -7824,7 +7736,7 @@ static void ggml_compute_forward_abs_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -7869,7 +7781,7 @@ static void ggml_compute_forward_sgn_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -7914,7 +7826,7 @@ static void ggml_compute_forward_neg_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -7959,7 +7871,7 @@ static void ggml_compute_forward_step_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -8004,7 +7916,7 @@ static void ggml_compute_forward_relu_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -8049,7 +7961,7 @@ static void ggml_compute_forward_gelu_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -8113,7 +8025,7 @@ static void ggml_compute_forward_silu_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -8176,7 +8088,7 @@ static void ggml_compute_forward_norm_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -8256,7 +8168,7 @@ static void ggml_compute_forward_rms_norm_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -8328,46 +8240,22 @@ static void ggml_compute_forward_rms_norm(
     }
 }
 
-static inline void ggml_mulmat_adjust_device(struct ggml_tensor *node) {
+static inline void ggml_mulmat_set_node_device(struct ggml_tensor *node, struct ggml_mulmat_bench *mulmat_bench, int n_threads) {
     GGML_ASSERT(node->op == GGML_OP_MUL_MAT);
-
-    if (node->sched.device == GGML_DEVICE_CPU) {
+    if (!ggml_is_contiguous(node->src0) || !ggml_is_contiguous(node->src1)) {
+        GGML_MULMAT_DEVICE_PRINT("device: %d, can not use blas\n", GGML_DEVICE_CPU);
         node->sched.device = GGML_DEVICE_CPU;
-    } else { // AUTO or GPU
-        if (!ggml_is_contiguous(node->src0) || !ggml_is_contiguous(node->src1)) {
-            GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, can not use blas\n", GGML_DEVICE_CPU);
-            node->sched.device = GGML_DEVICE_CPU;
-        } else if (node->sched.device == GGML_DEVICE_AUTO) {
-            int64_t M = node->ne[1];
-            int64_t N = node->ne[0];
-            int64_t K = node->src1->ne[0];
+    } else {
+        int M = (int)node->ne[1];
+        int N = (int)node->ne[0];
+        int K = (int)node->src1->ne[0];
 
-            if (M < 32 || N < 32 || K < 32) {
-                GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, GGML_DEVICE_AUTO && too small\n", GGML_DEVICE_CPU);
-                node->sched.device = GGML_DEVICE_CPU;
-            } else {
-                node->sched.device = GGML_DEVICE_GPU;
-#if defined(GGML_MULMAT_PERF)
-                int64_t key = GMGML_MULMAT_PERF_KEY(M, N, K, node->src0->type);
-
-                // TODO: when M/N/K are big, don't test for CPU?
-
-                struct ggml_mulmat_perf_kv * e = ggml_mulmat_perf_get_v(key);
-                if (e != NULL) {
-                    if (e->cpu[3] == -1) {
-                        GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, no cpu perf yet\n", GGML_DEVICE_CPU);
-                        node->sched.device = GGML_DEVICE_CPU;
-                    } else if (e->gpu[3] == -1) {
-                        GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, no gpu perf yet\n", GGML_DEVICE_CPU);
-                        node->sched.device = GGML_DEVICE_GPU;
-                    } else {
-                        enum ggml_device_type device = e->cpu[3] < e->gpu[3]? GGML_DEVICE_CPU : GGML_DEVICE_GPU;
-                        GGML_MULMAT_DEVICE_PRINT("\tdevice: %d, choose the fastest. cpu time: %" PRId64 ", gpu time: %" PRId64 "\n", device, e->cpu[3], e->gpu[3]);
-                        node->sched.device = device;
-                    }
-                }
-#endif
-            }
+        if (mulmat_bench) {
+            node->sched.device = ggml_mulmat_choose_device(mulmat_bench, M, N, K, n_threads);
+            GGML_MULMAT_DEVICE_PRINT("device: %d, M: %d, N: %d, K: %d, from bench\n", node->sched.device, M, N, K);
+        } else {
+            node->sched.device = (M < 32 || N < 32 || K < 32) ? GGML_DEVICE_CPU : GGML_DEVICE_GPU;
+            GGML_MULMAT_DEVICE_PRINT("device: %d, M: %d, N: %d, K: %d, default\n", node->sched.device, M, N, K);
         }
     }
 }
@@ -8380,12 +8268,10 @@ static void ggml_compute_forward_mul_mat_f32(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        ggml_mulmat_adjust_device(dst);
-
         if (dst->sched.device == GGML_DEVICE_GPU) {
-            dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 1);
+            dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG_SLOW(1, 0);
         } else {
-            dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1, 0);
+            dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         }
         return;
     }
@@ -8578,12 +8464,6 @@ static void ggml_compute_forward_mul_mat_f16_f32(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        bool is_auto_device = false;
-        if (dst->sched.device == GGML_DEVICE_AUTO) {
-            ggml_mulmat_adjust_device(dst);
-            is_auto_device = true;
-        }
-
         size_t work_size_cpu = 0;
         size_t work_size_gpu = 0;
 
@@ -8593,15 +8473,15 @@ static void ggml_compute_forward_mul_mat_f16_f32(
         }
 
         if (dst->sched.device == GGML_DEVICE_GPU) {
-            dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 1);
+            dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG_SLOW(1, 0);
             dst->sched.work_size = work_size_gpu;
         } else {
-            dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1, 0);
-            dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+            dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 0);
+            dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
             dst->sched.work_size = work_size_cpu;
         }
 
-        if (is_auto_device && dst->sched.work_size == 0) {
+        if (dst->sched.work_size == 0) {
             dst->sched.work_size = MAX(work_size_cpu, work_size_gpu);
         }
 
@@ -8847,12 +8727,6 @@ void ggml_compute_forward_mul_mat_q_f32(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        bool is_auto_device = false;
-        if (dst->sched.device == GGML_DEVICE_AUTO) {
-            ggml_mulmat_adjust_device(dst);
-            is_auto_device = true;
-        }
-
         int64_t work_size_cublas, work_size_blas, work_size_cpu;
         if (dst->sched.work_size == 0) {
             work_size_cublas = GGML_TYPE_SIZE[GGML_TYPE_F32]*(src0->ne[0]*src0->ne[1]);
@@ -8862,26 +8736,26 @@ void ggml_compute_forward_mul_mat_q_f32(
 
         if (dst->sched.device == GGML_DEVICE_GPU) {
 #if defined(GGML_USE_CUBLAS)
-            dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 1);
+            dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG_SLOW(1, 0);
             if (dst->sched.work_size == 0) {
                 dst->sched.work_size = work_size_cublas;
             }
 #else
-            dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1, 0);
-            dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 1);
+            dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1);
+            dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG_SLOW(1, 0);
             if (dst->sched.work_size == 0) {
                 dst->sched.work_size = work_size_blas;
             }
 #endif
         } else { // CPU
-            dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 0, 1);
-            dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+            dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 0);
+            dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
             if (dst->sched.work_size == 0) {
                 dst->sched.work_size = work_size_cpu;
             }
         }
 
-        if (is_auto_device && dst->sched.work_size == 0) {
+        if (dst->sched.work_size == 0) {
             dst->sched.work_size = MAX(work_size_cpu, MAX(work_size_blas, work_size_cublas));
         }
 
@@ -9204,7 +9078,7 @@ static void ggml_compute_forward_scale_f32(
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -9321,7 +9195,7 @@ static void ggml_compute_forward_get_rows_q(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -9352,7 +9226,7 @@ static void ggml_compute_forward_get_rows_f16(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -9382,7 +9256,7 @@ static void ggml_compute_forward_get_rows_f32(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0 , 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -9463,7 +9337,7 @@ static void ggml_compute_forward_diag_mask_inf_f32(
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 1);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -9520,7 +9394,7 @@ static void ggml_compute_forward_soft_max_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -9612,7 +9486,7 @@ static void ggml_compute_forward_rope_f32(
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -9705,7 +9579,7 @@ static void ggml_compute_forward_rope_f16(
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1 , 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -9821,8 +9695,8 @@ static void ggml_compute_forward_conv_1d_1s_f16_f32(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1, 0);
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
 
         int64_t nk = src0->ne[0];
         dst->sched.work_size = sizeof(ggml_fp16_t)*(
@@ -9951,8 +9825,8 @@ static void ggml_compute_forward_conv_1d_1s_f32(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1, 0);
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         int64_t nk = src0->ne[0];
         dst->sched.work_size = sizeof(float)*(
             nk*ggml_up32(src0->ne[1])*src0->ne[2] +
@@ -10103,8 +9977,8 @@ static void ggml_compute_forward_conv_1d_2s_f16_f32(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1, 0);
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -10227,8 +10101,8 @@ static void ggml_compute_forward_conv_1d_2s_f32(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1 , 0);
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1 , 0);
+        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -10376,7 +10250,7 @@ static void ggml_compute_forward_flash_attn_f32(
         const bool masked,
              struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
 
         const int64_t ne11 = ggml_up(dst->src1->ne[1], GGML_SOFT_MAX_UNROLL);
         dst->sched.work_size = sizeof(float)*ne11*params->n_threads; // TODO(gerganov): this can become (n_tasks-1)
@@ -10588,7 +10462,7 @@ static void ggml_compute_forward_flash_attn_f16(
         const bool masked,
              struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1);
 
         const int64_t ne11 = ggml_up(dst->src1->ne[1], GGML_SOFT_MAX_UNROLL);
         int n_tasks = params->n_threads;
@@ -10864,7 +10738,7 @@ static void ggml_compute_forward_flash_ff_f16(
         const struct ggml_tensor * c1, // F32 proj_b
         struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         int n_tasks = params->n_threads;
         dst->sched.work_size  = sizeof(float)*dst->src1->ne[1]*n_tasks; // TODO(gerganov): this can become (n_tasks-1)
         dst->sched.work_size += sizeof(float)*dst->src1->ne[1]*n_tasks; // this is overestimated by x2
@@ -11069,7 +10943,7 @@ static void ggml_compute_forward_map_unary_f32(
         struct ggml_tensor * dst,
         const ggml_unary_op_f32_t fun) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
 
@@ -11117,7 +10991,7 @@ static void ggml_compute_forward_map_binary_f32(
         struct ggml_tensor * dst,
         const ggml_binary_op_f32_t fun) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0, 0);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
@@ -11676,7 +11550,6 @@ struct ggml_cgraph ggml_build_forward(struct ggml_tensor * tensor) {
         /*.n_nodes      =*/ 0,
         /*.n_leafs      =*/ 0,
         /*.n_threads    =*/ GGML_DEFAULT_N_THREADS,
-        .device         = GGML_DEVICE_AUTO,
         .mulmat_bench   = NULL,
         /*.work_size    =*/ 0,
         /*.work         =*/ NULL,
@@ -11738,65 +11611,30 @@ struct ggml_cgraph ggml_build_backward(struct ggml_context * ctx, struct ggml_cg
 // I tried using spin locks, but not sure how to use them correctly - the things I tried were slower than busy loops
 //
 
-//////////////
-// TODO: count size and bench: blas init, blas compute, cpu init, cpu compute
-// TODO: dynamic per node n_threads
-// TODO: n_thread = 1 for node OP other than MUL_MAT.
-//////////////
-
+// TODO: for n_threads = 1.. n, choose the best n_threads value.
 static void ggml_graph_compute_plan(struct ggml_context * ctx, struct ggml_cgraph * cgraph) {
-    ///////////////
-    // TODO: set n_threads based on mul_mat perf (if enabled): overall gain.
-    ///////////////
+    if (cgraph->n_threads > 1) {
+        if (ggml_cpu_has_blas()) {
+            if (ggml_cpu_has_cublas()) {
+                cgraph->n_threads = 1;
+            } else {
+                cgraph->n_threads = MIN(4, cgraph->n_threads);
+            }
+        }
+    }
 
-//     int n_gpu = 0;
-
-//     for (int i = 0; i < cgraph->n_nodes; i++) {
-//         struct ggml_tensor * node = cgraph->nodes[i];
-//         node->sched.device = cgraph->device;
-        
-//         if (node->op == GGML_OP_MUL_MAT) {
-//             if (cgraph->device == GGML_DEVICE_AUTO || cgraph->device == GGML_DEVICE_GPU) {
-//                 ggml_mulmat_adjust_device(node);
-//             }
-    
-//             if (node->sched.device == GGML_DEVICE_GPU) {
-//                 n_gpu++;
-//             }
-// if (true) {
-//             int64_t M = node->ne[1];
-//             int64_t N = node->ne[0];
-//             int64_t K = node->src1->ne[0];
-//             enum ggml_type T = node->src0->type;
-
-//             printf("\n==== M: %" PRId64 ", N: %" PRId64 ", K: %" PRId64 ", src0 type: %d\n", M,  N, K, T);
-// }
-//         }
-//     }
-
-//     if (cgraph->n_threads > 1) {
-//         if (ggml_cpu_has_cublas()) {
-//             cgraph->n_threads = 1;
-//             printf("\ncublas: n_threads changed to %d\n", cgraph->n_threads);
-//         } else if (n_gpu > 0) {
-//              cgraph->n_threads = 2;
-//             printf("\naccelerate/openblas: n_threads changed to %d\n", cgraph->n_threads);
-//         }
-//     }
-
-    cgraph->n_threads = 1;
-    printf("\nDEBUG: n_threads changed to %d\n", cgraph->n_threads);
+    for (int i = 0; i < cgraph->n_nodes; i++) {
+        struct ggml_tensor * node = cgraph->nodes[i];
+        if (node->op == GGML_OP_MUL_MAT) {
+            ggml_mulmat_set_node_device(node, cgraph->mulmat_bench, cgraph->n_threads);
+        }
+    }
 
     int n_threads = cgraph->n_threads;
     size_t work_size = 0;
 
     for (int i = 0; i < cgraph->n_nodes; i++) {
         struct ggml_tensor * node = cgraph->nodes[i];
-
-        ////////////
-        // TODO: fix audo NODE device.
-        ////////////
-        node->sched.device = cgraph->device;
 
         node->sched.work_size = 0;
         for (int j = 0; j < 3; j++) {
@@ -11920,11 +11758,10 @@ struct ggml_compute_state_shared {
     // task done counter.
     atomic_int n_done;
 
-#if defined(GGML_IDLE_COND_WAIT)
-    atomic_int n_waiting;
+    atomic_bool wait; // main thread issue wait cmd
+    atomic_int n_waiting; // threads in waiting state
     pthread_mutex_t mutex;
     pthread_cond_t  cond;
-#endif
 
     // fix-sized task array.
     struct ggml_compute_state tasks[GGML_MAX_N_THREADS];
@@ -11942,6 +11779,14 @@ static thread_ret_t ggml_graph_compute_thread(void * args) {
             break;
         }
 
+        if (shared->wait) {
+            pthread_mutex_lock(&shared->mutex);
+            shared->n_waiting++;
+            pthread_cond_wait(&shared->cond, &shared->mutex);
+            shared->n_waiting--;
+            pthread_mutex_unlock(&shared->mutex);
+        }
+
         ggml_compute_spin_lock(&shared->spin);
         if (shared->next < shared->n_tasks) {
             task = &shared->tasks[shared->next];
@@ -11951,30 +11796,8 @@ static thread_ret_t ggml_graph_compute_thread(void * args) {
 
         if (task != NULL) {
             ggml_compute_forward(&task->params, task->node);
-#if defined(GGML_IDLE_COND_WAIT)
-            // TODO: set n_done properly.
-            // optimize for mul mat.
-            bool wait = false;
-            if (task->params.type < GGML_TASK_COMPUTE) {
-                int flag = task->node->sched.stage_flags[task->params.type + 1];
-                // TODO: check all following stages?
-                if (GGML_COMPUTE_FLAG_VALID(flag) &&
-                    !GGML_COMPUTE_FLAG_NEED_WORKER(flag) &&
-                    GGML_COMPUTE_FLAG_IDLE_WAIT(flag)) {
-                    wait = true;
-                }
-            }
-#endif
             shared->n_done++;
             task = NULL;
-
-            if (wait) {
-                pthread_mutex_lock(&shared->mutex);
-                shared->n_waiting++;
-                pthread_cond_wait(&shared->cond, &shared->mutex);
-                shared->n_waiting--;
-                pthread_mutex_unlock(&shared->mutex);
-            }
         }
 
         ggml_spin_pause();
@@ -12003,10 +11826,8 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
             GGML_ASSERT(state_shared);
             memset(state_shared, 0, len);
 
-#if defined(GGML_IDLE_COND_WAIT)
             pthread_mutex_init(&state_shared->mutex, NULL);
             pthread_cond_init(&state_shared->cond, NULL);
-#endif
         }
 
         for (int j = 0; j < n_threads - 1; j++) {
@@ -12257,13 +12078,6 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
 
         struct ggml_tensor * node = cgraph->nodes[i];
 
-#if defined(GGML_MULMAT_PERF)
-        int64_t mulmat_tm[3] = {0, 0, 0};
-        bool node_mulmat_perf = n_threads > 1 &&
-            node->op == GGML_OP_MUL_MAT &&
-            node->sched.device == GGML_DEVICE_GPU;
-#endif
-
 #ifdef GGML_PERF
         const int64_t perf_node_start_cycles  = ggml_perf_cycles();
         const int64_t perf_node_start_time_us = ggml_perf_time_us();
@@ -12273,37 +12087,37 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
         struct ggml_compute_params params;
 
         ////////////////////////////////////////////////
-        // TODO: use only one step when n_threads == 1.
+        // TODO: use only one comute stage when n_threads == 1?
         ////////////////////////////////////////////////
 
         for (int k = GGML_TASK_INIT; k <= GGML_TASK_FINALIZE; k++) {
             enum ggml_task_type type = k;
             int flag = node->sched.stage_flags[k];
-            if (!GGML_COMPUTE_FLAG_VALID(flag)) {
+            if (!GGML_COMPUTE_FLAG_IS_VALID(flag)) {
                 continue;
             }
-            int n_tasks = GGML_COMPUTE_FLAG_NEED_WORKER(flag)? n_threads : 1;
+            int n_tasks = GGML_COMPUTE_FLAG_IS_NEED_WORKER(flag)? n_threads : 1;
 
-#if defined(GGML_MULMAT_PERF)
-            if (node_mulmat_perf) {
-                mulmat_tm[k] = ggml_time_us();
-            }
-#endif
             int n_worker_tasks = n_tasks - 1;
 
-#if defined(GGML_IDLE_COND_WAIT)
-            // Ensure enough active threads and idle wait.
+            // Ensure: enough active threads, and idle wait for slow task stage.
             if (n_threads > 1) {
-                if (n_worker_tasks > 0 && state_shared->n_waiting > 0) {
+                if (n_worker_tasks == 0 && state_shared->n_waiting == 0 && GGML_COMPUTE_FLAG_IS_SLOW(flag)) {
+                    state_shared->wait = true;
+                } else if (n_worker_tasks > 0 && state_shared->n_waiting > 0) {
+                    state_shared->wait = false;
+
                     pthread_mutex_lock(&state_shared->mutex);
                     pthread_cond_broadcast(&state_shared->cond);
                     pthread_mutex_unlock(&state_shared->mutex);
-                    while (state_shared->n_waiting == 0) {
-                        ggml_spin_pause();
-                    }
+                }
+
+                int expected_n_waiting = state_shared->wait? n_threads - 1 : 0;
+                while (state_shared->n_waiting != expected_n_waiting) {
+                    ggml_spin_pause();
                 }
             }
-#endif
+
             // Assign optional tasks to workers.
             if (n_worker_tasks > 0) {
                 GGML_ASSERT(state_shared);
@@ -12344,19 +12158,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                 }
                 state_shared->n_done = 0;
             }
-
-#if defined(GGML_MULMAT_PERF)
-            if (node_mulmat_perf) {
-                mulmat_tm[k] = ggml_time_us() - mulmat_tm[k];
-            }
-#endif
         }
-
-#if defined(GGML_MULMAT_PERF)
-        if (node_mulmat_perf) {
-            ggml_mulmat_perf_set(node, mulmat_tm);
-        }
-#endif
 
 #ifdef GGML_PERF
         // performance stats (node)
@@ -12371,13 +12173,13 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
 #endif
     }
 
+
     // cleanup.
     if (n_threads > 1) {
         // stop
         state_shared->n_tasks = -1;
 
         // wakeup
-#if defined(GGML_IDLE_COND_WAIT)
         if (state_shared->n_waiting >  0) {
             pthread_mutex_lock(&state_shared->mutex);
             pthread_cond_broadcast(&state_shared->cond);
@@ -12390,7 +12192,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
 
         pthread_mutex_destroy(&state_shared->mutex);
         pthread_cond_destroy(&state_shared->cond);
-#endif
+
         // join thread pool
         for (int j = 0; j < n_threads - 1; j++) {
             int rc = ggml_thread_join(state_shared->thread_ids[j], NULL);

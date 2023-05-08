@@ -34,7 +34,7 @@ struct ggml_mulmat_bench_data_shape {
 };
 
 // top bench data to write/read to/from file.
-struct ggml_mulmat_bench_data {
+struct ggml_mulmat_bench {
     int version;
 
     char model[4];     // 7B | 13B
@@ -50,17 +50,16 @@ struct ggml_mulmat_bench_data {
 };
 
 enum ggml_device_type {
-    GGML_DEVICE_AUTO = 0,
-    GGML_DEVICE_CPU,
+    GGML_DEVICE_CPU = 0,
     GGML_DEVICE_GPU,
 };
 
-void ggml_mulmat_write_bench_data(struct ggml_mulmat_bench_data *bd, FILE *fp);
-int ggml_mulmat_read_bench_data(struct ggml_mulmat_bench_data *bd, FILE *file);
-int ggml_mulmat_estimate_time(struct ggml_mulmat_bench_data *bd, int M, int N, int K, int nth,
-                  bool is_cpu);
-enum ggml_device_type ggml_mulmat_choose_device(struct ggml_mulmat_bench_data *bd, int M, int N, int K,
-                                    int nth);
+void ggml_mulmat_write_bench_data(struct ggml_mulmat_bench *bench, FILE *fp);
+int ggml_mulmat_read_bench_data(struct ggml_mulmat_bench *bench, FILE *file);
+int ggml_mulmat_estimate_time(struct ggml_mulmat_bench *bench, int M, int N,
+                              int K, int nth, bool is_cpu);
+enum ggml_device_type ggml_mulmat_choose_device(struct ggml_mulmat_bench *bench,
+                                                int M, int N, int K, int nth);
 #ifdef __cplusplus
 }
 #endif

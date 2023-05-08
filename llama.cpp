@@ -234,7 +234,7 @@ struct llama_context {
     int    buf_last = 0;
     size_t buf_max_size[LLAMA_MAX_SCRATCH_BUFFERS] = { 0 };
 
-    struct ggml_mulmat_bench_data mulmat_bench;
+    struct ggml_mulmat_bench mulmat_bench;
 
     void use_buf(struct ggml_context * ctx, int i) {
 #if defined(LLAMA_USE_SCRATCH)
@@ -1816,7 +1816,7 @@ struct llama_context * llama_init_from_file(
         ctx->buf_scratch[1].resize(MEM_REQ_SCRATCH1().at(ctx->model.type));
     }
 
-    // TODO: refactor: bench data file as cmd arg; better handling errors.
+    // TODO: sorry can we load this bench file before the slow model loading?
     if (ctx->model.type == MODEL_7B || ctx->model.type == MODEL_13B) {
         const char * model_name = NULL;
         if (ctx->model.type == MODEL_7B) {
@@ -1829,13 +1829,16 @@ struct llama_context * llama_init_from_file(
         snprintf(buf, sizeof(buf), "bench.%s.ACCELERATE.txt", model_name);
         FILE *fp = fopen(buf, "r");
         if (!fp) {
+            fprintf(stderr, "failed to open the mulmat bench file %s\n", buf);
             return nullptr;
         }
         int rc = ggml_mulmat_read_bench_data(&ctx->mulmat_bench, fp);
         if (rc != 0) {
+            fprintf(stderr, "failed to load mulmat bench from file %s\n", buf);
             return nullptr;
         }
         fclose(fp);
+        printf("=== loaded mulmat bench from %s\n", buf);
     }
 
     return ctx;
