@@ -50,6 +50,7 @@ struct bench_data {
     int num_m;
 
     // bit 0: valid, bit 1: can parallel
+    // TODO: define macros.
     int cpu_stages[3];
     int gpu_stages[3];
 
@@ -73,10 +74,12 @@ static void read_bench_data(struct bench_data *bd, FILE *file);
 static int bench_time_avg(int *a, int len);
 static int estimate_time(struct bench_data *bd, int M, int N, int K, int nth,
                          bool is_cpu);
+static enum ggml_device_type choose_device(struct bench_data *bd, int M, int N,
+                                           int K, int nth);
 
 static void cmd_bench(struct bench_data *bd);
 static void cmd_analyze(struct bench_data *bd);
-static void cmd_test(struct bench_data *bd);
+static void cmd_test(void);
 
 static void usage(char *prog) {
     const char *usage_lines[7] = {
@@ -86,7 +89,7 @@ static void usage(char *prog) {
         "  data-file: the file to write bench result to.\n",
         "  -y always answer \"yes\" to overriding existing data file.\n",
         "* %s analyze <data-file>\n",
-        "* %s test    <data-file>\n",
+        "* %s test\n",
     };
 
     for (int i = 0; i < 7; i++) {
@@ -265,32 +268,12 @@ int main(int argc, char **argv) {
 
         cmd_analyze(&bd);
     } else if (strcmp(cmd, "test") == 0) {
-        if (argc < 3) {
-            fprintf(stderr, "[%s]: error: too few args", cmd);
+        if (argc != 2) {
+            fprintf(stderr, "[%s]: error: invalid args\n", cmd);
             usage(argv[0]);
             exit(1);
         }
-
-        struct bench_data bd;
-
-        char *data_file = argv[2];
-        {
-            struct stat st;
-            int rc = stat(data_file, &st);
-            UNUSED(st);
-            if (rc != 0) {
-                fprintf(stderr, "[%s]: error: data file not exists: %s\n", cmd,
-                        data_file);
-                exit(1);
-            }
-        }
-
-        FILE *fp = fopen(data_file, "r");
-        BENCH_ASSERT(fp);
-        read_bench_data(&bd, fp);
-        fclose(fp);
-
-        cmd_test(&bd);
+        cmd_test();
     } else {
         fprintf(stderr, "error: unknown command: %s.\n", cmd);
         usage(argv[0]);
@@ -530,6 +513,24 @@ static int estimate_time(struct bench_data *bd, int M, int N, int K, int nth,
     }
 
     return -1;
+}
+
+static enum ggml_device_type choose_device(struct bench_data *bd, int M, int N,
+                                           int K, int nth) {
+    if (M < bd->m_step) {
+        return GGML_DEVICE_CPU;
+    } else if (M > bd->m_step * bd->num_m) {
+        return GGML_DEVICE_GPU;
+    }
+
+    int cpu_time = estimate_time(bd, M, N, K, nth, true /* cpu */);
+    int gpu_time = estimate_time(bd, M, N, K, nth, false /* gpu */);
+
+    if (cpu_time < 0 && cpu_time < 0) {
+        return GGML_DEVICE_AUTO;
+    }
+
+    return (cpu_time < gpu_time) ? GGML_DEVICE_CPU : GGML_DEVICE_GPU;
 }
 
 static int64_t time_us(void) {
@@ -841,18 +842,43 @@ static void cmd_analyze(struct bench_data *bd) {
     }
 }
 
-static void cmd_test(struct bench_data *bd) {
-    const struct bench_data_shape *shape = &bd->shapes[0];
+static void cmd_test(void) {
+    struct bench_data bd = {
+        .version = 1,
+        .model = "7B",
+        .gpu_impl = "OPENBLAS",
+        .n_shapes = 1,
+        .m_step = 8,
+        .num_m = 2,
+        .cpu_stages = {1, (2 | 1), 0},
+        .gpu_stages = {(2 | 1), 1, 0},
+    };
+    bd.shapes = malloc(sizeof(struct bench_data_shape) * bd.n_shapes);
+    bd.shapes[0] = (struct bench_data_shape){
+        .N = 4096,
+        .K = 4096,
+    };
+    bd.shapes[0].items = malloc(sizeof(struct bench_data_item) * bd.num_m);
+    bd.shapes[0].items[0] = (struct bench_data_item){
+        .M = 8,
+        .cpu_time = {10, 20, 0},
+        .gpu_time = {30, 40, 0},
+    };
+    bd.shapes[0].items[1] = (struct bench_data_item){
+        .M = 16,
+        .cpu_time = {50, 60, 0},
+        .gpu_time = {70, 80, 0},
+    };
 
     const double error_bound = 0.01;
 
     const int nth = 1;
-    const int N = shape->N;
-    const int K = shape->K;
-    const int num_m = bd->num_m;
-    const int m_step = bd->m_step;
+    const int N = bd.shapes[0].N;
+    const int K = bd.shapes[0].K;
+    const int num_m = bd.num_m;
+    const int m_step = bd.m_step;
 
-    BENCH_ASSERT(num_m > 2);
+    BENCH_ASSERT(num_m >= 2);
     BENCH_ASSERT(m_step % 2 == 0);
 
     const int m_max = m_step * num_m;
@@ -866,8 +892,8 @@ static void cmd_test(struct bench_data *bd) {
 
         for (int j = 0; j < 4; j++) {
             int M = Ms[j];
-            T[j] = (i == 0) ? estimate_time(bd, M, N, K, nth, true)
-                            : estimate_time(bd, M, N, K, nth, false);
+            T[j] = (i == 0) ? estimate_time(&bd, M, N, K, nth, true)
+                            : estimate_time(&bd, M, N, K, nth, false);
             printf("M: %3d, N: %5d, K: %5d, nth: %d, time: %7d\n", M, N, K, nth,
                    T[j]);
         }
