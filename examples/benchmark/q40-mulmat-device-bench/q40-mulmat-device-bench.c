@@ -1,4 +1,6 @@
+#include "examples/benchmark/q40-mulmat-device-bench/q40-mulmat-device.h"
 #include "ggml.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,62 +33,12 @@
 
 #define UNUSED(x) (void)(x)
 
-#define NUM_BENCH 5
-
-struct bench_data_item {
-    int M;
-
-    int cpu_time[3];
-    int gpu_time[3];
-
-    int cpu_records[3][NUM_BENCH];
-    int gpu_records[3][NUM_BENCH];
-};
-
-struct bench_data_shape {
-    int N;
-    int K;
-
-    struct bench_data_item *items;
-};
-
-// top bench data to write/read to/from file.
-struct bench_data {
-    int version;
-
-    char model[4];     // 7B | 13B
-    char gpu_impl[20]; // ACCELERATE, OPENBLAS, CUBLAS
-    int n_shapes;
-    int m_step;
-    int num_m;
-
-    // bit 0: valid, bit 1: can parallel
-    // TODO: define macros.
-    int cpu_stages[3];
-    int gpu_stages[3];
-
-    struct bench_data_shape *shapes;
-};
-
-struct model_nk_shape {
-    int N;
-    int K;
-};
-
 static int64_t time_us(void);
-static void util__print_build_blas_tip(void);
-static bool util__prompt_yes_no(const char *prompt);
-static void util__progress(int i, int max);
-static void util__envs_for_gpu_feature(int feature, char *buf, int buf_len);
-
-static void write_bench_data(struct bench_data *bd, FILE *file);
-static void read_bench_data(struct bench_data *bd, FILE *file);
-
 static int bench_time_avg(int *a, int len);
-static int estimate_time(struct bench_data *bd, int M, int N, int K, int nth,
-                         bool is_cpu);
-static enum ggml_device_type choose_device(struct bench_data *bd, int M, int N,
-                                           int K, int nth);
+static void print_build_blas_tip(void);
+static void progress(int i, int max);
+static void envs_for_gpu_feature(int feature, char *buf, int buf_len);
+static bool prompt_yes_no(const char *prompt);
 
 static void cmd_bench(struct bench_data *bd);
 static void cmd_analyze(struct bench_data *bd);
@@ -121,7 +73,7 @@ int main(int argc, char **argv) {
     printf("\n");
 
     if (!ggml_cpu_has_blas()) {
-        util__print_build_blas_tip();
+        print_build_blas_tip();
         exit(1);
     }
 
@@ -192,7 +144,7 @@ int main(int argc, char **argv) {
                              "[%s]: data file '%s' exists, override? (Y|n)",
                              cmd, data_file);
 
-                    if (!util__prompt_yes_no(prompt)) {
+                    if (!prompt_yes_no(prompt)) {
                         printf("Aborted.\n");
                         exit(2);
                     }
@@ -277,7 +229,8 @@ int main(int argc, char **argv) {
 
         FILE *fp = fopen(data_file, "r");
         BENCH_ASSERT(fp);
-        read_bench_data(&bd, fp);
+        int rc = read_bench_data(&bd, fp);
+        BENCH_ASSERT(rc > 0);
         fclose(fp);
 
         cmd_analyze(&bd);
@@ -409,7 +362,7 @@ void cmd_bench(struct bench_data *bd) {
                                                            src0, src1, dst);
                         bench_item->cpu_records[stage][nb] =
                             (int)time_us() - t0;
-                        util__progress(nb, NUM_BENCH);
+                        progress(nb, NUM_BENCH);
                     }
                     line_len++;
                 }
@@ -426,7 +379,7 @@ void cmd_bench(struct bench_data *bd) {
                                                            src0, src1, dst);
                         bench_item->gpu_records[stage][nb] =
                             (int)time_us() - t0;
-                        util__progress(nb, NUM_BENCH);
+                        progress(nb, NUM_BENCH);
                     }
                     line_len++;
                 }
@@ -463,116 +416,32 @@ void cmd_bench(struct bench_data *bd) {
     }
 }
 
-// for given work load and number of threads, estimate cpu or gpu time.
-static int estimate_time(struct bench_data *bd, int M, int N, int K, int nth,
-                         bool is_cpu) {
-    struct bench_data_shape *shape = NULL;
-    for (int i = 0; i < bd->n_shapes; i++) {
-        if (bd->shapes[i].N == N && bd->shapes[i].K == K) {
-            shape = &bd->shapes[i];
-            break;
-        }
-    }
-
-    if (shape == NULL) {
-        return -1;
-    }
-
-    if (M < bd->m_step || M > bd->m_step * bd->num_m) {
-        return -1;
-    }
-
-    for (int i = 0; i < bd->num_m; i++) {
-        struct bench_data_item *item = &shape->items[i];
-        if (item->M == M) {
-            int total = 0;
-            for (int j = GGML_TASK_INIT; j <= GGML_TASK_FINALIZE; j++) {
-                int sv = is_cpu ? bd->cpu_stages[j] : bd->gpu_stages[j];
-
-                if (sv & 1) {
-                    int t = is_cpu ? item->cpu_time[j] : item->gpu_time[j];
-                    if (sv & (1 << 1)) {
-                        t /= nth;
-                    }
-                    total += t;
-                }
-            }
-            return total;
-        }
-    }
-
-    for (int i = 0; i < bd->num_m - 1; i++) {
-        struct bench_data_item *prev = &shape->items[i];
-        struct bench_data_item *next = &shape->items[i + 1];
-        // interpolate.
-        if (M > prev->M && M < next->M) {
-            double x = 1.0 * (M - prev->M) / (next->M - prev->M);
-            int total = 0;
-            for (int j = GGML_TASK_INIT; j <= GGML_TASK_FINALIZE; j++) {
-                int sv = is_cpu ? bd->cpu_stages[j] : bd->gpu_stages[j];
-
-                if (sv & 1) {
-                    int pv = is_cpu ? prev->cpu_time[j] : prev->gpu_time[j];
-                    int nv = is_cpu ? next->cpu_time[j] : next->gpu_time[j];
-
-                    double t = pv + (nv - pv) * x;
-                    if (sv & (1 << 1)) {
-                        t /= nth;
-                    }
-                    total += t;
-                }
-            }
-            return (int)total;
-        }
-    }
-
-    return -1;
-}
-
-static enum ggml_device_type choose_device(struct bench_data *bd, int M, int N,
-                                           int K, int nth) {
-    if (M < bd->m_step) {
-        return GGML_DEVICE_CPU;
-    } else if (M > bd->m_step * bd->num_m) {
-        return GGML_DEVICE_GPU;
-    }
-
-    int cpu_time = estimate_time(bd, M, N, K, nth, true /* cpu */);
-    int gpu_time = estimate_time(bd, M, N, K, nth, false /* gpu */);
-
-    if (cpu_time < 0 && cpu_time < 0) {
-        return GGML_DEVICE_AUTO;
-    }
-
-    return (cpu_time < gpu_time) ? GGML_DEVICE_CPU : GGML_DEVICE_GPU;
-}
-
 static int64_t time_us(void) {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (int64_t)ts.tv_sec * 1000000 + (int64_t)ts.tv_nsec / 1000;
 }
 
-static void util__print_build_blas_tip(void) {
+static void print_build_blas_tip(void) {
     const char *make_target = "q40-mulmat-device-bench";
 
     fprintf(stderr,
             "error: this program was not built with any GPU feature. tips:\n");
 
     char buf[100];
-    util__envs_for_gpu_feature(1, buf, 100);
+    envs_for_gpu_feature(1, buf, 100);
     fprintf(stderr, "* to build with accelerate: make clean; %s make %s\n", buf,
             make_target);
-    util__envs_for_gpu_feature(2, buf, 100);
+    envs_for_gpu_feature(2, buf, 100);
     fprintf(stderr, "* to build with openBLAS:   make clean; %s make %s\n", buf,
             make_target);
-    util__envs_for_gpu_feature(3, buf, 100);
+    envs_for_gpu_feature(3, buf, 100);
     fprintf(stderr, "* to build with cuBLAS:     make clean; %s make %s\n", buf,
             make_target);
 }
 
 // feature: 1: apple accelerate, 2: openBLAS, 3: cuBLAS
-static void util__envs_for_gpu_feature(int feature, char *buf, int buf_len) {
+static void envs_for_gpu_feature(int feature, char *buf, int buf_len) {
     memset(buf, 0, buf_len);
     const char *LLAMA_NO_ACCELERATE = feature == 1 ? " " : "1";
     const char *LLAMA_OPENBLAS = feature == 2 ? "1" : " ";
@@ -582,7 +451,7 @@ static void util__envs_for_gpu_feature(int feature, char *buf, int buf_len) {
              LLAMA_NO_ACCELERATE, LLAMA_OPENBLAS, LLAMA_CUBLAS);
 }
 
-static bool util__prompt_yes_no(const char *prompt) {
+static bool prompt_yes_no(const char *prompt) {
     char buf[2];
     while (true) {
         fprintf(stderr, "%s\n", prompt);
@@ -610,7 +479,7 @@ static bool util__prompt_yes_no(const char *prompt) {
     }
 }
 
-static void util__progress(int i, int n) {
+static void progress(int i, int n) {
     char tokens[4] = {'|', '/', '-', '\\'};
     if (i > 0) {
         printf("\b \b");
@@ -641,83 +510,6 @@ static int bench_time_avg(int *a, int len) {
         total += a[i];
     }
     return total / (len - 2);
-}
-
-static void write_bench_data(struct bench_data *bd, FILE *fp) {
-    fprintf(fp, "%d %s %s %d %d %d", bd->version, bd->model, bd->gpu_impl,
-            bd->n_shapes, bd->m_step, bd->num_m);
-
-    for (int i = 0; i < 3; i++) {
-        fprintf(fp, "%2d", bd->cpu_stages[i]);
-    }
-
-    for (int i = 0; i < 3; i++) {
-        fprintf(fp, "%2d", bd->gpu_stages[i]);
-    }
-
-    fprintf(fp, "\n");
-
-    for (int i = 0; i < bd->n_shapes; i++) {
-        struct bench_data_shape *s = &bd->shapes[i];
-
-        fprintf(fp, "%d %d\n", s->N, s->K);
-
-        for (int j = 0; j < bd->num_m; j++) {
-            struct bench_data_item *item = &s->items[j];
-            fprintf(fp, "%3d", item->M);
-            for (int k = GGML_TASK_INIT; k <= GGML_TASK_FINALIZE; k++) {
-                if (bd->cpu_stages[k] & 1) {
-                    fprintf(fp, "%8d", item->cpu_time[k]);
-                } else {
-                    fprintf(fp, " 0");
-                }
-            }
-            for (int k = GGML_TASK_INIT; k <= GGML_TASK_FINALIZE; k++) {
-                if (bd->gpu_stages[k] & 1) {
-                    fprintf(fp, "%7d", item->gpu_time[k]);
-                } else {
-                    fprintf(fp, " 0");
-                }
-            }
-            fprintf(fp, "\n");
-        }
-    }
-}
-
-static void read_bench_data(struct bench_data *bd, FILE *fp) {
-    int rc = fscanf(fp, "%d %s %s %d %d %d", &bd->version, bd->model,
-                    bd->gpu_impl, &bd->n_shapes, &bd->m_step, &bd->num_m);
-    BENCH_ASSERT(rc > 0);
-
-    for (int i = 0; i < 3; i++) {
-        rc = fscanf(fp, "%1d", &bd->cpu_stages[i]);
-        BENCH_ASSERT(rc > 0);
-    }
-
-    for (int i = 0; i < 3; i++) {
-        rc = fscanf(fp, "%d", &bd->gpu_stages[i]);
-        BENCH_ASSERT(rc > 0);
-    }
-
-    bd->shapes = malloc(sizeof(struct bench_data_shape) * bd->n_shapes);
-
-    for (int i = 0; i < bd->n_shapes; i++) {
-        struct bench_data_shape *s = &bd->shapes[i];
-
-        rc = fscanf(fp, "%d%d", &s->N, &s->K);
-        BENCH_ASSERT(rc > 0);
-
-        s->items = malloc(sizeof(struct bench_data_item) * bd->num_m);
-
-        for (int j = 0; j < bd->num_m; j++) {
-            struct bench_data_item *item = &s->items[j];
-            rc = fscanf(fp, "%d %d %d %d %d %d %d", &item->M,
-                        &item->cpu_time[0], &item->cpu_time[1],
-                        &item->cpu_time[2], &item->gpu_time[0],
-                        &item->gpu_time[1], &item->gpu_time[2]);
-            BENCH_ASSERT(rc > 0);
-        }
-    }
 }
 
 // TODO: write as column wise CSV format.
@@ -863,7 +655,7 @@ static void cmd_test(void) {
     printf("=== test estimate_time\n\n");
     test__estimate_time();
 
-    printf("=== test choose_device\n\n");
+    printf("\n=== test choose_device\n\n");
     test__choose_device();
 }
 
@@ -968,11 +760,11 @@ static void test__estimate_time(void) {
                 int t = estimate_time(&bd, test_data[j].M, N, K,
                                       test_data[j].nth, is_cpu);
                 if (is_cpu) {
-                    BENCH_ASSERT_INT_EQUAL(t,
-                                           test_data[j].expected_cpu_time, "#(i: %d, j: %d)", i, j);
+                    BENCH_ASSERT_INT_EQUAL(t, test_data[j].expected_cpu_time,
+                                           "#(i: %d, j: %d)", i, j);
                 } else {
-                    BENCH_ASSERT_INT_EQUAL(t,
-                                           test_data[j].expected_gpu_time, "#(i: %d, j: %d)", i, j);
+                    BENCH_ASSERT_INT_EQUAL(t, test_data[j].expected_gpu_time,
+                                           "#(i: %d, j: %d)", i, j);
                 }
             }
         }
@@ -1028,9 +820,11 @@ static void test__choose_device(void) {
                 enum ggml_device_type device =
                     choose_device(&bd, M_arr[j], N, K, nth);
                 if (j == 0) {
-                    BENCH_ASSERT_INT_EQUAL(device, GGML_DEVICE_CPU, "#(i: %d, i: %d)", i, j);
+                    BENCH_ASSERT_INT_EQUAL(device, GGML_DEVICE_CPU,
+                                           "#(i: %d, i: %d)", i, j);
                 } else {
-                    BENCH_ASSERT_INT_EQUAL(device, GGML_DEVICE_GPU, "#(i: %d, i: %d)", i, j);
+                    BENCH_ASSERT_INT_EQUAL(device, GGML_DEVICE_GPU,
+                                           "#(i: %d, i: %d)", i, j);
                 }
             }
         }
