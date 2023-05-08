@@ -68,7 +68,7 @@ static void usage(char *prog) {
     }
 }
 
-static struct model_nk_shape {
+struct model_nk_shape {
     int N;
     int K;
 };

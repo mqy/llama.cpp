@@ -11677,6 +11677,7 @@ struct ggml_cgraph ggml_build_forward(struct ggml_tensor * tensor) {
         /*.n_leafs      =*/ 0,
         /*.n_threads    =*/ GGML_DEFAULT_N_THREADS,
         .device         = GGML_DEVICE_AUTO,
+        .mulmat_bench   = NULL,
         /*.work_size    =*/ 0,
         /*.work         =*/ NULL,
         /*.nodes        =*/ { NULL },

@@ -1,5 +1,5 @@
 # Define the default target now so that it is always the first target
-default: main quantize quantize-stats perplexity embedding vdot q4_0-mulmat-bench
+default: main quantize quantize-stats perplexity embedding vdot q40-mulmat-device-bench
 
 ifndef UNAME_S
 UNAME_S := $(shell uname -s)
@@ -171,6 +171,8 @@ $(info I CC:       $(CCV))
 $(info I CXX:      $(CXXV))
 $(info )
 
+OBJS += q40-mulmat-device.o
+
 #
 # Build library
 #
@@ -223,9 +225,9 @@ q40-mulmat-device.o: examples/benchmark/q40-mulmat-device-bench/q40-mulmat-devic
 	examples/benchmark/q40-mulmat-device-bench/q40-mulmat-device.h
 	$(CC)  $(CFLAGS) -c $< -o $@
 
-q40-mulmat-device-bench: examples/benchmark/q40-mulmat-device-bench/q40-mulmat-device-bench.c q40-mulmat-device.o \
+q40-mulmat-device-bench: examples/benchmark/q40-mulmat-device-bench/q40-mulmat-device-bench.c \
 	ggml.o $(OBJS)
-	$(CC) $(CFLAGS) $^ -o q40-mulmat-device-bench $(LDFLAGS)
+	$(CC)  $(CFLAGS) $^ -o q40-mulmat-device-bench $(LDFLAGS)
 
 .PHONY: tests
 tests:

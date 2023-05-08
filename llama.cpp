@@ -234,6 +234,8 @@ struct llama_context {
     int    buf_last = 0;
     size_t buf_max_size[LLAMA_MAX_SCRATCH_BUFFERS] = { 0 };
 
+    struct ggml_mulmat_bench_data mulmat_bench;
+
     void use_buf(struct ggml_context * ctx, int i) {
 #if defined(LLAMA_USE_SCRATCH)
         size_t last_size = 0;
@@ -1084,6 +1086,7 @@ static bool llama_eval_internal(
 
     ggml_cgraph gf = {};
     gf.n_threads = n_threads;
+    gf.mulmat_bench = &lctx.mulmat_bench;
 
     struct ggml_tensor * embd = ggml_new_tensor_1d(ctx0, GGML_TYPE_I32, N);
     memcpy(embd->data, tokens, N*ggml_element_size(embd));
@@ -1811,6 +1814,28 @@ struct llama_context * llama_init_from_file(
 
         ctx->buf_scratch[0].resize(MEM_REQ_SCRATCH0().at(ctx->model.type));
         ctx->buf_scratch[1].resize(MEM_REQ_SCRATCH1().at(ctx->model.type));
+    }
+
+    // TODO: refactor: bench data file as cmd arg; better handling errors.
+    if (ctx->model.type == MODEL_7B || ctx->model.type == MODEL_13B) {
+        const char * model_name = NULL;
+        if (ctx->model.type == MODEL_7B) {
+            model_name = "7B";
+        } else if (ctx->model.type == MODEL_13B) {
+            model_name = "13B";
+        }
+        char buf[200];
+        memset(buf, 0, sizeof(buf));
+        snprintf(buf, sizeof(buf), "bench.%s.ACCELERATE.txt", model_name);
+        FILE *fp = fopen(buf, "r");
+        if (!fp) {
+            return nullptr;
+        }
+        int rc = ggml_mulmat_read_bench_data(&ctx->mulmat_bench, fp);
+        if (rc != 0) {
+            return nullptr;
+        }
+        fclose(fp);
     }
 
     return ctx;

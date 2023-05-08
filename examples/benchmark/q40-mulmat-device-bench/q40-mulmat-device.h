@@ -1,4 +1,5 @@
-#include "ggml.h"
+#ifndef GGML_Q40_MULMAT_DEVICE_H
+#define GGML_Q40_MULMAT_DEVICE_H
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -20,6 +21,7 @@ struct ggml_mulmat_bench_data_item {
     int cpu_time[3];
     int gpu_time[3];
 
+    // These are not save to data file.
     int cpu_records[3][NUM_BENCH];
     int gpu_records[3][NUM_BENCH];
 };
@@ -59,7 +61,7 @@ int ggml_mulmat_estimate_time(struct ggml_mulmat_bench_data *bd, int M, int N, i
                   bool is_cpu);
 enum ggml_device_type ggml_mulmat_choose_device(struct ggml_mulmat_bench_data *bd, int M, int N, int K,
                                     int nth);
-
 #ifdef __cplusplus
 }
+#endif
 #endif

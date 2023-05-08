@@ -44,6 +44,8 @@ int ggml_mulmat_read_bench_data(struct ggml_mulmat_bench_data *bd, FILE *fp) {
             }
         }
     }
+
+    return 0;
 }
 
 void ggml_mulmat_write_bench_data(struct ggml_mulmat_bench_data *bd, FILE *fp) {
@@ -68,14 +70,14 @@ void ggml_mulmat_write_bench_data(struct ggml_mulmat_bench_data *bd, FILE *fp) {
         for (int j = 0; j < bd->num_m; j++) {
             struct ggml_mulmat_bench_data_item *item = &s->items[j];
             fprintf(fp, "%3d", item->M);
-            for (int k = GGML_TASK_INIT; k <= GGML_TASK_FINALIZE; k++) {
+            for (int k = 0; k < 3; k++) {
                 if (bd->cpu_stages[k] & 1) {
                     fprintf(fp, "%8d", item->cpu_time[k]);
                 } else {
                     fprintf(fp, " 0");
                 }
             }
-            for (int k = GGML_TASK_INIT; k <= GGML_TASK_FINALIZE; k++) {
+            for (int k = 0; k < 3; k++) {
                 if (bd->gpu_stages[k] & 1) {
                     fprintf(fp, "%7d", item->gpu_time[k]);
                 } else {
