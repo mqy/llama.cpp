@@ -48,17 +48,19 @@ static void test__estimate_time(void);
 static void test__choose_device(void);
 
 static void usage(char *prog) {
-    const char *usage_lines[7] = {
+    const char *usage_lines[] = {
         "usage:\n",
         "* %s bench   <model> [data-file [-y]]\n",
         "  model: 7B or 13B.\n",
-        "  data-file: the file to write bench result to.\n",
+        "  data-file: the file to write bench result to, write to stdout if absent.\n",
         "  -y always answer \"yes\" to overriding existing data file.\n",
         "* %s analyze <data-file>\n",
         "* %s test\n",
+        "* %s help\n",
     };
 
-    for (int i = 0; i < 7; i++) {
+    int len = (int)(sizeof(usage_lines)/sizeof(char *));
+    for (int i = 0; i < len; i++) {
         const char *line = usage_lines[i];
         if (line[0] == '*') {
             fprintf(stderr, line, prog);
@@ -242,7 +244,7 @@ int main(int argc, char **argv) {
         FILE *fp = fopen(data_file, "r");
         BENCH_ASSERT(fp);
         int rc = ggml_mulmat_read_bench_data(&bench, fp);
-        BENCH_ASSERT(rc > 0);
+        BENCH_ASSERT(rc == 0);
         fclose(fp);
 
         cmd_analyze(&bench);
@@ -253,13 +255,18 @@ int main(int argc, char **argv) {
             exit(1);
         }
         cmd_test();
+    } else if (strcmp(cmd, "help") == 0) {
+        if (argc != 2) {
+            fprintf(stderr, "[%s]: error: invalid args\n", cmd);
+            usage(argv[0]);
+            exit(1);
+        }
+        usage(argv[0]);
     } else {
         fprintf(stderr, "error: unknown command: %s.\n", cmd);
         usage(argv[0]);
         exit(1);
     }
-
-    printf("\n[%s]: done!\n", cmd);
 
     return 0;
 }
@@ -529,7 +536,7 @@ static int bench_time_avg(int *a, int len) {
 
 // TODO: write as column wise CSV format.
 static void cmd_analyze(struct ggml_mulmat_bench *bench) {
-    printf("\n== gpu compute stage for all shapes ==\n\n");
+    printf("== gpu compute stage for all shapes ==\n\n");
     {
         int num_m = bench->num_m;
 
