@@ -1,5 +1,7 @@
 #pragma once
 
+
+
 //
 // GGML Tensor Library
 //
@@ -183,6 +185,8 @@
 #    define GGML_API
 #endif
 
+#include "examples/benchmark/q40-mulmat-device-bench/q40-mulmat-device.h"
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -295,19 +299,12 @@ extern "C" {
 
     static const size_t GGML_OBJECT_SIZE = sizeof(struct ggml_object);
 
-    enum ggml_device_type {
-        GGML_DEVICE_AUTO = 0,
-        GGML_DEVICE_CPU,
-        GGML_DEVICE_GPU,
-    };
-
     struct ggml_compute_schedule {
         enum ggml_device_type device;
         int                   stage_flags[3]; // bit 0: valid, bit 1: need worker(s), bit 2: idle_wait
         int                   n_threads;
         size_t                work_size;
     };
-
 
     enum ggml_task_type {
         GGML_TASK_INIT = 0,

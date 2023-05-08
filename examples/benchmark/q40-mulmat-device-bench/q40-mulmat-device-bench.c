@@ -40,8 +40,8 @@ static void progress(int i, int max);
 static void envs_for_gpu_feature(int feature, char *buf, int buf_len);
 static bool prompt_yes_no(const char *prompt);
 
-static void cmd_bench(struct bench_data *bd);
-static void cmd_analyze(struct bench_data *bd);
+static void cmd_bench(struct ggml_mulmat_bench_data *bd);
+static void cmd_analyze(struct ggml_mulmat_bench_data *bd);
 static void cmd_test(void);
 
 static void test__estimate_time(void);
@@ -68,6 +68,11 @@ static void usage(char *prog) {
     }
 }
 
+static struct model_nk_shape {
+    int N;
+    int K;
+};
+
 // main
 int main(int argc, char **argv) {
     printf("\n");
@@ -92,7 +97,7 @@ int main(int argc, char **argv) {
             exit(1);
         }
 
-        struct bench_data bd = {
+        struct ggml_mulmat_bench_data bd = {
             .version = 1,
             .m_step = 8,
             .num_m = 11,
@@ -160,7 +165,7 @@ int main(int argc, char **argv) {
             bd.n_shapes = 3,
             bd.shapes = malloc(bd.n_shapes * sizeof(struct model_nk_shape));
             BENCH_ASSERT(bd.shapes);
-            bd.shapes = (struct bench_data_shape[]){
+            bd.shapes = (struct ggml_mulmat_bench_data_shape[]){
                 {.N = 4096, .K = 4096},
                 {.N = 4096, .K = 11008},
                 {.N = 11008, .K = 4096},
@@ -169,7 +174,7 @@ int main(int argc, char **argv) {
             bd.n_shapes = 3,
             bd.shapes = malloc(bd.n_shapes * sizeof(struct model_nk_shape));
             BENCH_ASSERT(bd.shapes);
-            bd.shapes = (struct bench_data_shape[]){
+            bd.shapes = (struct ggml_mulmat_bench_data_shape[]){
                 {.N = 5120, .K = 5120},
                 {.N = 5120, .K = 13824},
                 {.N = 13824, .K = 5120},
@@ -198,7 +203,7 @@ int main(int argc, char **argv) {
 
         cmd_bench(&bd);
 
-        write_bench_data(&bd, fp == NULL ? stdout : fp);
+        ggml_mulmat_write_bench_data(&bd, fp == NULL ? stdout : fp);
         if (fp != NULL) {
             fclose(fp);
         }
@@ -213,7 +218,7 @@ int main(int argc, char **argv) {
             exit(1);
         }
 
-        struct bench_data bd;
+        struct ggml_mulmat_bench_data bd;
 
         char *data_file = argv[2];
         {
@@ -229,7 +234,7 @@ int main(int argc, char **argv) {
 
         FILE *fp = fopen(data_file, "r");
         BENCH_ASSERT(fp);
-        int rc = read_bench_data(&bd, fp);
+        int rc = ggml_mulmat_read_bench_data(&bd, fp);
         BENCH_ASSERT(rc > 0);
         fclose(fp);
 
@@ -252,7 +257,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void cmd_bench(struct bench_data *bd) {
+void cmd_bench(struct ggml_mulmat_bench_data *bd) {
     size_t wdata_size = 0;
     void *q4_0_buf = NULL;
     void *wdata = NULL;
@@ -285,9 +290,9 @@ void cmd_bench(struct bench_data *bd) {
         int N = bd->shapes[i].N;
         int K = bd->shapes[i].K;
 
-        struct bench_data_shape *bench_shape = &bd->shapes[i];
+        struct ggml_mulmat_bench_data_shape *bench_shape = &bd->shapes[i];
         {
-            size_t sz = sizeof(struct bench_data_item) * bd->num_m;
+            size_t sz = sizeof(struct ggml_mulmat_bench_data_item) * bd->num_m;
             bench_shape->items = malloc(sz);
             BENCH_ASSERT(bench_shape->items);
             memset(bench_shape->items, 0, sz);
@@ -337,7 +342,7 @@ void cmd_bench(struct bench_data *bd) {
                 dst = ggml_mul_mat(ctx, src0, src1);
             }
 
-            struct bench_data_item *bench_item = &bench_shape->items[im];
+            struct ggml_mulmat_bench_data_item *bench_item = &bench_shape->items[im];
             bench_item->M = M;
 
             struct ggml_compute_params compute_params = {
@@ -400,7 +405,7 @@ void cmd_bench(struct bench_data *bd) {
     // stats -> avg.
     for (int i = 0; i < bd->n_shapes; i++) {
         for (int j = 0; j < bd->num_m; j++) {
-            struct bench_data_item *item = &bd->shapes[i].items[j];
+            struct ggml_mulmat_bench_data_item *item = &bd->shapes[i].items[j];
             for (int stage = GGML_TASK_INIT; stage <= GGML_TASK_FINALIZE;
                  stage++) {
                 if (bd->cpu_stages[stage] > 0) {
@@ -513,7 +518,7 @@ static int bench_time_avg(int *a, int len) {
 }
 
 // TODO: write as column wise CSV format.
-static void cmd_analyze(struct bench_data *bd) {
+static void cmd_analyze(struct ggml_mulmat_bench_data *bd) {
     printf("\n== gpu compute stage for all shapes ==\n\n");
     {
         int num_m = bd->num_m;
@@ -530,7 +535,7 @@ static void cmd_analyze(struct bench_data *bd) {
 
         size_t max_nxk_len = 0;
         for (int i = 0; i < bd->n_shapes; i++) {
-            struct bench_data_shape *s = &bd->shapes[i];
+            struct ggml_mulmat_bench_data_shape *s = &bd->shapes[i];
             size_t offset = i * buf_slot_size;
             snprintf(&buf[offset], buf_slot_size, "NxK=%dx%d", s->N, s->K);
             size_t len = strlen(&buf[offset]);
@@ -540,7 +545,7 @@ static void cmd_analyze(struct bench_data *bd) {
         }
 
         for (int i = 0; i < bd->n_shapes; i++) {
-            struct bench_data_shape *s = &bd->shapes[i];
+            struct ggml_mulmat_bench_data_shape *s = &bd->shapes[i];
 
             size_t offset = i * buf_slot_size;
             printf("%s", &buf[offset]);
@@ -561,7 +566,7 @@ static void cmd_analyze(struct bench_data *bd) {
     printf("\n== details for each shape ==\n\n");
     {
         for (int i = 0; i < bd->n_shapes; i++) {
-            struct bench_data_shape *s = &bd->shapes[i];
+            struct ggml_mulmat_bench_data_shape *s = &bd->shapes[i];
             printf("#M@%dx%d", s->N, s->K);
 
             for (int j = 0; j < bd->num_m; j++) {
@@ -602,7 +607,7 @@ static void cmd_analyze(struct bench_data *bd) {
             if (i > 0) {
                 printf("\n");
             }
-            struct bench_data_shape *shape = &bd->shapes[i];
+            struct ggml_mulmat_bench_data_shape *shape = &bd->shapes[i];
             printf("#M@%dx%d", shape->N, shape->K);
 
             for (int j = 0; j < bd->num_m; j++) {
@@ -667,7 +672,7 @@ struct test__estimate_time_data {
 };
 
 static void test__estimate_time(void) {
-    struct bench_data bd = {
+    struct ggml_mulmat_bench_data bd = {
         .version = 1,
         .model = "7B",
         .gpu_impl = "OPENBLAS",
@@ -677,18 +682,18 @@ static void test__estimate_time(void) {
         .cpu_stages = {1, (2 | 1), 0},
         .gpu_stages = {(2 | 1), 1, 0},
     };
-    bd.shapes = malloc(sizeof(struct bench_data_shape) * bd.n_shapes);
-    bd.shapes[0] = (struct bench_data_shape){
+    bd.shapes = malloc(sizeof(struct ggml_mulmat_bench_data_shape) * bd.n_shapes);
+    bd.shapes[0] = (struct ggml_mulmat_bench_data_shape){
         .N = 4096,
         .K = 4096,
     };
-    bd.shapes[0].items = malloc(sizeof(struct bench_data_item) * bd.num_m);
-    bd.shapes[0].items[0] = (struct bench_data_item){
+    bd.shapes[0].items = malloc(sizeof(struct ggml_mulmat_bench_data_item) * bd.num_m);
+    bd.shapes[0].items[0] = (struct ggml_mulmat_bench_data_item){
         .M = 8,
         .cpu_time = {10, 20, 0},
         .gpu_time = {30, 40, 0},
     };
-    bd.shapes[0].items[1] = (struct bench_data_item){
+    bd.shapes[0].items[1] = (struct ggml_mulmat_bench_data_item){
         .M = 16,
         .cpu_time = {50, 60, 0},
         .gpu_time = {70, 80, 0},
@@ -704,11 +709,11 @@ static void test__estimate_time(void) {
     for (int i = 0; i < 2; i++) {
         bool is_cpu = (i == 0);
         for (int j = 0; j < bd.num_m; j++) {
-            struct bench_data_item *item = &bd.shapes[0].items[j];
+            struct ggml_mulmat_bench_data_item *item = &bd.shapes[0].items[j];
             int M = item->M;
 
-            int t = (i == 0) ? estimate_time(&bd, M, N, K, nth, true)
-                             : estimate_time(&bd, M, N, K, nth, false);
+            int t = (i == 0) ? ggml_mulmat_estimate_time(&bd, M, N, K, nth, true)
+                             : ggml_mulmat_estimate_time(&bd, M, N, K, nth, false);
             if (is_cpu) {
                 BENCH_ASSERT_INT_EQUAL(t, item->cpu_time[0] + item->cpu_time[1],
                                        "#(i: %d, j: %d)", i, j);
@@ -728,7 +733,7 @@ static void test__estimate_time(void) {
         for (int i = 0; i < 2; i++) {
             bool is_cpu = (i == 0);
             for (int j = 0; j < n; j++) {
-                int t = estimate_time(&bd, M_arr[j], N, K, nth, is_cpu);
+                int t = ggml_mulmat_estimate_time(&bd, M_arr[j], N, K, nth, is_cpu);
                 BENCH_ASSERT_INT_EQUAL(t, -1, "#(i: %d, j: %d)", i, j);
             }
         }
@@ -757,7 +762,7 @@ static void test__estimate_time(void) {
         for (int i = 0; i < 2; i++) {
             bool is_cpu = (i == 0);
             for (int j = 0; j < n; j++) {
-                int t = estimate_time(&bd, test_data[j].M, N, K,
+                int t = ggml_mulmat_estimate_time(&bd, test_data[j].M, N, K,
                                       test_data[j].nth, is_cpu);
                 if (is_cpu) {
                     BENCH_ASSERT_INT_EQUAL(t, test_data[j].expected_cpu_time,
@@ -778,7 +783,7 @@ struct test__choose_device_data {
 };
 
 static void test__choose_device(void) {
-    struct bench_data bd = {
+    struct ggml_mulmat_bench_data bd = {
         .version = 1,
         .model = "7B",
         .gpu_impl = "OPENBLAS",
@@ -788,18 +793,18 @@ static void test__choose_device(void) {
         .cpu_stages = {1, (2 | 1), 0},
         .gpu_stages = {(2 | 1), 1, 0},
     };
-    bd.shapes = malloc(sizeof(struct bench_data_shape) * bd.n_shapes);
-    bd.shapes[0] = (struct bench_data_shape){
+    bd.shapes = malloc(sizeof(struct ggml_mulmat_bench_data_shape) * bd.n_shapes);
+    bd.shapes[0] = (struct ggml_mulmat_bench_data_shape){
         .N = 4096,
         .K = 4096,
     };
-    bd.shapes[0].items = malloc(sizeof(struct bench_data_item) * bd.num_m);
-    bd.shapes[0].items[0] = (struct bench_data_item){
+    bd.shapes[0].items = malloc(sizeof(struct ggml_mulmat_bench_data_item) * bd.num_m);
+    bd.shapes[0].items[0] = (struct ggml_mulmat_bench_data_item){
         .M = 8,
         .cpu_time = {10, 100, 0},
         .gpu_time = {100, 200, 0},
     };
-    bd.shapes[0].items[1] = (struct bench_data_item){
+    bd.shapes[0].items[1] = (struct ggml_mulmat_bench_data_item){
         .M = 16,
         .cpu_time = {20, 300, 0},
         .gpu_time = {100, 100, 0},
@@ -818,7 +823,7 @@ static void test__choose_device(void) {
             int nth = i;
             for (int j = 0; j < n; j++) {
                 enum ggml_device_type device =
-                    choose_device(&bd, M_arr[j], N, K, nth);
+                    ggml_mulmat_choose_device(&bd, M_arr[j], N, K, nth);
                 if (j == 0) {
                     BENCH_ASSERT_INT_EQUAL(device, GGML_DEVICE_CPU,
                                            "#(i: %d, i: %d)", i, j);
@@ -886,7 +891,7 @@ static void test__choose_device(void) {
         for (int i = 0; i < n; i++) {
             const struct test__choose_device_data *e = &test_data[i];
             enum ggml_device_type device =
-                choose_device(&bd, e->M, N, K, e->nth);
+                ggml_mulmat_choose_device(&bd, e->M, N, K, e->nth);
             BENCH_ASSERT_INT_EQUAL(device, e->expected_device, "#(i: %d)", i);
         }
     }
