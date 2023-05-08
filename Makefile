@@ -34,9 +34,9 @@ endif
 #
 
 # keep standard at C11 and C++11
-CFLAGS   = -I.              -O3 -DNDEBUG -std=c11   -fPIC #-DGGML_IDLE_COND_WAIT=20 -DGGML_MULMAT_PERF -DGGML_MULMAT_DEVICE_DEBUG
+CFLAGS   = -I.              -O3 -DNDEBUG -std=c11   -fPIC
 CXXFLAGS = -I. -I./examples -O3 -DNDEBUG -std=c++11 -fPIC
-LDFLAGS  = -lm
+LDFLAGS  =
 
 # warnings
 CFLAGS   += -Wall -Wextra -Wpedantic -Wcast-qual -Wdouble-promotion -Wshadow -Wstrict-prototypes -Wpointer-arith
@@ -117,17 +117,10 @@ endif
 endif
 ifdef LLAMA_CUBLAS
 	CFLAGS    += -DGGML_USE_CUBLAS -I/usr/local/cuda/include
-	# add -lstdc++ fixed: /usr/bin/ld: ggml-cuda.o:(.data.rel.local.DW.ref.__gxx_personality_v0[DW.ref.__gxx_personality_v0]+0x0): undefined reference to `__gxx_personality_v0'
-collect2: error: ld returned 1 exit status
-	LDFLAGS   += -lstdc++ -lcublas -lculibos -lcudart -lcublasLt -lpthread -ldl -lrt -L/usr/local/cuda/lib64
-ifeq ($(UNAME_S),Linux)
-	# Ubuntu: sudo apt install nvidia-cuda-dev nvidia-cuda-toolkit
-	LDFLAGS += -L/usr/lib/x86_64-linux-gnu
-endif
+	LDFLAGS   += -lcublas -lculibos -lcudart -lcublasLt -lpthread -ldl -lrt -L/usr/local/cuda/lib64
 	OBJS      += ggml-cuda.o
 	NVCC      = nvcc
-	# nvcc fatal   : Value 'native' is not defined for option 'gpu-architecture'
-	NVCCFLAGS = --forward-unknown-to-host-compiler -arch=ms_87
+	NVCCFLAGS = --forward-unknown-to-host-compiler -arch=native
 ggml-cuda.o: ggml-cuda.cu ggml-cuda.h
 	$(NVCC) $(NVCCFLAGS) $(CXXFLAGS) -Wno-pedantic -c $< -o $@
 endif

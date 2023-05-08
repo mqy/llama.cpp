@@ -1826,7 +1826,7 @@ struct llama_context * llama_init_from_file(
         }
         char buf[200];
         memset(buf, 0, sizeof(buf));
-        snprintf(buf, sizeof(buf), "bench.%s.ACCELERATE.txt", model_name);
+        snprintf(buf, sizeof(buf), "q40-mulmat-device-bench.%s.txt", model_name);
         FILE *fp = fopen(buf, "r");
         if (!fp) {
             fprintf(stderr, "failed to open the mulmat bench file %s\n", buf);

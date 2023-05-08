@@ -299,21 +299,29 @@ extern "C" {
 
     static const size_t GGML_OBJECT_SIZE = sizeof(struct ggml_object);
 
+    // NOTE: newly added in this PR
     struct ggml_compute_schedule {
         enum ggml_device_type device;
-        int                   stage_flags[3]; // bit 0: valid, bit 1: need worker(s), bit 2: idle_wait
-        int                   n_threads;
-        size_t                work_size;
+        // bit 0: valid (stage exists)
+        // bit 1: this task stage can be paralleled, thus need worker(s)
+        // bit 2: slow stage (GPU 1 thread), worker threads should go wait.
+        int    stage_flags[3];
+
+        int    n_threads;
+        size_t work_size;
     };
 
+    // NOTE: moved from ggml.c
     enum ggml_task_type {
         GGML_TASK_INIT = 0,
         GGML_TASK_COMPUTE,
         GGML_TASK_FINALIZE,
 
+        // NOTE: newly added in this PR
         GGML_TASK_PLAN = 10,
     };
 
+    // NOTE: moved from ggml.c
     struct ggml_compute_params {
         enum ggml_task_type type;
         int n_threads;
@@ -394,7 +402,8 @@ extern "C" {
         bool   no_alloc;   // don't allocate memory for the tensor data
     };
 
-void ggml_compute_forward_mul_mat_q_f32(const struct ggml_compute_params * params,
+    // Temp, for q40-mulmat-device-bench
+    void ggml_compute_forward_mul_mat_q_f32(const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst);
