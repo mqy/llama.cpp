@@ -62,14 +62,15 @@ struct model_nk_shape {
 };
 
 static int64_t time_us(void);
-static bool util__yes_no(const char *prompt);
+static void util__print_build_blas_tip(void);
+static bool util__prompt_yes_no(const char *prompt);
 static void util__progress(int i, int max);
 static void util__envs_for_gpu_feature(int feature, char *buf, int buf_len);
 
-static int bench_time_avg(int *a, int len);
 static void write_bench_data(struct bench_data *bd, FILE *file);
 static void read_bench_data(struct bench_data *bd, FILE *file);
 
+static int bench_time_avg(int *a, int len);
 static int estimate_time(struct bench_data *bd, int M, int N, int K, int nth,
                          bool is_cpu);
 
@@ -78,40 +79,37 @@ static void cmd_analyze(struct bench_data *bd);
 static void cmd_test(struct bench_data *bd);
 
 static void usage(char *prog) {
-    fprintf(stderr,
-            "usage:\n"
-            "* %s bench   <model> [data-file], where: model is 7B or 13B, the "
-            "optional data-file is used to write bench result to\n"
-            "* %s analyze <data-file>,         where: data-file is used to "
-            "read bench result from\n"
-            "* %s test    <data-file>,         where: data-file is used to "
-            "read bench result from\n",
-            prog, prog, prog);
+    const char *usage_lines[7] = {
+        "usage:\n",
+        "* %s bench   <model> [data-file [-y]]\n",
+        "  model: 7B or 13B.\n",
+        "  data-file: the file to write bench result to.\n",
+        "  -y always answer \"yes\" to overriding existing data file.\n",
+        "* %s analyze <data-file>\n",
+        "* %s test    <data-file>\n",
+    };
+
+    for (int i = 0; i < 7; i++) {
+        const char *line = usage_lines[i];
+        if (line[0] == '*') {
+            fprintf(stderr, line, prog);
+        } else {
+            fprintf(stderr, "%s", line);
+        }
+    }
 }
 
 // main
 int main(int argc, char **argv) {
+    printf("\n");
+
     if (!ggml_cpu_has_blas()) {
-        const char *make_target = "q4_0-mulmat-bench";
-        fprintf(stderr, "GGML_USE_ACCELERATE, GGML_USE_OPENBLAS, LLAMA_CUBLAS: "
-                        "undefined.\n");
-
-        char buf[100];
-        util__envs_for_gpu_feature(1, buf, 100);
-        fprintf(stderr, "* build with accelerate: make clean; %s make %s\n",
-                buf, make_target);
-        util__envs_for_gpu_feature(2, buf, 100);
-        fprintf(stderr, "* build with openBLAS:   make clean; %s make %s\n",
-                buf, make_target);
-        util__envs_for_gpu_feature(3, buf, 100);
-        fprintf(stderr, "* build with cuBLAS:     make clean; %s make %s\n",
-                buf, make_target);
-
+        util__print_build_blas_tip();
         exit(1);
     }
 
     if (argc < 2) {
-        fprintf(stderr, "need sub command");
+        fprintf(stderr, "error: need sub command");
         usage(argv[0]);
         exit(1);
     }
@@ -120,7 +118,7 @@ int main(int argc, char **argv) {
 
     if (strcmp(cmd, "bench") == 0) {
         if (argc < 3) {
-            fprintf(stderr, "%s: too few args", cmd);
+            fprintf(stderr, "[%s]: too few args", cmd);
             usage(argv[0]);
             exit(1);
         }
@@ -149,11 +147,23 @@ int main(int argc, char **argv) {
         const char *data_file = NULL;
         FILE *fp = NULL;
 
-        if (argc == 4) {
+        if (argc == 4 || argc == 5) {
             data_file = argv[3];
+            bool overriding_check = true;
 
-            // TODO: -y to always answer "Yes".
-            {
+            if (argc == 5) {
+                if (strcmp(argv[4], "-y") != 0) {
+                    fprintf(
+                        stderr,
+                        "[%s]: error: the last arg is expected to be \"-y\".\n",
+                        cmd);
+                    usage(argv[0]);
+                    exit(1);
+                }
+                overriding_check = false;
+            }
+
+            if (overriding_check) {
                 struct stat st;
                 int rc = stat(data_file, &st);
                 UNUSED(st);
@@ -162,10 +172,10 @@ int main(int argc, char **argv) {
                     char *prompt = malloc(len);
                     BENCH_ASSERT(prompt);
                     snprintf(prompt, len,
-                             "%s: data file '%s' exists, override? (Y|n)", cmd,
-                             data_file);
+                             "[%s]: data file '%s' exists, override? (Y|n)",
+                             cmd, data_file);
 
-                    if (!util__yes_no(prompt)) {
+                    if (!util__prompt_yes_no(prompt)) {
                         printf("Aborted.\n");
                         exit(2);
                     }
@@ -197,7 +207,7 @@ int main(int argc, char **argv) {
             };
         } else {
             // TODO: support 30B and 65B.
-            fprintf(stderr, "%s: unsupported model: %s", cmd, model);
+            fprintf(stderr, "[%s]: error: unsupported model: %s", cmd, model);
             usage(argv[0]);
             exit(1);
         }
@@ -225,12 +235,11 @@ int main(int argc, char **argv) {
         }
 
         if (data_file != NULL) {
-            printf("%s: result was written to %s\n", cmd, data_file);
+            printf("[%s]: result was written to %s\n", cmd, data_file);
         }
-        printf("\n%s: done!\n", cmd);
     } else if (strcmp(cmd, "analyze") == 0) {
         if (argc < 3) {
-            fprintf(stderr, "%s: too few args", cmd);
+            fprintf(stderr, "[%s]: error: too few args", cmd);
             usage(argv[0]);
             exit(1);
         }
@@ -243,7 +252,7 @@ int main(int argc, char **argv) {
             int rc = stat(data_file, &st);
             UNUSED(st);
             if (rc != 0) {
-                fprintf(stderr, "%s: data file not exists: %s\n", cmd,
+                fprintf(stderr, "[%s]: error: data file not exists: %s\n", cmd,
                         data_file);
                 exit(1);
             }
@@ -255,10 +264,9 @@ int main(int argc, char **argv) {
         fclose(fp);
 
         cmd_analyze(&bd);
-        printf("\n%s: done!\n", cmd);
     } else if (strcmp(cmd, "test") == 0) {
         if (argc < 3) {
-            fprintf(stderr, "%s: too few args", cmd);
+            fprintf(stderr, "[%s]: error: too few args", cmd);
             usage(argv[0]);
             exit(1);
         }
@@ -271,7 +279,7 @@ int main(int argc, char **argv) {
             int rc = stat(data_file, &st);
             UNUSED(st);
             if (rc != 0) {
-                fprintf(stderr, "%s: data file not exists: %s\n", cmd,
+                fprintf(stderr, "[%s]: error: data file not exists: %s\n", cmd,
                         data_file);
                 exit(1);
             }
@@ -283,12 +291,13 @@ int main(int argc, char **argv) {
         fclose(fp);
 
         cmd_test(&bd);
-        printf("\n%s: done!\n", cmd);
     } else {
-        fprintf(stderr, "unknown command: %s.\n", cmd);
+        fprintf(stderr, "error: unknown command: %s.\n", cmd);
         usage(argv[0]);
         exit(1);
     }
+
+    printf("\n[%s]: done!\n", cmd);
 
     return 0;
 }
@@ -529,18 +538,36 @@ static int64_t time_us(void) {
     return (int64_t)ts.tv_sec * 1000000 + (int64_t)ts.tv_nsec / 1000;
 }
 
+static void util__print_build_blas_tip(void) {
+    const char *make_target = "q40-mulmat-device-bench";
+
+    fprintf(stderr,
+            "error: this program was not built with any GPU feature. tips:\n");
+
+    char buf[100];
+    util__envs_for_gpu_feature(1, buf, 100);
+    fprintf(stderr, "* to build with accelerate: make clean; %s make %s\n", buf,
+            make_target);
+    util__envs_for_gpu_feature(2, buf, 100);
+    fprintf(stderr, "* to build with openBLAS:   make clean; %s make %s\n", buf,
+            make_target);
+    util__envs_for_gpu_feature(3, buf, 100);
+    fprintf(stderr, "* to build with cuBLAS:     make clean; %s make %s\n", buf,
+            make_target);
+}
+
 // feature: 1: apple accelerate, 2: openBLAS, 3: cuBLAS
 static void util__envs_for_gpu_feature(int feature, char *buf, int buf_len) {
     memset(buf, 0, buf_len);
-    const char *LLAMA_NO_ACCELERATE = feature == 1 ? "" : "1";
-    const char *LLAMA_OPENBLAS = feature == 2 ? "1" : "";
-    const char *LLAMA_CUBLAS = feature == 3 ? "1" : "";
+    const char *LLAMA_NO_ACCELERATE = feature == 1 ? " " : "1";
+    const char *LLAMA_OPENBLAS = feature == 2 ? "1" : " ";
+    const char *LLAMA_CUBLAS = feature == 3 ? "1" : " ";
     snprintf(buf, buf_len,
              "LLAMA_NO_ACCELERATE=%s LLAMA_OPENBLAS=%s LLAMA_CUBLAS=%s",
              LLAMA_NO_ACCELERATE, LLAMA_OPENBLAS, LLAMA_CUBLAS);
 }
 
-static bool util__yes_no(const char *prompt) {
+static bool util__prompt_yes_no(const char *prompt) {
     char buf[2];
     while (true) {
         fprintf(stderr, "%s\n", prompt);
