@@ -18,6 +18,17 @@
         }                                                                      \
     } while (0)
 
+#define BENCH_ASSERT_INT_EQUAL(actual, expect, fmt, ...)                       \
+    do {                                                                       \
+        if (expect != actual) {                                                \
+            fprintf(stderr,                                                    \
+                    "test fail. line: %d: expect: %d, actual: %d. " fmt "\n",  \
+                    __LINE__, expect, actual, __VA_ARGS__);                    \
+        } else {                                                               \
+            printf("test pass\n");                                             \
+        }                                                                      \
+    } while (0)
+
 #define UNUSED(x) (void)(x)
 
 #define NUM_BENCH 5
@@ -80,6 +91,9 @@ static enum ggml_device_type choose_device(struct bench_data *bd, int M, int N,
 static void cmd_bench(struct bench_data *bd);
 static void cmd_analyze(struct bench_data *bd);
 static void cmd_test(void);
+
+static void test__estimate_time(void);
+static void test__choose_device(void);
 
 static void usage(char *prog) {
     const char *usage_lines[7] = {
@@ -706,6 +720,7 @@ static void read_bench_data(struct bench_data *bd, FILE *fp) {
     }
 }
 
+// TODO: write as column wise CSV format.
 static void cmd_analyze(struct bench_data *bd) {
     printf("\n== gpu compute stage for all shapes ==\n\n");
     {
@@ -789,19 +804,21 @@ static void cmd_analyze(struct bench_data *bd) {
     printf("== n_threads affects ==\n\n");
     {
         const int nth_list[5] = {1, 2, 4, 6, 8};
+        int num_nth = (int)(sizeof(nth_list) / sizeof(int));
+
         for (int i = 0; i < bd->n_shapes; i++) {
             if (i > 0) {
                 printf("\n");
             }
-            struct bench_data_shape *s = &bd->shapes[i];
-            printf("#M@%dx%d", s->N, s->K);
+            struct bench_data_shape *shape = &bd->shapes[i];
+            printf("#M@%dx%d", shape->N, shape->K);
 
             for (int j = 0; j < bd->num_m; j++) {
-                printf(";%3d", s->items[j].M);
+                printf(";%3d", shape->items[j].M);
             }
             printf("\n");
 
-            for (int k = 0; k < 5; k++) {
+            for (int k = 0; k < num_nth; k++) {
                 int nth = nth_list[k];
 
                 printf("cpu_nth_%d", nth);
@@ -810,7 +827,7 @@ static void cmd_analyze(struct bench_data *bd) {
                     for (int stage = GGML_TASK_INIT;
                          stage <= GGML_TASK_FINALIZE; stage++) {
                         if (bd->cpu_stages[stage] & 1) {
-                            int t = s->items[j].cpu_time[stage];
+                            int t = shape->items[j].cpu_time[stage];
                             if (bd->cpu_stages[stage] & ((1 << 1))) {
                                 t /= nth;
                             }
@@ -827,7 +844,7 @@ static void cmd_analyze(struct bench_data *bd) {
                     for (int stage = GGML_TASK_INIT;
                          stage <= GGML_TASK_FINALIZE; stage++) {
                         if (bd->gpu_stages[stage] & 1) {
-                            int t = s->items[j].gpu_time[stage];
+                            int t = shape->items[j].gpu_time[stage];
                             if (bd->gpu_stages[stage] & (1 << 1)) {
                                 t /= nth;
                             }
@@ -843,6 +860,21 @@ static void cmd_analyze(struct bench_data *bd) {
 }
 
 static void cmd_test(void) {
+    printf("=== test estimate_time\n\n");
+    test__estimate_time();
+
+    printf("=== test choose_device\n\n");
+    test__choose_device();
+}
+
+struct test__estimate_time_data {
+    int nth;
+    int M;
+    int expected_cpu_time;
+    int expected_gpu_time;
+};
+
+static void test__estimate_time(void) {
     struct bench_data bd = {
         .version = 1,
         .model = "7B",
@@ -870,40 +902,198 @@ static void cmd_test(void) {
         .gpu_time = {70, 80, 0},
     };
 
-    const double error_bound = 0.01;
-
-    const int nth = 1;
     const int N = bd.shapes[0].N;
     const int K = bd.shapes[0].K;
-    const int num_m = bd.num_m;
-    const int m_step = bd.m_step;
 
-    BENCH_ASSERT(num_m >= 2);
-    BENCH_ASSERT(m_step % 2 == 0);
+    const int nth = 1;
 
-    const int m_max = m_step * num_m;
-
-    const int Ms[4] = {m_step, m_step + m_step / 2, m_step * 2, m_max + 1};
-
-    int T[4];
+    // Test exact M equals.
 
     for (int i = 0; i < 2; i++) {
-        printf("\nestimate %s time\n", i == 0 ? "CPU" : "GPU");
+        bool is_cpu = (i == 0);
+        for (int j = 0; j < bd.num_m; j++) {
+            struct bench_data_item *item = &bd.shapes[0].items[j];
+            int M = item->M;
 
-        for (int j = 0; j < 4; j++) {
-            int M = Ms[j];
-            T[j] = (i == 0) ? estimate_time(&bd, M, N, K, nth, true)
-                            : estimate_time(&bd, M, N, K, nth, false);
-            printf("M: %3d, N: %5d, K: %5d, nth: %d, time: %7d\n", M, N, K, nth,
-                   T[j]);
+            int t = (i == 0) ? estimate_time(&bd, M, N, K, nth, true)
+                             : estimate_time(&bd, M, N, K, nth, false);
+            if (is_cpu) {
+                BENCH_ASSERT_INT_EQUAL(t, item->cpu_time[0] + item->cpu_time[1],
+                                       "#(i: %d, j: %d)", i, j);
+            } else {
+                BENCH_ASSERT_INT_EQUAL(t, item->gpu_time[0] + item->gpu_time[1],
+                                       "#(i: %d, j: %d)", i, j);
+            }
         }
+    }
 
-        int sum = T[0] + T[2];
-        double diff = sum - 2 * T[1];
-        if (diff < 0) {
-            diff = -diff;
+    // Test M out of range
+    {
+        const int M_arr[2] = {bd.shapes[0].items[0].M - 1,
+                              bd.shapes[0].items[1].M + 1};
+        int n = (int)(sizeof(M_arr) / sizeof(int));
+
+        for (int i = 0; i < 2; i++) {
+            bool is_cpu = (i == 0);
+            for (int j = 0; j < n; j++) {
+                int t = estimate_time(&bd, M_arr[j], N, K, nth, is_cpu);
+                BENCH_ASSERT_INT_EQUAL(t, -1, "#(i: %d, j: %d)", i, j);
+            }
         }
-        BENCH_ASSERT((diff / sum) < error_bound);
-        BENCH_ASSERT(T[3] == -1);
+    }
+
+    // Test M in range
+    {
+        const struct test__estimate_time_data test_data[] = {
+            {
+                .nth = 1,
+                .M = 12,
+                .expected_cpu_time = 70,
+                .expected_gpu_time = 110,
+            },
+            {
+                .nth = 1,
+                .M = 14,
+                .expected_cpu_time = 90,
+                .expected_gpu_time = 130,
+            },
+        };
+
+        int n =
+            (int)(sizeof(test_data) / sizeof(struct test__estimate_time_data));
+
+        for (int i = 0; i < 2; i++) {
+            bool is_cpu = (i == 0);
+            for (int j = 0; j < n; j++) {
+                int t = estimate_time(&bd, test_data[j].M, N, K,
+                                      test_data[j].nth, is_cpu);
+                if (is_cpu) {
+                    BENCH_ASSERT_INT_EQUAL(t,
+                                           test_data[j].expected_cpu_time, "#(i: %d, j: %d)", i, j);
+                } else {
+                    BENCH_ASSERT_INT_EQUAL(t,
+                                           test_data[j].expected_gpu_time, "#(i: %d, j: %d)", i, j);
+                }
+            }
+        }
+    }
+}
+
+struct test__choose_device_data {
+    int nth;
+    int M;
+    enum ggml_device_type expected_device;
+};
+
+static void test__choose_device(void) {
+    struct bench_data bd = {
+        .version = 1,
+        .model = "7B",
+        .gpu_impl = "OPENBLAS",
+        .n_shapes = 1,
+        .m_step = 8,
+        .num_m = 2,
+        .cpu_stages = {1, (2 | 1), 0},
+        .gpu_stages = {(2 | 1), 1, 0},
+    };
+    bd.shapes = malloc(sizeof(struct bench_data_shape) * bd.n_shapes);
+    bd.shapes[0] = (struct bench_data_shape){
+        .N = 4096,
+        .K = 4096,
+    };
+    bd.shapes[0].items = malloc(sizeof(struct bench_data_item) * bd.num_m);
+    bd.shapes[0].items[0] = (struct bench_data_item){
+        .M = 8,
+        .cpu_time = {10, 100, 0},
+        .gpu_time = {100, 200, 0},
+    };
+    bd.shapes[0].items[1] = (struct bench_data_item){
+        .M = 16,
+        .cpu_time = {20, 300, 0},
+        .gpu_time = {100, 100, 0},
+    };
+
+    const int N = bd.shapes[0].N;
+    const int K = bd.shapes[0].K;
+
+    // When M out of range.
+    {
+        const int M_arr[2] = {bd.shapes[0].items[0].M - 1,
+                              bd.shapes[0].items[1].M + 1};
+        int n = (int)(sizeof(M_arr) / sizeof(int));
+
+        for (int i = 1; i <= 8; i++) {
+            int nth = i;
+            for (int j = 0; j < n; j++) {
+                enum ggml_device_type device =
+                    choose_device(&bd, M_arr[j], N, K, nth);
+                if (j == 0) {
+                    BENCH_ASSERT_INT_EQUAL(device, GGML_DEVICE_CPU, "#(i: %d, i: %d)", i, j);
+                } else {
+                    BENCH_ASSERT_INT_EQUAL(device, GGML_DEVICE_GPU, "#(i: %d, i: %d)", i, j);
+                }
+            }
+        }
+    }
+
+    // When M in range.
+    {
+        const struct test__choose_device_data test_data[] = {
+            {
+                .nth = 1,
+                .M = 8,
+                .expected_device = GGML_DEVICE_CPU,
+            },
+            {
+                .nth = 1,
+                .M = 12,
+                .expected_device = GGML_DEVICE_CPU,
+            },
+            {
+                .nth = 1,
+                .M = 16,
+                .expected_device = GGML_DEVICE_GPU,
+            },
+            {
+                .nth = 2,
+                .M = 8,
+                .expected_device = GGML_DEVICE_CPU,
+            },
+            {
+                .nth = 2,
+                .M = 12,
+                .expected_device = GGML_DEVICE_CPU,
+            },
+            {
+                .nth = 2,
+                .M = 16,
+                .expected_device = GGML_DEVICE_GPU,
+            },
+            {
+                .nth = 4,
+                .M = 8,
+                .expected_device = GGML_DEVICE_CPU,
+            },
+            {
+                .nth = 4,
+                .M = 12,
+                .expected_device = GGML_DEVICE_CPU,
+            },
+            {
+                .nth = 4,
+                .M = 16,
+                .expected_device = GGML_DEVICE_CPU,
+            },
+        };
+
+        int n =
+            (int)(sizeof(test_data) / sizeof(struct test__choose_device_data));
+
+        for (int i = 0; i < n; i++) {
+            const struct test__choose_device_data *e = &test_data[i];
+            enum ggml_device_type device =
+                choose_device(&bd, e->M, N, K, e->nth);
+            BENCH_ASSERT_INT_EQUAL(device, e->expected_device, "#(i: %d)", i);
+        }
     }
 }
