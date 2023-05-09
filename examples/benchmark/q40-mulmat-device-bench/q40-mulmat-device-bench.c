@@ -196,9 +196,8 @@ int main(int argc, char **argv) {
         // bench.model
         {
             size_t n = sizeof(bench.model);
-            BENCH_ASSERT(n > sizeof(model));
-            strncpy(bench.model, model, n - 1);
-            bench.model[n - 1] == '\0';
+            BENCH_ASSERT(n > strlen(model));
+            strncpy(bench.model, model, n);
         }
 
         // bench.gpu_impl
@@ -214,9 +213,8 @@ int main(int argc, char **argv) {
             abort();
 #endif
             size_t n = sizeof(bench.gpu_impl);
-            BENCH_ASSERT(n > sizeof(gpu_impl));
-            strncpy(bench.gpu_impl, gpu_impl, n - 1);
-            bench.gpu_impl[n - 1] == '\0';
+            BENCH_ASSERT(n > strlen(gpu_impl));
+            strncpy(bench.gpu_impl, gpu_impl, n);
         }
 
         cmd_bench(&bench);
