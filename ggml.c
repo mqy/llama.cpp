@@ -9695,7 +9695,7 @@ static void ggml_compute_forward_conv_1d_1s_f16_f32(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1);
+        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 0);
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
 
         int64_t nk = src0->ne[0];
@@ -9825,7 +9825,7 @@ static void ggml_compute_forward_conv_1d_1s_f32(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1);
+        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 0);
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         int64_t nk = src0->ne[0];
         dst->sched.work_size = sizeof(float)*(
@@ -9977,7 +9977,7 @@ static void ggml_compute_forward_conv_1d_2s_f16_f32(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1);
+        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 0);
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
@@ -10101,7 +10101,7 @@ static void ggml_compute_forward_conv_1d_2s_f32(
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1);
+        dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 0);
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
@@ -10943,7 +10943,7 @@ static void ggml_compute_forward_map_unary_f32(
         struct ggml_tensor * dst,
         const ggml_unary_op_f32_t fun) {
     if (params->type == GGML_TASK_PLAN) {
-        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
+        dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
 
