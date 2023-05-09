@@ -169,17 +169,23 @@ int main(int argc, char **argv) {
             bench.groups =
                 malloc(bench.n_groups * sizeof(struct ggml_mulmat_bench_nk));
             BENCH_ASSERT(bench.groups);
-            bench.groups[0] = (struct ggml_mulmat_bench_nk){.N = 4096, .K = 4096, .items = NULL};
-            bench.groups[1] = (struct ggml_mulmat_bench_nk){.N = 4096, .K = 11008, .items = NULL};
-            bench.groups[2] = (struct ggml_mulmat_bench_nk){.N = 11008, .K = 4096, .items = NULL};
+            bench.groups[0] = (struct ggml_mulmat_bench_nk){
+                .N = 4096, .K = 4096, .items = NULL};
+            bench.groups[1] = (struct ggml_mulmat_bench_nk){
+                .N = 4096, .K = 11008, .items = NULL};
+            bench.groups[2] = (struct ggml_mulmat_bench_nk){
+                .N = 11008, .K = 4096, .items = NULL};
         } else if (strcmp(model, "13B") == 0) {
             bench.n_groups = 3;
             bench.groups =
                 malloc(bench.n_groups * sizeof(struct ggml_mulmat_bench_nk));
             BENCH_ASSERT(bench.groups);
-            bench.groups[0] = (struct ggml_mulmat_bench_nk){.N = 5120, .K = 5120, .items = NULL};
-            bench.groups[1] = (struct ggml_mulmat_bench_nk){.N = 5120, .K = 13824, .items = NULL};
-            bench.groups[2] = (struct ggml_mulmat_bench_nk){.N = 13824, .K = 5120, .items = NULL};
+            bench.groups[0] = (struct ggml_mulmat_bench_nk){
+                .N = 5120, .K = 5120, .items = NULL};
+            bench.groups[1] = (struct ggml_mulmat_bench_nk){
+                .N = 5120, .K = 13824, .items = NULL};
+            bench.groups[2] = (struct ggml_mulmat_bench_nk){
+                .N = 13824, .K = 5120, .items = NULL};
         } else {
             // TODO: support 30B and 65B.
             fprintf(stderr, "[%s]: error: unsupported model: %s", cmd, model);
@@ -190,16 +196,13 @@ int main(int argc, char **argv) {
         // bench.model
         {
             size_t n = sizeof(bench.model);
-            memset(bench.model, 0, n);
-            memcpy(bench.model, model, 0);
-            BENCH_ASSERT(bench.model[n - 1] == '\0');
+            BENCH_ASSERT(n > sizeof(model));
+            strncpy(bench.model, model, n - 1);
+            bench.model[n - 1] == '\0';
         }
 
         // bench.gpu_impl
         {
-            size_t n = sizeof(bench.gpu_impl);
-            memset(bench.gpu_impl, 0, n);
-
             const char *gpu_impl = NULL;
 #if defined(GGML_USE_ACCELERATE)
             gpu_impl = "ACCELERATE";
@@ -210,8 +213,10 @@ int main(int argc, char **argv) {
 #else
             abort();
 #endif
-            memcpy(bench.gpu_impl, gpu_impl, 0);
-            BENCH_ASSERT(bench.gpu_impl[n - 1] == '\0');
+            size_t n = sizeof(bench.gpu_impl);
+            BENCH_ASSERT(n > sizeof(gpu_impl));
+            strncpy(bench.gpu_impl, gpu_impl, n - 1);
+            bench.gpu_impl[n - 1] == '\0';
         }
 
         cmd_bench(&bench);
