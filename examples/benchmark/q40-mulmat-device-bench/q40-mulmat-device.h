@@ -15,7 +15,7 @@ typedef int ggml_compute_stage_flag_t;
 #define COMPUTE_STAGE_FLAG_VALID 1
 #define COMPUTE_STAGE_FLAG_NEED_WORKER (1 << 1)
 
-struct ggml_mulmat_bench_data_item {
+struct ggml_mulmat_bench_m {
     int M;
 
     int cpu_time[3];
@@ -26,11 +26,11 @@ struct ggml_mulmat_bench_data_item {
     int gpu_records[3][NUM_BENCH];
 };
 
-struct ggml_mulmat_bench_data_shape {
+struct ggml_mulmat_bench_nk {
     int N;
     int K;
 
-    struct ggml_mulmat_bench_data_item *items;
+    struct ggml_mulmat_bench_m *items;
 };
 
 // top bench data to write/read to/from file.
@@ -38,15 +38,15 @@ struct ggml_mulmat_bench {
     int version;
 
     char model[4];     // 7B | 13B
-    char gpu_impl[20]; // ACCELERATE, OPENBLAS, CUBLAS
-    int n_shapes;
+    char gpu_impl[16]; // ACCELERATE, OPENBLAS, CUBLAS
+    int n_groups;
     int m_step;
     int num_m;
 
     ggml_compute_stage_flag_t cpu_stages[3];
     ggml_compute_stage_flag_t gpu_stages[3];
 
-    struct ggml_mulmat_bench_data_shape *shapes;
+    struct ggml_mulmat_bench_nk *groups;
 };
 
 enum ggml_device_type {

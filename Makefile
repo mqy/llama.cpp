@@ -36,7 +36,8 @@ endif
 # keep standard at C11 and C++11
 CFLAGS   = -I.              -O3 -DNDEBUG -std=c11   -fPIC
 CXXFLAGS = -I. -I./examples -O3 -DNDEBUG -std=c++11 -fPIC
-LDFLAGS  =
+# -lm fixed error: ggml.o: undefined reference to symbol 'tanhf@@GLIBC_2.2.5' from ubuntu 22.04
+LDFLAGS  = -lm
 
 # warnings
 CFLAGS   += -Wall -Wextra -Wpedantic -Wcast-qual -Wdouble-promotion -Wshadow -Wstrict-prototypes -Wpointer-arith

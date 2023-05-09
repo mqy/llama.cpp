@@ -2,7 +2,7 @@
 
 int ggml_mulmat_read_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
     int rc = fscanf(fp, "%d %s %s %d %d %d", &bench->version, bench->model,
-                    bench->gpu_impl, &bench->n_shapes, &bench->m_step,
+                    bench->gpu_impl, &bench->n_groups, &bench->m_step,
                     &bench->num_m);
     if (rc <= 0) {
         return rc;
@@ -22,22 +22,21 @@ int ggml_mulmat_read_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
         }
     }
 
-    bench->shapes =
-        malloc(sizeof(struct ggml_mulmat_bench_data_shape) * bench->n_shapes);
+    bench->groups =
+        malloc(sizeof(struct ggml_mulmat_bench_nk) * bench->n_groups);
 
-    for (int i = 0; i < bench->n_shapes; i++) {
-        struct ggml_mulmat_bench_data_shape *s = &bench->shapes[i];
+    for (int i = 0; i < bench->n_groups; i++) {
+        struct ggml_mulmat_bench_nk *s = &bench->groups[i];
 
         rc = fscanf(fp, "%d%d", &s->N, &s->K);
         if (rc <= 0) {
             return rc;
         }
 
-        s->items =
-            malloc(sizeof(struct ggml_mulmat_bench_data_item) * bench->num_m);
+        s->items = malloc(sizeof(struct ggml_mulmat_bench_m) * bench->num_m);
 
         for (int j = 0; j < bench->num_m; j++) {
-            struct ggml_mulmat_bench_data_item *item = &s->items[j];
+            struct ggml_mulmat_bench_m *item = &s->items[j];
             rc = fscanf(fp, "%d %d %d %d %d %d %d", &item->M,
                         &item->cpu_time[0], &item->cpu_time[1],
                         &item->cpu_time[2], &item->gpu_time[0],
@@ -53,7 +52,7 @@ int ggml_mulmat_read_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
 
 void ggml_mulmat_write_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
     fprintf(fp, "%d %s %s %d %d %d", bench->version, bench->model,
-            bench->gpu_impl, bench->n_shapes, bench->m_step, bench->num_m);
+            bench->gpu_impl, bench->n_groups, bench->m_step, bench->num_m);
 
     for (int i = 0; i < 3; i++) {
         fprintf(fp, "%2d", bench->cpu_stages[i]);
@@ -65,13 +64,13 @@ void ggml_mulmat_write_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
 
     fprintf(fp, "\n");
 
-    for (int i = 0; i < bench->n_shapes; i++) {
-        struct ggml_mulmat_bench_data_shape *shape = &bench->shapes[i];
+    for (int i = 0; i < bench->n_groups; i++) {
+        struct ggml_mulmat_bench_nk *group = &bench->groups[i];
 
-        fprintf(fp, "%d %d\n", shape->N, shape->K);
+        fprintf(fp, "%d %d\n", group->N, group->K);
 
         for (int j = 0; j < bench->num_m; j++) {
-            struct ggml_mulmat_bench_data_item *item = &shape->items[j];
+            struct ggml_mulmat_bench_m *item = &group->items[j];
             fprintf(fp, "%3d", item->M);
             for (int k = 0; k < 3; k++) {
                 if (bench->cpu_stages[k] & COMPUTE_STAGE_FLAG_VALID) {
@@ -95,15 +94,15 @@ void ggml_mulmat_write_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
 // for given work load and number of threads, estimate cpu or gpu time.
 int ggml_mulmat_estimate_time(struct ggml_mulmat_bench *bench, int M, int N,
                               int K, int nth, bool is_cpu) {
-    struct ggml_mulmat_bench_data_shape *shape = NULL;
-    for (int i = 0; i < bench->n_shapes; i++) {
-        if (bench->shapes[i].N == N && bench->shapes[i].K == K) {
-            shape = &bench->shapes[i];
+    struct ggml_mulmat_bench_nk *group = NULL;
+    for (int i = 0; i < bench->n_groups; i++) {
+        if (bench->groups[i].N == N && bench->groups[i].K == K) {
+            group = &bench->groups[i];
             break;
         }
     }
 
-    if (shape == NULL) {
+    if (group == NULL) {
         return -1;
     }
 
@@ -112,7 +111,7 @@ int ggml_mulmat_estimate_time(struct ggml_mulmat_bench *bench, int M, int N,
     }
 
     for (int i = 0; i < bench->num_m; i++) {
-        struct ggml_mulmat_bench_data_item *item = &shape->items[i];
+        struct ggml_mulmat_bench_m *item = &group->items[i];
         if (item->M == M) {
             int total = 0;
             for (int j = 0; j < 3; j++) {
@@ -131,8 +130,8 @@ int ggml_mulmat_estimate_time(struct ggml_mulmat_bench *bench, int M, int N,
     }
 
     for (int i = 0; i < bench->num_m - 1; i++) {
-        struct ggml_mulmat_bench_data_item *prev = &shape->items[i];
-        struct ggml_mulmat_bench_data_item *next = &shape->items[i + 1];
+        struct ggml_mulmat_bench_m *prev = &group->items[i];
+        struct ggml_mulmat_bench_m *next = &group->items[i + 1];
         // interpolate.
         if (M > prev->M && M < next->M) {
             double x = 1.0 * (M - prev->M) / (next->M - prev->M);
