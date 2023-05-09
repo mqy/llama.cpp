@@ -316,15 +316,14 @@ extern "C" {
         GGML_TASK_INIT = 0,
         GGML_TASK_COMPUTE,
         GGML_TASK_FINALIZE,
-
-        // NOTE: newly added in this PR
-        GGML_TASK_PLAN = 10,
     };
 
     // NOTE: moved from ggml.c
     struct ggml_compute_params {
-        enum ggml_task_type type;
+        bool set_config;
         int n_threads;
+
+        enum ggml_task_type type;
 
         int ith, nth;
 

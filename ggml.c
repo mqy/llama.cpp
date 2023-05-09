@@ -6371,7 +6371,7 @@ static void ggml_compute_forward_dup_f16(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         if (ggml_is_quantized(dst->type)) {
             dst->sched.work_size = GGML_TYPE_SIZE[GGML_TYPE_F32] * dst->ne[0] * params->n_threads;
@@ -6675,7 +6675,7 @@ static void ggml_compute_forward_dup_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
@@ -6995,7 +6995,7 @@ static void ggml_compute_forward_add_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         if (ggml_is_quantized(src0->type)) {
             dst->sched.work_size = GGML_TYPE_SIZE[GGML_TYPE_F32] * src0->ne[0] * params->n_threads;
@@ -7057,7 +7057,7 @@ static void ggml_compute_forward_add_f16_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
@@ -7108,7 +7108,7 @@ static void ggml_compute_forward_add_f16_f16(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
@@ -7306,7 +7306,7 @@ static void ggml_compute_forward_sub_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -7356,7 +7356,7 @@ static void ggml_compute_forward_mul_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -7405,7 +7405,7 @@ static void ggml_compute_forward_div_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -7453,7 +7453,7 @@ static void ggml_compute_forward_sqr_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -7498,7 +7498,7 @@ static void ggml_compute_forward_sqrt_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -7543,7 +7543,7 @@ static void ggml_compute_forward_sum_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -7601,7 +7601,7 @@ static void ggml_compute_forward_mean_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -7674,7 +7674,7 @@ static void ggml_compute_forward_repeat_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -7735,7 +7735,7 @@ static void ggml_compute_forward_abs_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -7780,7 +7780,7 @@ static void ggml_compute_forward_sgn_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -7825,7 +7825,7 @@ static void ggml_compute_forward_neg_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -7870,7 +7870,7 @@ static void ggml_compute_forward_step_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -7915,7 +7915,7 @@ static void ggml_compute_forward_relu_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -7960,7 +7960,7 @@ static void ggml_compute_forward_gelu_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
@@ -8024,7 +8024,7 @@ static void ggml_compute_forward_silu_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
@@ -8087,7 +8087,7 @@ static void ggml_compute_forward_norm_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
@@ -8167,7 +8167,7 @@ static void ggml_compute_forward_rms_norm_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
@@ -8267,7 +8267,7 @@ static void ggml_compute_forward_mul_mat_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         if (dst->sched.device == GGML_DEVICE_GPU) {
             dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG_SLOW(1, 0);
         } else {
@@ -8463,7 +8463,7 @@ static void ggml_compute_forward_mul_mat_f16_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         size_t work_size_cpu = 0;
         size_t work_size_gpu = 0;
 
@@ -8726,7 +8726,7 @@ void ggml_compute_forward_mul_mat_q_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         int64_t work_size_cublas, work_size_blas, work_size_cpu;
         if (dst->sched.work_size == 0) {
             work_size_cublas = GGML_TYPE_SIZE[GGML_TYPE_F32]*(src0->ne[0]*src0->ne[1]);
@@ -9077,7 +9077,7 @@ static void ggml_compute_forward_scale_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
@@ -9194,7 +9194,7 @@ static void ggml_compute_forward_get_rows_q(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -9225,7 +9225,7 @@ static void ggml_compute_forward_get_rows_f16(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
@@ -9255,7 +9255,7 @@ static void ggml_compute_forward_get_rows_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -9336,7 +9336,7 @@ static void ggml_compute_forward_diag_mask_inf_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -9393,7 +9393,7 @@ static void ggml_compute_forward_soft_max_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
@@ -9485,7 +9485,7 @@ static void ggml_compute_forward_rope_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
@@ -9578,7 +9578,7 @@ static void ggml_compute_forward_rope_f16(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
     }
@@ -9694,7 +9694,7 @@ static void ggml_compute_forward_conv_1d_1s_f16_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 0);
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
 
@@ -9824,7 +9824,7 @@ static void ggml_compute_forward_conv_1d_1s_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 0);
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         int64_t nk = src0->ne[0];
@@ -9976,7 +9976,7 @@ static void ggml_compute_forward_conv_1d_2s_f16_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 0);
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
@@ -10100,7 +10100,7 @@ static void ggml_compute_forward_conv_1d_2s_f32(
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 0);
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         return;
@@ -10249,7 +10249,7 @@ static void ggml_compute_forward_flash_attn_f32(
         const struct ggml_tensor * v,
         const bool masked,
              struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
 
         const int64_t ne11 = ggml_up(dst->src1->ne[1], GGML_SOFT_MAX_UNROLL);
@@ -10461,7 +10461,7 @@ static void ggml_compute_forward_flash_attn_f16(
         const struct ggml_tensor * v,
         const bool masked,
              struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_INIT] = GGML_COMPUTE_FLAG(1, 1);
 
         const int64_t ne11 = ggml_up(dst->src1->ne[1], GGML_SOFT_MAX_UNROLL);
@@ -10737,7 +10737,7 @@ static void ggml_compute_forward_flash_ff_f16(
         const struct ggml_tensor * c0, // F16 proj_w
         const struct ggml_tensor * c1, // F32 proj_b
         struct ggml_tensor * dst) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 1);
         int n_tasks = params->n_threads;
         dst->sched.work_size  = sizeof(float)*dst->src1->ne[1]*n_tasks; // TODO(gerganov): this can become (n_tasks-1)
@@ -10942,7 +10942,7 @@ static void ggml_compute_forward_map_unary_f32(
         const struct ggml_tensor * src0,
         struct ggml_tensor * dst,
         const ggml_unary_op_f32_t fun) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -10990,7 +10990,7 @@ static void ggml_compute_forward_map_binary_f32(
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst,
         const ggml_binary_op_f32_t fun) {
-    if (params->type == GGML_TASK_PLAN) {
+    if (params->set_config) {
         dst->sched.stage_flags[GGML_TASK_COMPUTE] = GGML_COMPUTE_FLAG(1, 0);
         return;
     }
@@ -11642,8 +11642,8 @@ static void ggml_graph_compute_plan(struct ggml_context * ctx, struct ggml_cgrap
         }
 
         struct ggml_compute_params params = {
-            .type      = GGML_TASK_PLAN,
-            .n_threads = n_threads,
+            .set_config = true,
+            .n_threads  = n_threads,
         };
 
         ggml_compute_forward(&params, node);
@@ -11854,7 +11854,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
 #endif
 
         // This is the params for main thread.
-        struct ggml_compute_params params;
+        struct ggml_compute_params params = { .set_config = false };
 
         for (int k = GGML_TASK_INIT; k <= GGML_TASK_FINALIZE; k++) {
             enum ggml_task_type type = k;
