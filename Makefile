@@ -1,5 +1,5 @@
 # Define the default target now so that it is always the first target
-default: main quantize quantize-stats perplexity embedding vdot
+default: main quantize quantize-stats perplexity embedding vdot mulmat-device-bench
 
 ifndef UNAME_S
 UNAME_S := $(shell uname -s)
@@ -36,7 +36,8 @@ endif
 # keep standard at C11 and C++11
 CFLAGS   = -I.              -O3 -std=c11   -fPIC
 CXXFLAGS = -I. -I./examples -O3 -std=c++11 -fPIC
-LDFLAGS  =
+# -lm fixed error: ggml.o: undefined reference to symbol 'tanhf@@GLIBC_2.2.5' from ubuntu 22.04
+LDFLAGS  = -lm
 
 ifndef LLAMA_DEBUG
 	CFLAGS   += -DNDEBUG
@@ -98,8 +99,7 @@ ifneq ($(filter ppc64%,$(UNAME_M)),)
 	endif
 endif
 ifndef LLAMA_NO_ACCELERATE
-	# Mac M1 - include Accelerate framework.
-	# `-framework Accelerate` works on Mac Intel as well, with negliable performance boost (as of the predict time).
+	# Mac Intel & M1 - include Accelerate framework.
 	ifeq ($(UNAME_S),Darwin)
 		CFLAGS  += -DGGML_USE_ACCELERATE
 		LDFLAGS += -framework Accelerate
@@ -112,6 +112,16 @@ ifdef LLAMA_OPENBLAS
 	else
 		LDFLAGS += -lopenblas
 	endif
+endif
+ifeq ($(UNAME_S),Darwin)
+	# openblas installed with Homebew on macOS.
+	CFLAGS  += -I/usr/local/opt/openblas/include
+	LDFLAGS += -L/usr/local/opt/openblas/lib
+endif
+ifeq ($(UNAME_S),Linux)
+	# libopenblas64-pthread-dev on ubunntu.
+	CFLAGS  += -I/usr/include/x86_64-linux-gnu/openblas64-pthread
+	LDFLAGS += -lopenblas64 -L/usr/lib/x86_64-linux-gnu/openblas64-pthread
 endif
 ifdef LLAMA_CUBLAS
 	CFLAGS    += -DGGML_USE_CUBLAS -I/usr/local/cuda/include -I/opt/cuda/include -I$(CUDA_PATH)/targets/x86_64-linux/include
@@ -177,6 +187,8 @@ $(info I CC:       $(CCV))
 $(info I CXX:      $(CXXV))
 $(info )
 
+OBJS += mulmat-device.o
+
 #
 # Build library
 #
@@ -239,6 +251,14 @@ benchmark-matmult: examples/benchmark/benchmark-matmult.cpp build-info.h ggml.o 
 
 vdot: pocs/vdot/vdot.cpp ggml.o $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+
+mulmat-device.o: examples/mulmat-device/mulmat-device.c \
+	examples/mulmat-device/mulmat-device.h
+	$(CC)  $(CFLAGS) -c $< -o $@
+
+mulmat-device-bench: examples/mulmat-device/mulmat-device-bench.c \
+	ggml.o $(OBJS)
+	$(CC)  $(CFLAGS) $^ -o mulmat-device-bench $(LDFLAGS)
 
 .PHONY: tests
 tests:

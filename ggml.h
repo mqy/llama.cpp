@@ -1,5 +1,7 @@
 #pragma once
 
+
+
 //
 // GGML Tensor Library
 //
@@ -183,6 +185,8 @@
 #    define GGML_API
 #endif
 
+#include "examples/mulmat-device/mulmat-device.h"
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -196,6 +200,7 @@
 #define GGML_MAX_CONTEXTS      64
 #define GGML_MAX_OPT           4
 #define GGML_DEFAULT_N_THREADS 4
+#define GGML_MAX_N_THREADS     32
 
 #define GGML_ASSERT(x) \
     do { \
@@ -319,6 +324,45 @@ extern "C" {
 
     static const size_t GGML_OBJECT_SIZE = sizeof(struct ggml_object);
 
+    // NOTE: newly added in this PR
+    struct ggml_compute_task_config {
+        // number of threads to parallel, >= 1
+        int n_tasks;
+
+        // this is a slow stage that typically runs on GPU with just main thread,
+        // so worker threads SHOULD go waiting if possible.
+        bool worker_wait;
+    };
+
+    // NOTE: newly added in this PR
+    struct ggml_compute_tensor_config {
+        enum ggml_device_type device;
+        size_t work_size;
+
+        struct ggml_compute_task_config task_stages[3];
+    };
+
+    // NOTE: copied from ggml.c
+    enum ggml_task_type {
+        GGML_TASK_INIT = 0,
+        GGML_TASK_COMPUTE,
+        GGML_TASK_FINALIZE,
+    };
+
+    // NOTE: copied from ggml.c, added set_config
+    struct ggml_compute_params {
+        bool configure_task_stages;
+        int n_threads;
+
+        enum ggml_task_type type;
+
+        int ith, nth;
+
+        // work buffer for all threads
+        size_t wsize;
+        void * wdata;
+    };
+
     // n-dimensional tensor
     struct ggml_tensor {
         enum ggml_type type;
@@ -341,7 +385,7 @@ extern "C" {
         struct ggml_tensor * opt[GGML_MAX_OPT];
 
         // thread scheduling
-        int n_tasks;
+        struct ggml_compute_tensor_config sched; // will replace n_tasks.
 
         // performance
         int     perf_runs;
@@ -352,7 +396,7 @@ extern "C" {
 
         char name[32];
 
-        char padding[8]; // TODO: remove and add padding to name?
+        //char padding[8]; // TODO: remove and add padding to name?
     };
 
     // computation graph
@@ -360,6 +404,8 @@ extern "C" {
         int n_nodes;
         int n_leafs;
         int n_threads;
+
+        struct ggml_mulmat_bench *mulmat_bench;
 
         size_t work_size;
         struct ggml_tensor * work;
@@ -387,6 +433,12 @@ extern "C" {
         void * mem_buffer; // if NULL, memory will be allocated internally
         bool   no_alloc;   // don't allocate memory for the tensor data
     };
+
+    // Temp, for mulmat-device-bench
+    void ggml_compute_forward_mul_mat_q_f32(const struct ggml_compute_params * params,
+        const struct ggml_tensor * src0,
+        const struct ggml_tensor * src1,
+              struct ggml_tensor * dst);
 
     // misc
 
