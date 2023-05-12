@@ -151,6 +151,9 @@ static cl_kernel kernel_q4_0, kernel_q4_1, kernel_q5_0, kernel_q5_1, kernel_q8_0
 static cl_mem cl_buffer_a, cl_buffer_qb, cl_buffer_b, cl_buffer_c;
 static size_t cl_size_a = 0, cl_size_qb = 0, cl_size_b = 0, cl_size_c = 0;
 
+static bool is_blocking_queue = false;
+static bool cl_has_been_inited = false;
+
 static cl_program build_program_from_source(cl_context ctx, cl_device_id dev, const char* program_buffer) {
     cl_program p;
     char *program_log;
@@ -181,13 +184,23 @@ static cl_program build_program_from_source(cl_context ctx, cl_device_id dev, co
 }
 
 void ggml_cl_init(void) {
+    if (cl_has_been_inited) {
+        return;
+    }
+    cl_has_been_inited = true;
+
     cl_int err = 0;
     char * GGML_CLBLAST_PLATFORM = getenv("GGML_CLBLAST_PLATFORM");
     char * GGML_CLBLAST_DEVICE = getenv("GGML_CLBLAST_DEVICE");
     int plat_num = (GGML_CLBLAST_PLATFORM == NULL ? 0 : atoi(GGML_CLBLAST_PLATFORM));
     int dev_num = (GGML_CLBLAST_DEVICE == NULL ? 0 : atoi(GGML_CLBLAST_DEVICE));
-    printf("\nInitializing CLBlast (First Run)...");
-    printf("\nAttempting to use: Platform=%d, Device=%d (If invalid, program will crash)\n",plat_num,dev_num);
+
+    printf("\nInitializing CLBlast (First Run). ENVs: GGML_CLBLAST_PLATFORM=%s, GGML_CLBLAST_DEVICE=%s", 
+        GGML_CLBLAST_PLATFORM? GGML_CLBLAST_PLATFORM : "",
+        GGML_CLBLAST_DEVICE? GGML_CLBLAST_DEVICE : "");
+    printf("\nCAUTION: on some system, device 0 may work but very slow.");
+    printf("\nAttempting to use: Platform=%d, Device=%d (If invalid, program will crash)\n", plat_num, dev_num);
+
     cl_uint num_platforms;
     clGetPlatformIDs(0, NULL, &num_platforms);
     cl_platform_id* platforms = (cl_platform_id*)malloc(num_platforms*sizeof(cl_platform_id));
@@ -202,10 +215,20 @@ void ggml_cl_init(void) {
     device = devices[dev_num];
     char device_buffer[1024];
     clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(device_buffer), &device_buffer, NULL);
-    printf("Using Platform: %s Device: %s\n", platform_buffer, device_buffer);
+
+    printf("Using Platform: %s, Device: %s\n", platform_buffer, device_buffer);
+ 
     context = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
     CL_CHECK(err, "clCreateContext");
+
     queue = clCreateCommandQueue(context, device, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err);
+    if (err != CL_SUCCESS) {
+        queue = clCreateCommandQueue(context, device, 0, &err);
+        if (err == CL_SUCCESS) {
+            is_blocking_queue = true;
+            printf("CLBlast: the device does not support async queue, fallback to blocking queue.\n\n");
+        }
+    }
     CL_CHECK(err, "clCreateCommandQueue");
 
     free(platforms);
@@ -233,12 +256,69 @@ static void ggml_cl_malloc(size_t req_size, size_t* cur_size, cl_mem_flags flags
 
     // Reallocate buffer with enough space
     if (*cur_size > 0) {
-        clReleaseMemObject(*buf);
+        cl_int err = clReleaseMemObject(*buf);
+        CL_CHECK(err, "clReleaseMemObject");
     }
     cl_int err;
     *buf = clCreateBuffer(context, flags, req_size, NULL, &err);
     *cur_size = req_size;
     CL_CHECK(err, "clCreateBuffer");
+}
+
+static inline void ggml_cl_sgemm_blocking_runner(
+        const enum ggml_blas_order order, const enum ggml_blas_op trans_a,
+        const enum ggml_blas_op trans_b, const int m, const int n, const int k,
+        const float alpha, const void *host_a, const int lda, const float *host_b,
+        const int ldb, const float beta, float *host_c, const int ldc,
+        cl_kernel kernel, size_t local, size_t size_qb) {
+  
+    cl_int err;
+
+    const size_t global = n * k;
+    const size_t size_a = m * k * sizeof(float);
+    const size_t size_b = global * sizeof(float);
+    const size_t size_c = m * n * sizeof(float);
+
+    err = clEnqueueWriteBuffer(queue, cl_buffer_b, CL_TRUE, 0, size_b, host_b, 0, NULL, NULL);
+    CL_CHECK(err, "clEnqueueWriteBuffer b");
+
+    if (size_qb > 0) {
+        err = clEnqueueWriteBuffer(queue, cl_buffer_qb, CL_TRUE, 0, size_qb, host_b, 0, NULL, NULL);
+        CL_CHECK(err, "clEnqueueWriteBuffer qb");
+
+        err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &cl_buffer_qb);
+        CL_CHECK(err, "clSetKernelArg");
+
+        err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &cl_buffer_b);
+        CL_CHECK(err, "clSetKernelArg");
+        
+        err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global, &local, 0, NULL, NULL);
+        CL_CHECK(err, "clEnqueueNDRangeKernel");
+    } else {
+        err = clEnqueueWriteBuffer(queue, cl_buffer_b, CL_TRUE, 0, size_b, host_b, 0, NULL, NULL);
+        CL_CHECK(err, "clEnqueueWriteBuffer b");
+    }
+
+    err = clEnqueueWriteBuffer(queue, cl_buffer_a, CL_TRUE, 0, size_a, host_a, 0, NULL, NULL);
+    CL_CHECK(err, "clEnqueueWriteBuffer a");
+
+    CLBlastStatusCode status = CLBlastSgemm((CLBlastLayout)order,
+                                            (CLBlastTranspose)trans_a, (CLBlastTranspose)trans_b,
+                                            m, n, k,
+                                            alpha,
+                                            cl_buffer_a, 0, lda,
+                                            cl_buffer_b, 0, ldb,
+                                            beta,
+                                            cl_buffer_c, 0, ldc,
+                                            &queue, NULL);
+
+    if (status != CLBlastSuccess) {
+        fprintf(stderr, "Error: CLBlast SGEMM %d\n", status);
+        abort();
+    }
+
+    err = clEnqueueReadBuffer(queue, cl_buffer_c, CL_TRUE, 0, size_c, host_c, 0, NULL, NULL);
+    CL_CHECK(err, "clEnqueueNDRangeKernel");
 }
 
 void ggml_cl_sgemm_wrapper(
@@ -315,6 +395,12 @@ void ggml_cl_sgemm_wrapper(
     }
     ggml_cl_malloc(size_b, &cl_size_b, CL_MEM_READ_WRITE, &cl_buffer_b);
     ggml_cl_malloc(size_c, &cl_size_c, CL_MEM_WRITE_ONLY, &cl_buffer_c);
+
+    if (is_blocking_queue) {
+        ggml_cl_sgemm_blocking_runner(order, trans_a, trans_b, m, n, k, alpha,
+            host_a, lda, host_b, ldb, beta, host_c, ldc, kernel, local, size_qb);
+        return;
+    }
 
     cl_event ev_a, ev_qb, ev_b;
 
