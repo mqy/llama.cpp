@@ -1,9 +1,9 @@
 #include "examples/mulmat-device/mulmat-device.h"
 
-const char* ggml_blas_names[GGML_BLAS_TYPE_COUNT] = {
+const char *ggml_blas_names[GGML_BLAS_TYPE_COUNT] = {
     [GGML_BLAS_TYPE_ACCELERATE] = "Accelerate",
-    [GGML_BLAS_TYPE_CLBLAST] ="CLBlast",
-    [GGML_BLAS_TYPE_CUBLAS] ="cuBLAS",
+    [GGML_BLAS_TYPE_CLBLAST] = "CLBlast",
+    [GGML_BLAS_TYPE_CUBLAS] = "cuBLAS",
     [GGML_BLAS_TYPE_OPENBLAS] = "OpenBLAS",
 };
 
@@ -183,7 +183,7 @@ enum ggml_device_type ggml_mulmat_choose_device(struct ggml_mulmat_bench *b,
     return (cpu_time < gpu_time) ? GGML_DEVICE_CPU : GGML_DEVICE_GPU;
 }
 
-const char* ggml_get_blas_name(void) {
+const char *ggml_get_blas_name(void) {
 #if defined(GGML_USE_ACCELERATE)
     return ggml_blas_names[GGML_BLAS_TYPE_ACCELERATE];
 #elif defined(GGML_USE_CLBLAST)

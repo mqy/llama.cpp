@@ -2157,9 +2157,9 @@ struct llama_context * llama_init_from_file(
         if (ctx->model.type == MODEL_7B || ctx->model.type == MODEL_13B) {
             const char * model_name = NULL;
             if (ctx->model.type == MODEL_7B) {
-                model_name = "7B";
+                model_name = "7b";
             } else if (ctx->model.type == MODEL_13B) {
-                model_name = "13B";
+                model_name = "13b";
             }
             char buf[200];
             memset(buf, 0, sizeof(buf));

@@ -325,28 +325,28 @@ extern "C" {
     static const size_t GGML_OBJECT_SIZE = sizeof(struct ggml_object);
 
     // NOTE: newly added in this PR
-    struct ggml_compute_task_config {
+    struct ggml_compute_task_stage {
+        enum ggml_device_type device;
+
+        enum ggml_blas_type blas;
+
         // number of threads to parallel, >= 1
-        int n_tasks;
+        bool n_tasks;
 
         // this is a slow stage that typically runs on GPU with just main thread,
         // so worker threads SHOULD go waiting if possible.
         bool worker_wait;
-
-        // TODO: stage level device and blas.
-        // enum ggml_device_type device;
-
-        // // blas type when device is GPU.
-        // enum ggml_blas_type blas;
     };
 
     // NOTE: newly added in this PR
     struct ggml_compute_tensor_config {
         enum ggml_device_type device;
 
+        enum ggml_blas_type blas;
+
         size_t work_size;
 
-        struct ggml_compute_task_config task_stages[3];
+        struct ggml_compute_task_stage task_stages[3];
     };
 
     // NOTE: copied from ggml.c

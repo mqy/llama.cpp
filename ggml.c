@@ -11238,7 +11238,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
 
         for (int k = GGML_TASK_INIT; k <= GGML_TASK_FINALIZE; k++) {
             enum ggml_task_type type = k;
-            struct ggml_compute_task_config *tc = &node->sched.task_stages[k];
+            struct ggml_compute_task_stage *tc = &node->sched.task_stages[k];
             if (tc->n_tasks < 1) {
                 continue;
             }
