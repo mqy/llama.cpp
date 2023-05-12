@@ -7667,9 +7667,7 @@ static void ggml_compute_forward_mul_mat_f32(
 #if defined(GGML_USE_CUBLAS)
         ggml_cuda_mul_mat(src0, src1, dst, params->wdata, params->wsize);
         return;
-#endif
-
-#if defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS) || defined(GGML_USE_CLBLAS)
+#elif defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS) || defined(GGML_USE_CLBLAST)
         GGML_ASSERT(ggml_is_contiguous(src0) && ggml_is_contiguous(src1));
 
         for (int64_t i03 = 0; i03 < ne03; i03++) {
@@ -7698,6 +7696,8 @@ static void ggml_compute_forward_mul_mat_f32(
         //printf("CBLAS F32 = %f ms, %d x %d x %d x %d\n", (ggml_perf_time_us() - t0)/1000.0, ne0, ne1, ne2, ne3);
 
         return;
+#else
+        GGML_ASSERT(false);
 #endif
     }
 
@@ -7838,9 +7838,7 @@ static void ggml_compute_forward_mul_mat_f16_f32(
 #if defined(GGML_USE_CUBLAS)
         ggml_cuda_mul_mat(src0, src1, dst, params->wdata, params->wsize);
         return;
-#endif
-
-#if defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS) || defined(GGML_USE_CLBLAS)
+#elif defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS) || defined(GGML_USE_CLBLAS)
         GGML_ASSERT(nb10 == sizeof(float));
 
         for (int64_t i03 = 0; i03 < ne03; i03++) {
@@ -7888,6 +7886,8 @@ static void ggml_compute_forward_mul_mat_f16_f32(
         /*printf("CBLAS F16 = %f ms, %d x %d x %d x %d\n", (ggml_perf_time_us() - t0)/1000.0, ne0, ne1, ne2, ne3);*/
 
         return;
+#else
+        GGML_ASSERT(false);
 #endif
     }
 
@@ -7973,10 +7973,10 @@ void ggml_compute_forward_mul_mat_q_f32(
               struct ggml_tensor * dst) {
     if (params->configure_task_stages) {
         if (dst->sched.device == GGML_DEVICE_GPU) {
-#if defined(GGML_USE_CUBLAS)
-            dst->config.stages[GGML_TASK_COMPUTE].n_tasks = 1; // TODO
-            dst->config.stages[GGML_TASK_COMPUTE].worker_wait = true; // TODO
-            dst->config.work_size = GGML_TYPE_SIZE[GGML_TYPE_F32]*(src0->ne[0]*src0->ne[1]);
+#if defined(GGML_USE_CUBLAS) || defined(GGML_USE_CLBLAST)
+            dst->sched.task_stages[GGML_TASK_COMPUTE].n_tasks = 1;
+            dst->sched.task_stages[GGML_TASK_COMPUTE].worker_wait = true;
+            dst->sched.work_size = GGML_TYPE_SIZE[GGML_TYPE_F32]*(src0->ne[0]*src0->ne[1]);
 #else
             dst->sched.task_stages[GGML_TASK_INIT].n_tasks = params->n_threads;
             dst->sched.task_stages[GGML_TASK_COMPUTE].n_tasks = 1;
@@ -7985,7 +7985,7 @@ void ggml_compute_forward_mul_mat_q_f32(
 #endif
         } else {
             dst->sched.task_stages[GGML_TASK_INIT].n_tasks = 1;
-            //dst->config.tasks[GGML_TASK_INIT]..worker_wait = true;
+            //dst->sched.tasks[GGML_TASK_INIT]..worker_wait = true;
             dst->sched.task_stages[GGML_TASK_COMPUTE].n_tasks = params->n_threads;
             dst->sched.work_size = GGML_TYPE_SIZE[GGML_TYPE_Q8_0]*ggml_nelements(src1)/GGML_BLCK_SIZE[GGML_TYPE_Q8_0];
         }
@@ -8066,9 +8066,27 @@ void ggml_compute_forward_mul_mat_q_f32(
 
         ggml_cuda_mul_mat(src0, src1, dst, params->wdata, params->wsize);
         return;
-#endif
+#elif defined(GGML_USE_CLBLAST)
+        GGML_ASSERT(params->nth == 1);
+        GGML_ASSERT(params->type == GGML_TASK_COMPUTE);
 
-#if defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS) || defined(GGML_USE_CLBLAST)
+        for (int64_t i03 = 0; i03 < ne03; i03++) {
+            for (int64_t i02 = 0; i02 < ne02; i02++) {
+                const float * y = (float *) ((char *) src1->data + i02*nb12 + i03*nb13);
+                const void* x = (char *) src0->data + i03*nb03 + i02*nb02;
+                float * d = (float *) ((char *) dst->data + i02*nb2 + i03*nb3);
+
+                // zT = y * xT
+                ggml_cl_sgemm_wrapper(GGML_BLAS_ORDER_ROW_MAJOR, GGML_BLAS_OP_N, GGML_BLAS_OP_T,
+                        ne11, ne01, ne10,
+                        1.0f,    y, ne10,
+                                 x, ne10,
+                        0.0f,    d, ne01,
+                        type);
+            }
+        }
+        return;
+#elif defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS)
         float * const wdata = params->wdata;
         dequantize_row_q_t const dequantize_row_q = quantize_fns[type].dequantize_row_q;
 
@@ -8096,32 +8114,26 @@ void ggml_compute_forward_mul_mat_q_f32(
 
         GGML_ASSERT(nth == 1);
 
-        const float * x = wdata;
         for (int64_t i03 = 0; i03 < ne03; i03++) {
             for (int64_t i02 = 0; i02 < ne02; i02++) {
                 const float * y = (float *) ((char *) src1->data + i02*nb12 + i03*nb13);
                 float * d = (float *) ((char *) dst->data + i02*nb2 + i03*nb3);
 
-#if defined(GGML_USE_CLBLAST)
-                // zT = y * xT
-                ggml_cl_sgemm_wrapper(GGML_BLAS_ORDER_ROW_MAJOR, GGML_BLAS_OP_N, GGML_BLAS_OP_T,
-                        ne11, ne01, ne10,
-                        1.0f,    y, ne10,
-                                 x, ne10,
-                        0.0f,    d, ne01,
-                        type);
-#else
+                 // zT = y * xT
+                const float * x = wdata;
                 cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasTrans,
                         ne11, ne01, ne10,
                         1.0f,    y, ne10,
                                  x, ne00,
                         0.0f,    d, ne01);
-#endif
             }
         }
 
         return;
+#else
+        GGML_ASSERT(false);
 #endif
+        return;
     }
 
     GGML_ASSERT(dst->sched.device == GGML_DEVICE_CPU);
@@ -11111,19 +11123,11 @@ static inline void ggml_graph_compute_mulmat_set_device(struct ggml_tensor *node
         int K = (int)node->src1->ne[0];
 
         if (bench) {
-            char *impl = NULL;
+            char *blas_name = NULL;
             // TODO: define constants for these names
-#if defined(ACCELERATE)
-            impl = "ACCELERATE";
-#elif defined(CLBLAS)
-            impl = "CUBLAS";
-#elif defined(GGML_USE_CUBLAS)
-            impl = "CUBLAS";
-#elif defined(OPENBLAS)
-            impl = "OPENBLAS";
-#endif
 
-            if (impl != NULL && strcmp(bench->gpu_impl, impl) == 0) {
+
+            if (blas_name != NULL && strcmp(bench->blas_name, blas_name) == 0) {
                 node->sched.device = ggml_mulmat_choose_device(bench, M, N, K, n_threads);
                 GGML_MULMAT_DEVICE_PRINT("device: %d, M: %d, N: %d, K: %d, from bench of impl %s\n", node->sched.device, M, N, K, impl);
             }

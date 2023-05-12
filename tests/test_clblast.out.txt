@@ -1,0 +1,586 @@
+=== n:  4096, k:  4096 ===
+m:  16, create buffers: 0.062 ms, dequant: 111.320 ms, write buffers: 3.042 ms, segemm: 503.675 ms, read buffer:  34.676 ms, total: 655.429 ms
+m:  16, create buffers: 0.032 ms, dequant: 108.722 ms, write buffers: 0.813 ms, segemm:   0.085 ms, read buffer:  25.011 ms, total: 137.548 ms
+m:  16, create buffers: 0.027 ms, dequant:  99.885 ms, write buffers: 1.797 ms, segemm:   0.123 ms, read buffer:  24.805 ms, total: 129.026 ms
+m:  16, create buffers: 0.024 ms, dequant:  99.271 ms, write buffers: 0.664 ms, segemm:   0.072 ms, read buffer:  25.432 ms, total: 127.945 ms
+m:  16, create buffers: 0.066 ms, dequant:  89.858 ms, write buffers: 0.945 ms, segemm:   0.068 ms, read buffer:  21.944 ms, total: 115.486 ms
+
+m:  32, create buffers: 0.027 ms, dequant:  91.361 ms, write buffers: 1.000 ms, segemm:   0.064 ms, read buffer:  42.074 ms, total: 137.323 ms
+m:  32, create buffers: 0.027 ms, dequant:  82.587 ms, write buffers: 3.703 ms, segemm:   0.114 ms, read buffer:  41.177 ms, total: 130.106 ms
+m:  32, create buffers: 0.031 ms, dequant:  79.434 ms, write buffers: 0.841 ms, segemm:   0.182 ms, read buffer:  37.564 ms, total: 120.593 ms
+m:  32, create buffers: 0.027 ms, dequant:  74.248 ms, write buffers: 0.973 ms, segemm:   0.115 ms, read buffer:  35.987 ms, total: 113.683 ms
+m:  32, create buffers: 0.027 ms, dequant:  70.063 ms, write buffers: 0.964 ms, segemm:   0.115 ms, read buffer:  35.021 ms, total: 108.966 ms
+
+m:  48, create buffers: 0.026 ms, dequant:  69.476 ms, write buffers: 1.113 ms, segemm:   0.243 ms, read buffer:  52.786 ms, total: 126.232 ms
+m:  48, create buffers: 0.030 ms, dequant:  65.416 ms, write buffers: 1.024 ms, segemm:   0.155 ms, read buffer:  47.072 ms, total: 116.663 ms
+m:  48, create buffers: 0.026 ms, dequant:  63.033 ms, write buffers: 0.978 ms, segemm:   0.185 ms, read buffer:  50.858 ms, total: 117.914 ms
+m:  48, create buffers: 0.025 ms, dequant:  63.286 ms, write buffers: 0.790 ms, segemm:   0.167 ms, read buffer:  48.964 ms, total: 115.847 ms
+m:  48, create buffers: 0.027 ms, dequant:  67.025 ms, write buffers: 1.051 ms, segemm:   0.184 ms, read buffer:  51.608 ms, total: 122.572 ms
+
+m:  64, create buffers: 0.026 ms, dequant:  66.023 ms, write buffers: 1.127 ms, segemm:   0.159 ms, read buffer:  53.052 ms, total: 123.044 ms
+m:  64, create buffers: 0.025 ms, dequant:  76.516 ms, write buffers: 1.238 ms, segemm:   0.422 ms, read buffer:  61.161 ms, total: 142.409 ms
+m:  64, create buffers: 0.030 ms, dequant:  82.871 ms, write buffers: 1.269 ms, segemm:   0.178 ms, read buffer:  60.926 ms, total: 148.380 ms
+m:  64, create buffers: 0.028 ms, dequant:  74.387 ms, write buffers: 1.620 ms, segemm:   0.572 ms, read buffer:  61.928 ms, total: 141.923 ms
+m:  64, create buffers: 0.026 ms, dequant:  71.605 ms, write buffers: 2.058 ms, segemm:   0.643 ms, read buffer:  61.080 ms, total: 138.969 ms
+
+m:  80, create buffers: 0.028 ms, dequant:  74.648 ms, write buffers: 2.191 ms, segemm:   0.405 ms, read buffer:  77.915 ms, total: 158.121 ms
+m:  80, create buffers: 0.029 ms, dequant:  67.137 ms, write buffers: 2.070 ms, segemm:   0.400 ms, read buffer:  75.397 ms, total: 148.560 ms
+m:  80, create buffers: 0.026 ms, dequant:  64.881 ms, write buffers: 2.202 ms, segemm:   0.401 ms, read buffer:  74.496 ms, total: 145.365 ms
+m:  80, create buffers: 0.028 ms, dequant:  71.849 ms, write buffers: 2.189 ms, segemm:   0.393 ms, read buffer:  81.152 ms, total: 159.068 ms
+m:  80, create buffers: 0.029 ms, dequant:  69.426 ms, write buffers: 2.097 ms, segemm:   0.415 ms, read buffer:  78.974 ms, total: 154.308 ms
+
+m:  96, create buffers: 0.028 ms, dequant:  71.676 ms, write buffers: 2.255 ms, segemm:   0.267 ms, read buffer:  79.024 ms, total: 156.672 ms
+m:  96, create buffers: 0.026 ms, dequant:  69.787 ms, write buffers: 2.375 ms, segemm:   0.400 ms, read buffer:  77.832 ms, total: 153.818 ms
+m:  96, create buffers: 0.026 ms, dequant:  71.776 ms, write buffers: 1.748 ms, segemm:   0.362 ms, read buffer:  78.871 ms, total: 156.365 ms
+m:  96, create buffers: 0.027 ms, dequant:  69.305 ms, write buffers: 2.481 ms, segemm:   0.399 ms, read buffer:  78.271 ms, total: 153.879 ms
+m:  96, create buffers: 0.028 ms, dequant:  77.300 ms, write buffers: 1.871 ms, segemm:   0.265 ms, read buffer:  82.281 ms, total: 165.111 ms
+
+m: 112, create buffers: 0.025 ms, dequant:  78.313 ms, write buffers: 2.552 ms, segemm:   0.266 ms, read buffer: 102.505 ms, total: 187.112 ms
+m: 112, create buffers: 0.028 ms, dequant:  72.209 ms, write buffers: 2.437 ms, segemm:   0.616 ms, read buffer:  95.468 ms, total: 174.026 ms
+m: 112, create buffers: 0.029 ms, dequant:  65.617 ms, write buffers: 2.432 ms, segemm:   0.417 ms, read buffer:  91.751 ms, total: 163.924 ms
+m: 112, create buffers: 0.026 ms, dequant:  69.567 ms, write buffers: 2.484 ms, segemm:   0.622 ms, read buffer:  95.890 ms, total: 172.104 ms
+m: 112, create buffers: 0.027 ms, dequant:  65.327 ms, write buffers: 2.137 ms, segemm:   0.268 ms, read buffer:  90.324 ms, total: 161.647 ms
+
+m: 128, create buffers: 0.028 ms, dequant:  66.847 ms, write buffers: 2.639 ms, segemm:   0.272 ms, read buffer:  91.092 ms, total: 164.497 ms
+m: 128, create buffers: 0.025 ms, dequant:  66.890 ms, write buffers: 2.539 ms, segemm:   0.626 ms, read buffer:  92.286 ms, total: 165.777 ms
+m: 128, create buffers: 0.025 ms, dequant:  64.620 ms, write buffers: 2.239 ms, segemm:   0.560 ms, read buffer:  91.245 ms, total: 162.240 ms
+m: 128, create buffers: 0.027 ms, dequant:  61.401 ms, write buffers: 2.653 ms, segemm:   0.616 ms, read buffer:  87.034 ms, total: 155.400 ms
+m: 128, create buffers: 0.026 ms, dequant:  66.946 ms, write buffers: 2.548 ms, segemm:   0.389 ms, read buffer:  91.123 ms, total: 164.632 ms
+
+m: 144, create buffers: 0.027 ms, dequant:  71.798 ms, write buffers: 2.632 ms, segemm:   0.430 ms, read buffer: 114.668 ms, total: 193.140 ms
+m: 144, create buffers: 0.027 ms, dequant:  64.900 ms, write buffers: 2.414 ms, segemm:   0.428 ms, read buffer: 105.435 ms, total: 176.664 ms
+m: 144, create buffers: 0.027 ms, dequant:  64.256 ms, write buffers: 1.983 ms, segemm:   0.354 ms, read buffer: 102.347 ms, total: 172.541 ms
+m: 144, create buffers: 0.026 ms, dequant:  66.855 ms, write buffers: 2.545 ms, segemm:   0.271 ms, read buffer: 107.924 ms, total: 181.322 ms
+m: 144, create buffers: 0.027 ms, dequant:  66.818 ms, write buffers: 2.384 ms, segemm:   0.416 ms, read buffer: 106.307 ms, total: 179.373 ms
+
+m: 160, create buffers: 0.028 ms, dequant:  61.486 ms, write buffers: 2.034 ms, segemm:   0.284 ms, read buffer: 100.748 ms, total: 167.850 ms
+m: 160, create buffers: 0.027 ms, dequant:  65.275 ms, write buffers: 2.317 ms, segemm:   0.426 ms, read buffer: 106.523 ms, total: 177.988 ms
+m: 160, create buffers: 0.026 ms, dequant:  61.790 ms, write buffers: 2.571 ms, segemm:   0.282 ms, read buffer: 101.913 ms, total: 170.149 ms
+m: 160, create buffers: 0.027 ms, dequant:  61.459 ms, write buffers: 1.416 ms, segemm:   0.274 ms, read buffer: 100.627 ms, total: 167.143 ms
+m: 160, create buffers: 0.028 ms, dequant:  61.602 ms, write buffers: 1.707 ms, segemm:   0.321 ms, read buffer: 100.508 ms, total: 167.989 ms
+
+m: 176, create buffers: 0.027 ms, dequant:  61.501 ms, write buffers: 2.722 ms, segemm:   0.425 ms, read buffer: 113.464 ms, total: 181.210 ms
+m: 176, create buffers: 0.030 ms, dequant:  61.965 ms, write buffers: 2.710 ms, segemm:   0.512 ms, read buffer: 114.468 ms, total: 182.902 ms
+m: 176, create buffers: 0.027 ms, dequant:  58.152 ms, write buffers: 2.761 ms, segemm:   0.285 ms, read buffer: 110.705 ms, total: 175.655 ms
+m: 176, create buffers: 0.027 ms, dequant:  59.587 ms, write buffers: 2.656 ms, segemm:   0.437 ms, read buffer: 110.584 ms, total: 176.599 ms
+m: 176, create buffers: 0.028 ms, dequant:  55.247 ms, write buffers: 2.833 ms, segemm:   0.460 ms, read buffer: 106.378 ms, total: 168.782 ms
+
+m: 192, create buffers: 0.029 ms, dequant:  58.347 ms, write buffers: 2.938 ms, segemm:   0.386 ms, read buffer: 113.951 ms, total: 181.829 ms
+m: 192, create buffers: 0.025 ms, dequant:  62.469 ms, write buffers: 2.897 ms, segemm:   0.425 ms, read buffer: 116.249 ms, total: 185.593 ms
+m: 192, create buffers: 0.025 ms, dequant:  61.832 ms, write buffers: 2.875 ms, segemm:   0.424 ms, read buffer: 116.458 ms, total: 187.593 ms
+m: 192, create buffers: 0.045 ms, dequant:  63.634 ms, write buffers: 2.723 ms, segemm:   0.398 ms, read buffer: 116.795 ms, total: 187.084 ms
+m: 192, create buffers: 0.027 ms, dequant:  57.788 ms, write buffers: 2.790 ms, segemm:   0.433 ms, read buffer: 110.873 ms, total: 175.565 ms
+
+m: 208, create buffers: 0.027 ms, dequant:  54.660 ms, write buffers: 3.088 ms, segemm:   0.440 ms, read buffer: 118.507 ms, total: 180.634 ms
+m: 208, create buffers: 0.064 ms, dequant:  55.091 ms, write buffers: 3.063 ms, segemm:   0.434 ms, read buffer: 119.322 ms, total: 181.705 ms
+m: 208, create buffers: 0.026 ms, dequant:  51.959 ms, write buffers: 3.017 ms, segemm:   0.460 ms, read buffer: 113.458 ms, total: 172.439 ms
+m: 208, create buffers: 0.028 ms, dequant:  49.865 ms, write buffers: 3.017 ms, segemm:   0.445 ms, read buffer: 109.329 ms, total: 166.336 ms
+m: 208, create buffers: 0.059 ms, dequant:  47.648 ms, write buffers: 2.942 ms, segemm:   0.443 ms, read buffer: 105.692 ms, total: 160.493 ms
+
+m: 224, create buffers: 0.027 ms, dequant:  49.281 ms, write buffers: 3.133 ms, segemm:   0.454 ms, read buffer: 103.629 ms, total: 160.161 ms
+m: 224, create buffers: 0.025 ms, dequant:  47.054 ms, write buffers: 2.810 ms, segemm:   0.313 ms, read buffer: 108.205 ms, total: 162.055 ms
+m: 224, create buffers: 0.027 ms, dequant:  47.374 ms, write buffers: 3.090 ms, segemm:   0.452 ms, read buffer: 105.254 ms, total: 159.929 ms
+m: 224, create buffers: 0.028 ms, dequant:  47.755 ms, write buffers: 3.076 ms, segemm:   0.502 ms, read buffer: 105.173 ms, total: 160.206 ms
+m: 224, create buffers: 0.026 ms, dequant:  51.257 ms, write buffers: 3.309 ms, segemm:   0.467 ms, read buffer: 107.506 ms, total: 166.220 ms
+
+m: 240, create buffers: 0.026 ms, dequant:  51.793 ms, write buffers: 3.240 ms, segemm:   0.445 ms, read buffer: 123.870 ms, total: 182.771 ms
+m: 240, create buffers: 0.028 ms, dequant:  49.655 ms, write buffers: 3.316 ms, segemm:   0.295 ms, read buffer: 122.012 ms, total: 179.076 ms
+m: 240, create buffers: 0.028 ms, dequant:  47.542 ms, write buffers: 3.285 ms, segemm:   0.461 ms, read buffer: 116.912 ms, total: 171.726 ms
+m: 240, create buffers: 0.028 ms, dequant:  45.801 ms, write buffers: 3.401 ms, segemm:   0.434 ms, read buffer: 112.330 ms, total: 165.601 ms
+m: 240, create buffers: 0.026 ms, dequant:  43.745 ms, write buffers: 3.190 ms, segemm:   0.456 ms, read buffer: 109.694 ms, total: 160.566 ms
+
+m: 256, create buffers: 0.027 ms, dequant:  45.685 ms, write buffers: 3.392 ms, segemm:   0.302 ms, read buffer: 111.440 ms, total: 164.650 ms
+m: 256, create buffers: 0.039 ms, dequant:  46.279 ms, write buffers: 3.367 ms, segemm:   0.313 ms, read buffer: 111.428 ms, total: 165.103 ms
+m: 256, create buffers: 0.026 ms, dequant:  47.164 ms, write buffers: 3.390 ms, segemm:   0.460 ms, read buffer: 114.980 ms, total: 169.229 ms
+m: 256, create buffers: 0.026 ms, dequant:  48.873 ms, write buffers: 3.388 ms, segemm:   0.311 ms, read buffer: 120.894 ms, total: 177.161 ms
+m: 256, create buffers: 0.065 ms, dequant:  48.033 ms, write buffers: 2.746 ms, segemm:   0.296 ms, read buffer: 115.541 ms, total: 170.459 ms
+
+
+=== n:  4096, k: 11008 ===
+m:  16, create buffers: 0.026 ms, dequant: 145.215 ms, write buffers: 0.844 ms, segemm:   0.264 ms, read buffer:  88.044 ms, total: 242.134 ms
+m:  16, create buffers: 0.027 ms, dequant: 170.183 ms, write buffers: 1.359 ms, segemm:   0.359 ms, read buffer:  95.922 ms, total: 276.330 ms
+m:  16, create buffers: 0.027 ms, dequant: 203.738 ms, write buffers: 1.044 ms, segemm:   0.261 ms, read buffer: 105.557 ms, total: 319.496 ms
+m:  16, create buffers: 0.026 ms, dequant: 234.510 ms, write buffers: 1.362 ms, segemm:   0.369 ms, read buffer: 103.731 ms, total: 348.544 ms
+m:  16, create buffers: 0.027 ms, dequant: 201.383 ms, write buffers: 1.140 ms, segemm:   0.353 ms, read buffer: 104.144 ms, total: 315.587 ms
+
+m:  32, create buffers: 0.026 ms, dequant: 217.947 ms, write buffers: 1.574 ms, segemm:   0.364 ms, read buffer: 109.543 ms, total: 337.165 ms
+m:  32, create buffers: 0.026 ms, dequant: 216.546 ms, write buffers: 1.420 ms, segemm:   0.360 ms, read buffer: 109.963 ms, total: 338.881 ms
+m:  32, create buffers: 0.026 ms, dequant: 213.306 ms, write buffers: 1.401 ms, segemm:   0.273 ms, read buffer: 103.497 ms, total: 327.241 ms
+m:  32, create buffers: 0.027 ms, dequant: 203.130 ms, write buffers: 1.448 ms, segemm:   0.362 ms, read buffer: 104.402 ms, total: 317.404 ms
+m:  32, create buffers: 0.026 ms, dequant: 234.303 ms, write buffers: 1.502 ms, segemm:   0.377 ms, read buffer: 108.785 ms, total: 352.839 ms
+
+m:  48, create buffers: 0.027 ms, dequant: 199.525 ms, write buffers: 1.940 ms, segemm:   0.364 ms, read buffer: 146.899 ms, total: 356.671 ms
+m:  48, create buffers: 0.026 ms, dequant: 186.886 ms, write buffers: 1.685 ms, segemm:   0.353 ms, read buffer: 139.524 ms, total: 335.814 ms
+m:  48, create buffers: 0.026 ms, dequant: 202.958 ms, write buffers: 1.781 ms, segemm:   0.365 ms, read buffer: 149.116 ms, total: 364.782 ms
+m:  48, create buffers: 0.040 ms, dequant: 217.399 ms, write buffers: 1.590 ms, segemm:   0.265 ms, read buffer: 154.692 ms, total: 381.889 ms
+m:  48, create buffers: 0.026 ms, dequant: 217.802 ms, write buffers: 1.744 ms, segemm:   0.380 ms, read buffer: 154.142 ms, total: 382.293 ms
+
+m:  64, create buffers: 0.026 ms, dequant: 203.198 ms, write buffers: 1.882 ms, segemm:   0.395 ms, read buffer: 147.141 ms, total: 364.319 ms
+m:  64, create buffers: 0.027 ms, dequant: 215.078 ms, write buffers: 2.085 ms, segemm:   0.270 ms, read buffer: 145.872 ms, total: 371.100 ms
+m:  64, create buffers: 0.027 ms, dequant: 188.770 ms, write buffers: 2.082 ms, segemm:   0.270 ms, read buffer: 139.754 ms, total: 342.367 ms
+m:  64, create buffers: 0.026 ms, dequant: 189.229 ms, write buffers: 1.573 ms, segemm:   0.266 ms, read buffer: 138.438 ms, total: 337.285 ms
+m:  64, create buffers: 0.026 ms, dequant: 190.505 ms, write buffers: 2.027 ms, segemm:   0.302 ms, read buffer: 139.814 ms, total: 340.516 ms
+
+m:  80, create buffers: 0.026 ms, dequant: 175.663 ms, write buffers: 2.108 ms, segemm:   0.269 ms, read buffer: 163.390 ms, total: 352.909 ms
+m:  80, create buffers: 0.026 ms, dequant: 166.615 ms, write buffers: 2.082 ms, segemm:   0.268 ms, read buffer: 172.170 ms, total: 352.053 ms
+m:  80, create buffers: 0.026 ms, dequant: 178.253 ms, write buffers: 2.113 ms, segemm:   0.260 ms, read buffer: 177.446 ms, total: 366.030 ms
+m:  80, create buffers: 0.027 ms, dequant: 175.988 ms, write buffers: 2.147 ms, segemm:   0.264 ms, read buffer: 170.743 ms, total: 357.206 ms
+m:  80, create buffers: 0.025 ms, dequant: 178.702 ms, write buffers: 2.107 ms, segemm:   0.274 ms, read buffer: 180.081 ms, total: 369.764 ms
+
+m:  96, create buffers: 0.026 ms, dequant: 178.590 ms, write buffers: 2.416 ms, segemm:   0.383 ms, read buffer: 178.431 ms, total: 367.944 ms
+m:  96, create buffers: 0.025 ms, dequant: 177.285 ms, write buffers: 2.352 ms, segemm:   0.270 ms, read buffer: 172.972 ms, total: 363.797 ms
+m:  96, create buffers: 0.027 ms, dequant: 178.538 ms, write buffers: 1.497 ms, segemm:   0.268 ms, read buffer: 178.730 ms, total: 372.872 ms
+m:  96, create buffers: 0.026 ms, dequant: 178.054 ms, write buffers: 2.918 ms, segemm:   0.264 ms, read buffer: 178.379 ms, total: 367.712 ms
+m:  96, create buffers: 0.025 ms, dequant: 178.868 ms, write buffers: 2.209 ms, segemm:   0.270 ms, read buffer: 178.831 ms, total: 368.836 ms
+
+m: 112, create buffers: 0.026 ms, dequant: 182.774 ms, write buffers: 2.622 ms, segemm:   0.281 ms, read buffer: 214.437 ms, total: 408.265 ms
+m: 112, create buffers: 0.027 ms, dequant: 165.829 ms, write buffers: 2.578 ms, segemm:   0.457 ms, read buffer: 198.795 ms, total: 375.898 ms
+m: 112, create buffers: 0.027 ms, dequant: 160.902 ms, write buffers: 2.304 ms, segemm:   0.259 ms, read buffer: 201.032 ms, total: 372.626 ms
+m: 112, create buffers: 0.025 ms, dequant: 152.441 ms, write buffers: 2.710 ms, segemm:   0.593 ms, read buffer: 192.762 ms, total: 360.155 ms
+m: 112, create buffers: 0.026 ms, dequant: 152.022 ms, write buffers: 2.196 ms, segemm:   0.263 ms, read buffer: 191.372 ms, total: 357.692 ms
+
+m: 128, create buffers: 0.027 ms, dequant: 151.942 ms, write buffers: 2.737 ms, segemm:   0.262 ms, read buffer: 193.101 ms, total: 356.858 ms
+m: 128, create buffers: 0.026 ms, dequant: 152.490 ms, write buffers: 2.919 ms, segemm:   0.582 ms, read buffer: 188.231 ms, total: 352.576 ms
+m: 128, create buffers: 0.025 ms, dequant: 151.518 ms, write buffers: 2.766 ms, segemm:   0.265 ms, read buffer: 191.618 ms, total: 354.078 ms
+m: 128, create buffers: 0.032 ms, dequant: 145.281 ms, write buffers: 2.809 ms, segemm:   0.467 ms, read buffer: 185.742 ms, total: 345.897 ms
+m: 128, create buffers: 0.041 ms, dequant: 154.065 ms, write buffers: 2.035 ms, segemm:   0.200 ms, read buffer: 188.047 ms, total: 355.991 ms
+
+m: 144, create buffers: 0.027 ms, dequant: 138.688 ms, write buffers: 3.191 ms, segemm:   0.266 ms, read buffer: 216.638 ms, total: 367.044 ms
+m: 144, create buffers: 0.027 ms, dequant: 136.416 ms, write buffers: 3.041 ms, segemm:   0.258 ms, read buffer: 203.570 ms, total: 354.957 ms
+m: 144, create buffers: 0.026 ms, dequant: 138.018 ms, write buffers: 3.220 ms, segemm:   0.290 ms, read buffer: 214.057 ms, total: 364.293 ms
+m: 144, create buffers: 0.028 ms, dequant: 141.066 ms, write buffers: 3.194 ms, segemm:   0.436 ms, read buffer: 214.314 ms, total: 367.350 ms
+m: 144, create buffers: 0.027 ms, dequant: 131.035 ms, write buffers: 3.181 ms, segemm:   0.267 ms, read buffer: 203.238 ms, total: 349.326 ms
+
+m: 160, create buffers: 0.025 ms, dequant: 141.257 ms, write buffers: 3.358 ms, segemm:   0.264 ms, read buffer: 216.918 ms, total: 369.879 ms
+m: 160, create buffers: 0.026 ms, dequant: 137.893 ms, write buffers: 3.306 ms, segemm:   0.311 ms, read buffer: 204.538 ms, total: 357.882 ms
+m: 160, create buffers: 0.027 ms, dequant: 140.632 ms, write buffers: 3.116 ms, segemm:   0.466 ms, read buffer: 213.945 ms, total: 366.222 ms
+m: 160, create buffers: 0.027 ms, dequant: 130.749 ms, write buffers: 3.299 ms, segemm:   0.354 ms, read buffer: 205.817 ms, total: 351.261 ms
+m: 160, create buffers: 0.026 ms, dequant: 138.513 ms, write buffers: 3.461 ms, segemm:   0.268 ms, read buffer: 218.967 ms, total: 369.637 ms
+
+m: 176, create buffers: 0.027 ms, dequant: 137.890 ms, write buffers: 3.591 ms, segemm:   0.288 ms, read buffer: 244.119 ms, total: 394.020 ms
+m: 176, create buffers: 0.026 ms, dequant: 137.957 ms, write buffers: 3.854 ms, segemm:   0.465 ms, read buffer: 245.058 ms, total: 395.686 ms
+m: 176, create buffers: 0.026 ms, dequant: 138.187 ms, write buffers: 3.710 ms, segemm:   0.355 ms, read buffer: 248.097 ms, total: 399.032 ms
+m: 176, create buffers: 0.027 ms, dequant: 138.737 ms, write buffers: 3.891 ms, segemm:   0.381 ms, read buffer: 244.511 ms, total: 395.762 ms
+m: 176, create buffers: 0.026 ms, dequant: 137.403 ms, write buffers: 3.557 ms, segemm:   0.445 ms, read buffer: 244.745 ms, total: 394.925 ms
+
+m: 192, create buffers: 0.027 ms, dequant: 137.065 ms, write buffers: 3.904 ms, segemm:   0.463 ms, read buffer: 244.447 ms, total: 394.312 ms
+m: 192, create buffers: 0.027 ms, dequant: 138.099 ms, write buffers: 4.476 ms, segemm:   0.486 ms, read buffer: 253.564 ms, total: 404.845 ms
+m: 192, create buffers: 0.027 ms, dequant: 137.803 ms, write buffers: 4.231 ms, segemm:   0.492 ms, read buffer: 244.019 ms, total: 395.373 ms
+m: 192, create buffers: 0.025 ms, dequant: 139.434 ms, write buffers: 4.204 ms, segemm:   0.368 ms, read buffer: 234.729 ms, total: 387.591 ms
+m: 192, create buffers: 0.050 ms, dequant: 138.372 ms, write buffers: 3.902 ms, segemm:   0.270 ms, read buffer: 245.562 ms, total: 396.471 ms
+
+m: 208, create buffers: 0.026 ms, dequant: 138.012 ms, write buffers: 4.181 ms, segemm:   0.474 ms, read buffer: 275.232 ms, total: 426.186 ms
+m: 208, create buffers: 0.027 ms, dequant: 138.223 ms, write buffers: 4.675 ms, segemm:   0.484 ms, read buffer: 263.521 ms, total: 415.209 ms
+m: 208, create buffers: 0.026 ms, dequant: 132.303 ms, write buffers: 4.151 ms, segemm:   0.491 ms, read buffer: 272.119 ms, total: 417.642 ms
+m: 208, create buffers: 0.025 ms, dequant: 132.338 ms, write buffers: 3.889 ms, segemm:   0.409 ms, read buffer: 268.676 ms, total: 414.373 ms
+m: 208, create buffers: 0.026 ms, dequant: 132.777 ms, write buffers: 4.128 ms, segemm:   0.482 ms, read buffer: 270.766 ms, total: 417.143 ms
+
+m: 224, create buffers: 0.026 ms, dequant: 131.092 ms, write buffers: 4.392 ms, segemm:   0.409 ms, read buffer: 265.367 ms, total: 410.058 ms
+m: 224, create buffers: 0.026 ms, dequant: 132.605 ms, write buffers: 4.348 ms, segemm:   0.230 ms, read buffer: 270.946 ms, total: 417.514 ms
+m: 224, create buffers: 0.026 ms, dequant: 134.147 ms, write buffers: 4.410 ms, segemm:   0.428 ms, read buffer: 269.223 ms, total: 416.713 ms
+m: 224, create buffers: 0.027 ms, dequant: 132.469 ms, write buffers: 4.408 ms, segemm:   0.426 ms, read buffer: 268.193 ms, total: 413.873 ms
+m: 224, create buffers: 0.026 ms, dequant: 138.065 ms, write buffers: 4.379 ms, segemm:   0.424 ms, read buffer: 276.037 ms, total: 427.132 ms
+
+m: 240, create buffers: 0.024 ms, dequant: 138.490 ms, write buffers: 4.676 ms, segemm:   0.403 ms, read buffer: 305.407 ms, total: 457.452 ms
+m: 240, create buffers: 0.027 ms, dequant: 132.455 ms, write buffers: 4.333 ms, segemm:   0.354 ms, read buffer: 300.350 ms, total: 445.972 ms
+m: 240, create buffers: 0.027 ms, dequant: 132.149 ms, write buffers: 4.884 ms, segemm:   0.389 ms, read buffer: 300.955 ms, total: 446.818 ms
+m: 240, create buffers: 0.026 ms, dequant: 132.272 ms, write buffers: 4.641 ms, segemm:   0.431 ms, read buffer: 299.898 ms, total: 445.910 ms
+m: 240, create buffers: 0.026 ms, dequant: 131.822 ms, write buffers: 4.660 ms, segemm:   0.426 ms, read buffer: 301.581 ms, total: 447.644 ms
+
+m: 256, create buffers: 0.026 ms, dequant: 132.215 ms, write buffers: 4.338 ms, segemm:   0.374 ms, read buffer: 300.276 ms, total: 445.587 ms
+m: 256, create buffers: 0.025 ms, dequant: 134.101 ms, write buffers: 4.454 ms, segemm:   0.389 ms, read buffer: 300.066 ms, total: 448.073 ms
+m: 256, create buffers: 0.027 ms, dequant: 131.533 ms, write buffers: 5.099 ms, segemm:   0.464 ms, read buffer: 301.710 ms, total: 447.976 ms
+m: 256, create buffers: 0.026 ms, dequant: 131.491 ms, write buffers: 5.197 ms, segemm:   0.280 ms, read buffer: 301.396 ms, total: 447.010 ms
+m: 256, create buffers: 0.025 ms, dequant: 133.082 ms, write buffers: 4.978 ms, segemm:   0.439 ms, read buffer: 300.436 ms, total: 447.391 ms
+
+
+=== n: 11008, k:  4096 ===
+m:  16, create buffers: 0.027 ms, dequant: 132.804 ms, write buffers: 1.142 ms, segemm:   0.346 ms, read buffer:  85.829 ms, total: 229.234 ms
+m:  16, create buffers: 0.027 ms, dequant: 159.397 ms, write buffers: 1.093 ms, segemm:   0.360 ms, read buffer:  89.097 ms, total: 258.435 ms
+m:  16, create buffers: 0.026 ms, dequant: 178.854 ms, write buffers: 1.161 ms, segemm:   0.366 ms, read buffer: 100.815 ms, total: 289.886 ms
+m:  16, create buffers: 0.026 ms, dequant: 202.964 ms, write buffers: 1.046 ms, segemm:   0.266 ms, read buffer: 103.994 ms, total: 316.665 ms
+m:  16, create buffers: 0.025 ms, dequant: 234.054 ms, write buffers: 0.614 ms, segemm:   0.222 ms, read buffer: 106.507 ms, total: 349.120 ms
+
+m:  32, create buffers: 0.026 ms, dequant: 217.476 ms, write buffers: 1.427 ms, segemm:   0.590 ms, read buffer: 109.812 ms, total: 338.038 ms
+m:  32, create buffers: 0.025 ms, dequant: 217.465 ms, write buffers: 1.549 ms, segemm:   0.641 ms, read buffer: 110.196 ms, total: 340.303 ms
+m:  32, create buffers: 0.026 ms, dequant: 213.771 ms, write buffers: 1.477 ms, segemm:   0.361 ms, read buffer: 104.556 ms, total: 331.375 ms
+m:  32, create buffers: 0.026 ms, dequant: 218.363 ms, write buffers: 1.244 ms, segemm:   0.264 ms, read buffer: 109.094 ms, total: 336.939 ms
+m:  32, create buffers: 0.027 ms, dequant: 217.749 ms, write buffers: 1.478 ms, segemm:   0.324 ms, read buffer: 112.101 ms, total: 340.170 ms
+
+m:  48, create buffers: 0.026 ms, dequant: 219.290 ms, write buffers: 1.740 ms, segemm:   0.364 ms, read buffer: 155.659 ms, total: 384.906 ms
+m:  48, create buffers: 0.027 ms, dequant: 203.859 ms, write buffers: 1.448 ms, segemm:   0.454 ms, read buffer: 148.124 ms, total: 362.408 ms
+m:  48, create buffers: 0.026 ms, dequant: 202.089 ms, write buffers: 1.458 ms, segemm:   0.460 ms, read buffer: 147.243 ms, total: 359.721 ms
+m:  48, create buffers: 0.026 ms, dequant: 191.395 ms, write buffers: 1.754 ms, segemm:   0.367 ms, read buffer: 136.600 ms, total: 341.306 ms
+m:  48, create buffers: 0.028 ms, dequant: 178.217 ms, write buffers: 1.713 ms, segemm:   0.358 ms, read buffer: 140.867 ms, total: 329.317 ms
+
+m:  64, create buffers: 0.027 ms, dequant: 191.387 ms, write buffers: 2.066 ms, segemm:   0.495 ms, read buffer: 139.075 ms, total: 341.749 ms
+m:  64, create buffers: 0.026 ms, dequant: 191.097 ms, write buffers: 2.046 ms, segemm:   0.483 ms, read buffer: 139.034 ms, total: 343.237 ms
+m:  64, create buffers: 0.024 ms, dequant: 189.957 ms, write buffers: 2.040 ms, segemm:   0.508 ms, read buffer: 140.419 ms, total: 344.150 ms
+m:  64, create buffers: 0.025 ms, dequant: 186.622 ms, write buffers: 2.061 ms, segemm:   0.599 ms, read buffer: 141.554 ms, total: 338.775 ms
+m:  64, create buffers: 0.025 ms, dequant: 188.861 ms, write buffers: 2.002 ms, segemm:   0.615 ms, read buffer: 142.364 ms, total: 344.263 ms
+
+m:  80, create buffers: 0.026 ms, dequant: 202.435 ms, write buffers: 2.393 ms, segemm:   0.466 ms, read buffer: 188.555 ms, total: 401.821 ms
+m:  80, create buffers: 0.025 ms, dequant: 203.628 ms, write buffers: 2.372 ms, segemm:   0.488 ms, read buffer: 191.244 ms, total: 405.484 ms
+m:  80, create buffers: 0.026 ms, dequant: 176.137 ms, write buffers: 2.285 ms, segemm:   0.464 ms, read buffer: 162.576 ms, total: 352.538 ms
+m:  80, create buffers: 0.026 ms, dequant: 168.901 ms, write buffers: 2.216 ms, segemm:   0.458 ms, read buffer: 170.707 ms, total: 352.797 ms
+m:  80, create buffers: 0.026 ms, dequant: 178.156 ms, write buffers: 1.988 ms, segemm:   0.462 ms, read buffer: 177.193 ms, total: 365.791 ms
+
+m:  96, create buffers: 0.026 ms, dequant: 177.976 ms, write buffers: 2.592 ms, segemm:   0.467 ms, read buffer: 162.382 ms, total: 354.347 ms
+m:  96, create buffers: 0.026 ms, dequant: 168.650 ms, write buffers: 2.514 ms, segemm:   0.285 ms, read buffer: 171.782 ms, total: 354.415 ms
+m:  96, create buffers: 0.027 ms, dequant: 178.727 ms, write buffers: 2.533 ms, segemm:   0.488 ms, read buffer: 177.384 ms, total: 367.155 ms
+m:  96, create buffers: 0.026 ms, dequant: 177.983 ms, write buffers: 2.564 ms, segemm:   0.285 ms, read buffer: 177.316 ms, total: 368.724 ms
+m:  96, create buffers: 0.026 ms, dequant: 178.807 ms, write buffers: 2.125 ms, segemm:   0.282 ms, read buffer: 176.231 ms, total: 365.691 ms
+
+m: 112, create buffers: 0.026 ms, dequant: 178.055 ms, write buffers: 2.602 ms, segemm:   0.286 ms, read buffer: 213.962 ms, total: 403.249 ms
+m: 112, create buffers: 0.026 ms, dequant: 169.585 ms, write buffers: 2.609 ms, segemm:   0.285 ms, read buffer: 205.329 ms, total: 385.776 ms
+m: 112, create buffers: 0.026 ms, dequant: 157.898 ms, write buffers: 2.696 ms, segemm:   0.282 ms, read buffer: 196.679 ms, total: 365.519 ms
+m: 112, create buffers: 0.026 ms, dequant: 149.674 ms, write buffers: 2.718 ms, segemm:   0.275 ms, read buffer: 190.300 ms, total: 354.055 ms
+m: 112, create buffers: 0.026 ms, dequant: 151.513 ms, write buffers: 2.707 ms, segemm:   0.281 ms, read buffer: 189.106 ms, total: 354.714 ms
+
+m: 128, create buffers: 0.026 ms, dequant: 144.163 ms, write buffers: 2.922 ms, segemm:   0.278 ms, read buffer: 191.519 ms, total: 347.490 ms
+m: 128, create buffers: 0.027 ms, dequant: 151.143 ms, write buffers: 3.013 ms, segemm:   0.300 ms, read buffer: 188.783 ms, total: 351.875 ms
+m: 128, create buffers: 0.026 ms, dequant: 144.955 ms, write buffers: 2.967 ms, segemm:   0.281 ms, read buffer: 191.053 ms, total: 349.736 ms
+m: 128, create buffers: 0.026 ms, dequant: 146.332 ms, write buffers: 3.099 ms, segemm:   0.275 ms, read buffer: 184.768 ms, total: 342.485 ms
+m: 128, create buffers: 0.062 ms, dequant: 142.343 ms, write buffers: 1.941 ms, segemm:   0.200 ms, read buffer: 184.461 ms, total: 340.379 ms
+
+m: 144, create buffers: 0.027 ms, dequant: 152.035 ms, write buffers: 2.748 ms, segemm:   0.287 ms, read buffer: 219.867 ms, total: 382.993 ms
+m: 144, create buffers: 0.027 ms, dequant: 144.680 ms, write buffers: 3.189 ms, segemm:   0.280 ms, read buffer: 219.521 ms, total: 376.468 ms
+m: 144, create buffers: 0.026 ms, dequant: 143.994 ms, write buffers: 3.010 ms, segemm:   0.451 ms, read buffer: 219.662 ms, total: 375.747 ms
+m: 144, create buffers: 0.031 ms, dequant: 172.414 ms, write buffers: 3.175 ms, segemm:   0.288 ms, read buffer: 206.403 ms, total: 390.478 ms
+m: 144, create buffers: 0.026 ms, dequant: 138.358 ms, write buffers: 3.189 ms, segemm:   0.317 ms, read buffer: 226.698 ms, total: 376.681 ms
+
+m: 160, create buffers: 0.026 ms, dequant: 125.675 ms, write buffers: 3.429 ms, segemm:   0.334 ms, read buffer: 199.012 ms, total: 336.556 ms
+m: 160, create buffers: 0.026 ms, dequant: 139.085 ms, write buffers: 3.580 ms, segemm:   0.366 ms, read buffer: 211.996 ms, total: 363.169 ms
+m: 160, create buffers: 0.027 ms, dequant: 144.594 ms, write buffers: 3.615 ms, segemm:   0.304 ms, read buffer: 220.372 ms, total: 377.693 ms
+m: 160, create buffers: 0.026 ms, dequant: 152.737 ms, write buffers: 3.661 ms, segemm:   0.372 ms, read buffer: 219.664 ms, total: 384.781 ms
+m: 160, create buffers: 0.027 ms, dequant: 143.833 ms, write buffers: 3.493 ms, segemm:   0.326 ms, read buffer: 219.265 ms, total: 375.016 ms
+
+m: 176, create buffers: 0.026 ms, dequant: 143.985 ms, write buffers: 3.196 ms, segemm:   0.338 ms, read buffer: 248.866 ms, total: 405.137 ms
+m: 176, create buffers: 0.025 ms, dequant: 145.133 ms, write buffers: 3.393 ms, segemm:   0.375 ms, read buffer: 248.021 ms, total: 405.189 ms
+m: 176, create buffers: 0.027 ms, dequant: 144.220 ms, write buffers: 3.742 ms, segemm:   0.365 ms, read buffer: 249.824 ms, total: 406.793 ms
+m: 176, create buffers: 0.027 ms, dequant: 143.974 ms, write buffers: 3.352 ms, segemm:   0.377 ms, read buffer: 248.637 ms, total: 405.147 ms
+m: 176, create buffers: 0.025 ms, dequant: 143.384 ms, write buffers: 3.545 ms, segemm:   0.367 ms, read buffer: 250.486 ms, total: 406.024 ms
+
+m: 192, create buffers: 0.027 ms, dequant: 143.830 ms, write buffers: 3.940 ms, segemm:   0.438 ms, read buffer: 251.254 ms, total: 407.597 ms
+m: 192, create buffers: 0.026 ms, dequant: 137.109 ms, write buffers: 3.746 ms, segemm:   0.443 ms, read buffer: 234.558 ms, total: 384.172 ms
+m: 192, create buffers: 0.027 ms, dequant: 135.075 ms, write buffers: 3.830 ms, segemm:   0.431 ms, read buffer: 234.021 ms, total: 381.760 ms
+m: 192, create buffers: 0.027 ms, dequant: 137.098 ms, write buffers: 3.958 ms, segemm:   0.446 ms, read buffer: 229.346 ms, total: 379.004 ms
+m: 192, create buffers: 0.026 ms, dequant: 131.263 ms, write buffers: 4.014 ms, segemm:   0.398 ms, read buffer: 234.906 ms, total: 378.842 ms
+
+m: 208, create buffers: 0.026 ms, dequant: 140.614 ms, write buffers: 4.138 ms, segemm:   0.444 ms, read buffer: 271.717 ms, total: 425.909 ms
+m: 208, create buffers: 0.026 ms, dequant: 137.819 ms, write buffers: 4.150 ms, segemm:   0.453 ms, read buffer: 269.900 ms, total: 420.830 ms
+m: 208, create buffers: 0.027 ms, dequant: 130.847 ms, write buffers: 4.071 ms, segemm:   0.413 ms, read buffer: 259.276 ms, total: 403.627 ms
+m: 208, create buffers: 0.026 ms, dequant: 132.605 ms, write buffers: 3.976 ms, segemm:   0.443 ms, read buffer: 264.404 ms, total: 410.066 ms
+m: 208, create buffers: 0.026 ms, dequant: 125.892 ms, write buffers: 3.817 ms, segemm:   0.449 ms, read buffer: 260.155 ms, total: 399.059 ms
+
+m: 224, create buffers: 0.027 ms, dequant: 136.635 ms, write buffers: 4.463 ms, segemm:   0.488 ms, read buffer: 260.102 ms, total: 409.924 ms
+m: 224, create buffers: 0.027 ms, dequant: 126.327 ms, write buffers: 4.262 ms, segemm:   0.436 ms, read buffer: 256.977 ms, total: 396.879 ms
+m: 224, create buffers: 0.026 ms, dequant: 132.334 ms, write buffers: 4.025 ms, segemm:   0.393 ms, read buffer: 265.169 ms, total: 410.859 ms
+m: 224, create buffers: 0.026 ms, dequant: 132.042 ms, write buffers: 4.376 ms, segemm:   0.487 ms, read buffer: 263.820 ms, total: 408.975 ms
+m: 224, create buffers: 0.027 ms, dequant: 132.796 ms, write buffers: 3.568 ms, segemm:   0.357 ms, read buffer: 264.471 ms, total: 410.126 ms
+
+m: 240, create buffers: 0.026 ms, dequant: 132.228 ms, write buffers: 4.617 ms, segemm:   0.390 ms, read buffer: 294.994 ms, total: 440.469 ms
+m: 240, create buffers: 0.027 ms, dequant: 129.432 ms, write buffers: 4.783 ms, segemm:   0.477 ms, read buffer: 289.641 ms, total: 438.043 ms
+m: 240, create buffers: 0.026 ms, dequant: 138.050 ms, write buffers: 4.663 ms, segemm:   0.398 ms, read buffer: 301.456 ms, total: 452.821 ms
+m: 240, create buffers: 0.027 ms, dequant: 125.672 ms, write buffers: 4.496 ms, segemm:   0.488 ms, read buffer: 286.718 ms, total: 425.675 ms
+m: 240, create buffers: 0.026 ms, dequant: 131.795 ms, write buffers: 4.765 ms, segemm:   0.410 ms, read buffer: 289.628 ms, total: 435.141 ms
+
+m: 256, create buffers: 0.026 ms, dequant: 138.577 ms, write buffers: 4.935 ms, segemm:   0.414 ms, read buffer: 301.427 ms, total: 454.270 ms
+m: 256, create buffers: 0.027 ms, dequant: 132.950 ms, write buffers: 5.101 ms, segemm:   0.393 ms, read buffer: 294.870 ms, total: 441.708 ms
+m: 256, create buffers: 0.026 ms, dequant: 139.898 ms, write buffers: 5.173 ms, segemm:   0.485 ms, read buffer: 297.566 ms, total: 451.822 ms
+m: 256, create buffers: 0.026 ms, dequant: 138.108 ms, write buffers: 4.885 ms, segemm:   0.474 ms, read buffer: 300.404 ms, total: 452.277 ms
+m: 256, create buffers: 0.026 ms, dequant: 126.380 ms, write buffers: 4.748 ms, segemm:   0.412 ms, read buffer: 285.805 ms, total: 425.687 ms
+
+
+=== n:  5120, k:  5120 ===
+m:  16, create buffers: 0.026 ms, dequant:  77.679 ms, write buffers: 1.404 ms, segemm:   0.177 ms, read buffer:  18.985 ms, total: 104.706 ms
+m:  16, create buffers: 0.025 ms, dequant:  87.522 ms, write buffers: 1.419 ms, segemm:   0.177 ms, read buffer:  20.846 ms, total: 116.469 ms
+m:  16, create buffers: 0.027 ms, dequant:  96.824 ms, write buffers: 1.395 ms, segemm:   0.178 ms, read buffer:  23.494 ms, total: 128.176 ms
+m:  16, create buffers: 0.026 ms, dequant: 108.410 ms, write buffers: 1.041 ms, segemm:   0.147 ms, read buffer:  25.997 ms, total: 142.341 ms
+m:  16, create buffers: 0.027 ms, dequant: 111.653 ms, write buffers: 1.157 ms, segemm:   0.153 ms, read buffer:  26.905 ms, total: 146.287 ms
+
+m:  32, create buffers: 0.026 ms, dequant: 115.451 ms, write buffers: 1.403 ms, segemm:   0.262 ms, read buffer:  64.235 ms, total: 186.208 ms
+m:  32, create buffers: 0.026 ms, dequant: 115.962 ms, write buffers: 1.363 ms, segemm:   0.358 ms, read buffer:  65.088 ms, total: 187.616 ms
+m:  32, create buffers: 0.026 ms, dequant: 120.103 ms, write buffers: 1.293 ms, segemm:   0.350 ms, read buffer:  64.539 ms, total: 191.193 ms
+m:  32, create buffers: 0.026 ms, dequant: 124.454 ms, write buffers: 1.307 ms, segemm:   0.361 ms, read buffer:  67.316 ms, total: 198.460 ms
+m:  32, create buffers: 0.025 ms, dequant: 136.130 ms, write buffers: 1.455 ms, segemm:   0.379 ms, read buffer:  71.278 ms, total: 214.087 ms
+
+m:  48, create buffers: 0.024 ms, dequant: 149.961 ms, write buffers: 1.812 ms, segemm:   0.621 ms, read buffer: 101.777 ms, total: 258.987 ms
+m:  48, create buffers: 0.026 ms, dequant: 136.258 ms, write buffers: 1.623 ms, segemm:   0.378 ms, read buffer: 102.061 ms, total: 245.130 ms
+m:  48, create buffers: 0.025 ms, dequant: 124.333 ms, write buffers: 1.648 ms, segemm:   0.373 ms, read buffer:  96.185 ms, total: 227.706 ms
+m:  48, create buffers: 0.024 ms, dequant: 117.143 ms, write buffers: 1.424 ms, segemm:   0.359 ms, read buffer:  93.771 ms, total: 217.525 ms
+m:  48, create buffers: 0.025 ms, dequant: 124.526 ms, write buffers: 1.568 ms, segemm:   0.374 ms, read buffer:  94.861 ms, total: 226.047 ms
+
+m:  64, create buffers: 0.025 ms, dequant: 111.503 ms, write buffers: 2.008 ms, segemm:   0.638 ms, read buffer:  86.385 ms, total: 205.930 ms
+m:  64, create buffers: 0.025 ms, dequant: 109.164 ms, write buffers: 1.652 ms, segemm:   0.577 ms, read buffer:  87.421 ms, total: 203.636 ms
+m:  64, create buffers: 0.026 ms, dequant: 108.702 ms, write buffers: 2.091 ms, segemm:   0.407 ms, read buffer:  87.333 ms, total: 203.413 ms
+m:  64, create buffers: 0.025 ms, dequant: 116.616 ms, write buffers: 1.611 ms, segemm:   0.264 ms, read buffer:  90.404 ms, total: 213.745 ms
+m:  64, create buffers: 0.026 ms, dequant: 116.972 ms, write buffers: 1.643 ms, segemm:   0.359 ms, read buffer:  92.215 ms, total: 216.031 ms
+
+m:  80, create buffers: 0.025 ms, dequant: 119.465 ms, write buffers: 1.841 ms, segemm:   0.555 ms, read buffer: 119.078 ms, total: 246.170 ms
+m:  80, create buffers: 0.027 ms, dequant: 108.642 ms, write buffers: 1.680 ms, segemm:   0.266 ms, read buffer: 110.924 ms, total: 226.784 ms
+m:  80, create buffers: 0.026 ms, dequant: 101.294 ms, write buffers: 2.235 ms, segemm:   0.429 ms, read buffer: 105.487 ms, total: 214.195 ms
+m:  80, create buffers: 0.026 ms, dequant: 102.217 ms, write buffers: 1.942 ms, segemm:   0.570 ms, read buffer: 106.973 ms, total: 216.672 ms
+m:  80, create buffers: 0.025 ms, dequant: 102.604 ms, write buffers: 1.955 ms, segemm:   0.261 ms, read buffer: 106.789 ms, total: 216.495 ms
+
+m:  96, create buffers: 0.026 ms, dequant: 108.287 ms, write buffers: 2.320 ms, segemm:   0.365 ms, read buffer: 110.736 ms, total: 226.791 ms
+m:  96, create buffers: 0.026 ms, dequant: 109.598 ms, write buffers: 2.516 ms, segemm:   0.412 ms, read buffer: 120.917 ms, total: 238.362 ms
+m:  96, create buffers: 0.025 ms, dequant: 107.749 ms, write buffers: 1.849 ms, segemm:   0.268 ms, read buffer: 111.062 ms, total: 226.128 ms
+m:  96, create buffers: 0.026 ms, dequant: 101.267 ms, write buffers: 2.177 ms, segemm:   0.272 ms, read buffer: 106.608 ms, total: 215.375 ms
+m:  96, create buffers: 0.024 ms, dequant: 102.356 ms, write buffers: 1.951 ms, segemm:   0.596 ms, read buffer: 106.669 ms, total: 216.667 ms
+
+m: 112, create buffers: 0.026 ms, dequant: 102.855 ms, write buffers: 2.178 ms, segemm:   0.435 ms, read buffer: 129.837 ms, total: 240.259 ms
+m: 112, create buffers: 0.026 ms, dequant: 103.413 ms, write buffers: 2.421 ms, segemm:   0.368 ms, read buffer: 135.059 ms, total: 246.375 ms
+m: 112, create buffers: 0.026 ms, dequant:  96.481 ms, write buffers: 2.827 ms, segemm:   0.406 ms, read buffer: 130.312 ms, total: 235.242 ms
+m: 112, create buffers: 0.026 ms, dequant: 102.487 ms, write buffers: 2.835 ms, segemm:   0.662 ms, read buffer: 134.775 ms, total: 245.755 ms
+m: 112, create buffers: 0.026 ms, dequant:  96.586 ms, write buffers: 2.606 ms, segemm:   0.629 ms, read buffer: 129.796 ms, total: 234.521 ms
+
+m: 128, create buffers: 0.025 ms, dequant: 101.818 ms, write buffers: 2.266 ms, segemm:   0.441 ms, read buffer: 134.088 ms, total: 243.942 ms
+m: 128, create buffers: 0.025 ms, dequant:  95.812 ms, write buffers: 2.525 ms, segemm:   0.578 ms, read buffer: 124.720 ms, total: 228.858 ms
+m: 128, create buffers: 0.026 ms, dequant:  96.780 ms, write buffers: 2.112 ms, segemm:   0.448 ms, read buffer: 128.931 ms, total: 233.688 ms
+m: 128, create buffers: 0.026 ms, dequant:  96.454 ms, write buffers: 2.313 ms, segemm:   0.363 ms, read buffer: 130.068 ms, total: 234.176 ms
+m: 128, create buffers: 0.026 ms, dequant: 103.107 ms, write buffers: 2.671 ms, segemm:   0.496 ms, read buffer: 136.135 ms, total: 247.370 ms
+
+m: 144, create buffers: 0.025 ms, dequant:  96.581 ms, write buffers: 2.770 ms, segemm:   0.461 ms, read buffer: 144.355 ms, total: 250.487 ms
+m: 144, create buffers: 0.026 ms, dequant:  92.208 ms, write buffers: 2.412 ms, segemm:   0.607 ms, read buffer: 144.245 ms, total: 244.702 ms
+m: 144, create buffers: 0.026 ms, dequant:  90.729 ms, write buffers: 2.809 ms, segemm:   0.500 ms, read buffer: 136.679 ms, total: 235.790 ms
+m: 144, create buffers: 0.026 ms, dequant:  82.635 ms, write buffers: 2.708 ms, segemm:   0.463 ms, read buffer: 131.852 ms, total: 222.780 ms
+m: 144, create buffers: 0.027 ms, dequant:  86.495 ms, write buffers: 2.935 ms, segemm:   0.451 ms, read buffer: 142.123 ms, total: 236.894 ms
+
+m: 160, create buffers: 0.025 ms, dequant:  86.862 ms, write buffers: 2.907 ms, segemm:   0.449 ms, read buffer: 136.820 ms, total: 232.275 ms
+m: 160, create buffers: 0.026 ms, dequant:  84.008 ms, write buffers: 2.830 ms, segemm:   0.478 ms, read buffer: 138.262 ms, total: 230.907 ms
+m: 160, create buffers: 0.026 ms, dequant:  91.983 ms, write buffers: 2.904 ms, segemm:   0.436 ms, read buffer: 142.753 ms, total: 243.037 ms
+m: 160, create buffers: 0.025 ms, dequant:  88.103 ms, write buffers: 2.918 ms, segemm:   0.454 ms, read buffer: 143.659 ms, total: 240.564 ms
+m: 160, create buffers: 0.025 ms, dequant:  90.845 ms, write buffers: 2.628 ms, segemm:   0.429 ms, read buffer: 136.290 ms, total: 235.142 ms
+
+m: 176, create buffers: 0.025 ms, dequant:  81.699 ms, write buffers: 2.607 ms, segemm:   0.419 ms, read buffer: 148.635 ms, total: 238.763 ms
+m: 176, create buffers: 0.025 ms, dequant:  82.863 ms, write buffers: 2.724 ms, segemm:   0.416 ms, read buffer: 149.783 ms, total: 241.045 ms
+m: 176, create buffers: 0.025 ms, dequant:  80.530 ms, write buffers: 3.038 ms, segemm:   0.490 ms, read buffer: 148.264 ms, total: 237.514 ms
+m: 176, create buffers: 0.026 ms, dequant:  82.902 ms, write buffers: 2.693 ms, segemm:   0.421 ms, read buffer: 148.635 ms, total: 239.850 ms
+m: 176, create buffers: 0.026 ms, dequant:  83.207 ms, write buffers: 3.168 ms, segemm:   0.485 ms, read buffer: 157.639 ms, total: 249.613 ms
+
+m: 192, create buffers: 0.025 ms, dequant:  86.081 ms, write buffers: 2.793 ms, segemm:   0.433 ms, read buffer: 151.423 ms, total: 245.915 ms
+m: 192, create buffers: 0.025 ms, dequant:  79.235 ms, write buffers: 2.879 ms, segemm:   0.310 ms, read buffer: 144.737 ms, total: 232.457 ms
+m: 192, create buffers: 0.085 ms, dequant:  74.970 ms, write buffers: 3.238 ms, segemm:   0.316 ms, read buffer: 144.128 ms, total: 227.741 ms
+m: 192, create buffers: 0.024 ms, dequant:  78.793 ms, write buffers: 3.198 ms, segemm:   0.459 ms, read buffer: 151.443 ms, total: 239.327 ms
+m: 192, create buffers: 0.025 ms, dequant:  78.814 ms, write buffers: 2.853 ms, segemm:   0.458 ms, read buffer: 144.405 ms, total: 231.556 ms
+
+m: 208, create buffers: 0.027 ms, dequant:  74.664 ms, write buffers: 3.342 ms, segemm:   0.309 ms, read buffer: 162.379 ms, total: 245.930 ms
+m: 208, create buffers: 0.027 ms, dequant:  79.183 ms, write buffers: 3.313 ms, segemm:   0.466 ms, read buffer: 161.555 ms, total: 249.939 ms
+m: 208, create buffers: 0.025 ms, dequant:  79.199 ms, write buffers: 3.410 ms, segemm:   0.459 ms, read buffer: 167.060 ms, total: 254.960 ms
+m: 208, create buffers: 0.026 ms, dequant:  81.291 ms, write buffers: 3.353 ms, segemm:   0.303 ms, read buffer: 161.230 ms, total: 251.288 ms
+m: 208, create buffers: 0.026 ms, dequant:  79.415 ms, write buffers: 2.843 ms, segemm:   0.430 ms, read buffer: 161.931 ms, total: 250.066 ms
+
+m: 224, create buffers: 0.025 ms, dequant:  79.846 ms, write buffers: 3.470 ms, segemm:   0.302 ms, read buffer: 168.061 ms, total: 257.132 ms
+m: 224, create buffers: 0.026 ms, dequant:  77.564 ms, write buffers: 3.343 ms, segemm:   0.282 ms, read buffer: 168.275 ms, total: 254.654 ms
+m: 224, create buffers: 0.025 ms, dequant:  79.270 ms, write buffers: 3.203 ms, segemm:   0.313 ms, read buffer: 161.718 ms, total: 249.700 ms
+m: 224, create buffers: 0.027 ms, dequant:  78.617 ms, write buffers: 3.726 ms, segemm:   0.375 ms, read buffer: 168.413 ms, total: 256.373 ms
+m: 224, create buffers: 0.026 ms, dequant:  84.083 ms, write buffers: 3.250 ms, segemm:   0.492 ms, read buffer: 177.326 ms, total: 270.200 ms
+
+m: 240, create buffers: 0.025 ms, dequant:  82.423 ms, write buffers: 3.252 ms, segemm:   0.438 ms, read buffer: 184.670 ms, total: 276.017 ms
+m: 240, create buffers: 0.026 ms, dequant:  76.039 ms, write buffers: 2.985 ms, segemm:   0.385 ms, read buffer: 174.555 ms, total: 259.320 ms
+m: 240, create buffers: 0.025 ms, dequant:  73.186 ms, write buffers: 3.346 ms, segemm:   0.306 ms, read buffer: 175.229 ms, total: 257.485 ms
+m: 240, create buffers: 0.026 ms, dequant:  73.121 ms, write buffers: 3.114 ms, segemm:   0.433 ms, read buffer: 174.644 ms, total: 256.662 ms
+m: 240, create buffers: 0.025 ms, dequant:  73.962 ms, write buffers: 3.754 ms, segemm:   0.304 ms, read buffer: 171.161 ms, total: 254.518 ms
+
+m: 256, create buffers: 0.026 ms, dequant:  73.138 ms, write buffers: 3.585 ms, segemm:   0.436 ms, read buffer: 172.743 ms, total: 254.949 ms
+m: 256, create buffers: 0.026 ms, dequant:  79.162 ms, write buffers: 3.875 ms, segemm:   0.314 ms, read buffer: 183.323 ms, total: 271.808 ms
+m: 256, create buffers: 0.026 ms, dequant:  75.975 ms, write buffers: 3.824 ms, segemm:   0.308 ms, read buffer: 180.392 ms, total: 265.763 ms
+m: 256, create buffers: 0.025 ms, dequant:  73.082 ms, write buffers: 3.805 ms, segemm:   0.277 ms, read buffer: 175.124 ms, total: 257.629 ms
+m: 256, create buffers: 0.025 ms, dequant:  72.448 ms, write buffers: 3.908 ms, segemm:   0.337 ms, read buffer: 171.991 ms, total: 253.757 ms
+
+
+=== n:  5120, k: 13824 ===
+m:  16, create buffers: 0.027 ms, dequant: 240.190 ms, write buffers: 1.243 ms, segemm:   0.348 ms, read buffer: 134.258 ms, total: 390.426 ms
+m:  16, create buffers: 0.028 ms, dequant: 251.584 ms, write buffers: 1.383 ms, segemm:   0.345 ms, read buffer: 139.032 ms, total: 405.190 ms
+m:  16, create buffers: 0.027 ms, dequant: 277.172 ms, write buffers: 1.228 ms, segemm:   0.351 ms, read buffer: 142.239 ms, total: 435.700 ms
+m:  16, create buffers: 0.027 ms, dequant: 275.047 ms, write buffers: 1.417 ms, segemm:   0.348 ms, read buffer: 142.911 ms, total: 433.333 ms
+m:  16, create buffers: 0.026 ms, dequant: 293.439 ms, write buffers: 1.227 ms, segemm:   0.351 ms, read buffer: 148.390 ms, total: 456.300 ms
+
+m:  32, create buffers: 0.028 ms, dequant: 309.841 ms, write buffers: 1.565 ms, segemm:   0.360 ms, read buffer: 147.509 ms, total: 472.405 ms
+m:  32, create buffers: 0.028 ms, dequant: 313.031 ms, write buffers: 1.401 ms, segemm:   0.266 ms, read buffer: 146.464 ms, total: 474.045 ms
+m:  32, create buffers: 0.027 ms, dequant: 311.214 ms, write buffers: 1.531 ms, segemm:   0.366 ms, read buffer: 148.276 ms, total: 475.029 ms
+m:  32, create buffers: 0.026 ms, dequant: 311.672 ms, write buffers: 1.565 ms, segemm:   0.362 ms, read buffer: 147.461 ms, total: 474.421 ms
+m:  32, create buffers: 0.027 ms, dequant: 311.740 ms, write buffers: 1.414 ms, segemm:   0.265 ms, read buffer: 149.126 ms, total: 476.940 ms
+
+m:  48, create buffers: 0.027 ms, dequant: 313.949 ms, write buffers: 2.070 ms, segemm:   0.363 ms, read buffer: 205.135 ms, total: 534.432 ms
+m:  48, create buffers: 0.028 ms, dequant: 263.281 ms, write buffers: 1.810 ms, segemm:   0.642 ms, read buffer: 196.503 ms, total: 476.163 ms
+m:  48, create buffers: 0.025 ms, dequant: 264.373 ms, write buffers: 1.805 ms, segemm:   0.346 ms, read buffer: 189.980 ms, total: 469.312 ms
+m:  48, create buffers: 0.027 ms, dequant: 251.817 ms, write buffers: 1.783 ms, segemm:   0.250 ms, read buffer: 190.876 ms, total: 458.486 ms
+m:  48, create buffers: 0.027 ms, dequant: 250.412 ms, write buffers: 1.326 ms, segemm:   0.228 ms, read buffer: 191.276 ms, total: 455.998 ms
+
+m:  64, create buffers: 0.028 ms, dequant: 251.270 ms, write buffers: 2.196 ms, segemm:   0.263 ms, read buffer: 189.370 ms, total: 455.954 ms
+m:  64, create buffers: 0.026 ms, dequant: 250.610 ms, write buffers: 1.709 ms, segemm:   0.262 ms, read buffer: 189.770 ms, total: 455.745 ms
+m:  64, create buffers: 0.027 ms, dequant: 264.037 ms, write buffers: 2.404 ms, segemm:   0.290 ms, read buffer: 198.885 ms, total: 478.498 ms
+m:  64, create buffers: 0.028 ms, dequant: 266.079 ms, write buffers: 2.172 ms, segemm:   0.276 ms, read buffer: 196.872 ms, total: 478.335 ms
+m:  64, create buffers: 0.025 ms, dequant: 255.718 ms, write buffers: 2.197 ms, segemm:   0.260 ms, read buffer: 190.019 ms, total: 462.118 ms
+
+m:  80, create buffers: 0.026 ms, dequant: 239.338 ms, write buffers: 2.025 ms, segemm:   0.258 ms, read buffer: 233.653 ms, total: 489.096 ms
+m:  80, create buffers: 0.027 ms, dequant: 237.425 ms, write buffers: 2.268 ms, segemm:   0.256 ms, read buffer: 233.326 ms, total: 486.314 ms
+m:  80, create buffers: 0.026 ms, dequant: 236.951 ms, write buffers: 2.408 ms, segemm:   0.263 ms, read buffer: 232.183 ms, total: 484.858 ms
+m:  80, create buffers: 0.027 ms, dequant: 239.733 ms, write buffers: 2.371 ms, segemm:   0.272 ms, read buffer: 226.117 ms, total: 481.518 ms
+m:  80, create buffers: 0.026 ms, dequant: 225.623 ms, write buffers: 2.453 ms, segemm:   0.263 ms, read buffer: 226.446 ms, total: 467.803 ms
+
+m:  96, create buffers: 0.025 ms, dequant: 229.334 ms, write buffers: 2.715 ms, segemm:   0.265 ms, read buffer: 225.467 ms, total: 470.851 ms
+m:  96, create buffers: 0.027 ms, dequant: 228.779 ms, write buffers: 2.232 ms, segemm:   0.404 ms, read buffer: 223.586 ms, total: 467.752 ms
+m:  96, create buffers: 0.027 ms, dequant: 230.716 ms, write buffers: 2.063 ms, segemm:   0.425 ms, read buffer: 226.214 ms, total: 472.598 ms
+m:  96, create buffers: 0.026 ms, dequant: 228.506 ms, write buffers: 2.515 ms, segemm:   0.262 ms, read buffer: 226.639 ms, total: 470.969 ms
+m:  96, create buffers: 0.026 ms, dequant: 228.525 ms, write buffers: 2.613 ms, segemm:   0.482 ms, read buffer: 225.289 ms, total: 469.846 ms
+
+m: 112, create buffers: 0.026 ms, dequant: 230.354 ms, write buffers: 2.981 ms, segemm:   0.493 ms, read buffer: 271.848 ms, total: 519.659 ms
+m: 112, create buffers: 0.027 ms, dequant: 219.727 ms, write buffers: 2.795 ms, segemm:   0.283 ms, read buffer: 273.298 ms, total: 509.125 ms
+m: 112, create buffers: 0.026 ms, dequant: 222.804 ms, write buffers: 2.804 ms, segemm:   0.221 ms, read buffer: 273.301 ms, total: 513.036 ms
+m: 112, create buffers: 0.027 ms, dequant: 209.316 ms, write buffers: 2.492 ms, segemm:   0.215 ms, read buffer: 268.880 ms, total: 493.885 ms
+m: 112, create buffers: 0.024 ms, dequant: 228.683 ms, write buffers: 3.104 ms, segemm:   0.258 ms, read buffer: 273.942 ms, total: 519.072 ms
+
+m: 128, create buffers: 0.026 ms, dequant: 221.291 ms, write buffers: 6.151 ms, segemm:   0.185 ms, read buffer: 270.717 ms, total: 511.725 ms
+m: 128, create buffers: 0.025 ms, dequant: 229.882 ms, write buffers: 3.526 ms, segemm:   0.510 ms, read buffer: 274.983 ms, total: 522.128 ms
+m: 128, create buffers: 0.028 ms, dequant: 218.522 ms, write buffers: 6.746 ms, segemm:   0.245 ms, read buffer: 272.327 ms, total: 510.985 ms
+m: 128, create buffers: 0.026 ms, dequant: 219.009 ms, write buffers: 3.310 ms, segemm:   0.474 ms, read buffer: 277.567 ms, total: 513.446 ms
+m: 128, create buffers: 0.027 ms, dequant: 218.894 ms, write buffers: 3.250 ms, segemm:   0.483 ms, read buffer: 273.312 ms, total: 510.068 ms
+
+m: 144, create buffers: 0.025 ms, dequant: 220.354 ms, write buffers: 3.125 ms, segemm:   0.340 ms, read buffer: 315.560 ms, total: 552.456 ms
+m: 144, create buffers: 0.027 ms, dequant: 217.909 ms, write buffers: 3.869 ms, segemm:   0.266 ms, read buffer: 319.754 ms, total: 555.028 ms
+m: 144, create buffers: 0.026 ms, dequant: 218.216 ms, write buffers: 3.914 ms, segemm:   0.489 ms, read buffer: 319.883 ms, total: 555.563 ms
+m: 144, create buffers: 0.027 ms, dequant: 227.423 ms, write buffers: 3.472 ms, segemm:   0.491 ms, read buffer: 319.925 ms, total: 564.444 ms
+m: 144, create buffers: 0.027 ms, dequant: 218.829 ms, write buffers: 4.406 ms, segemm:   3.767 ms, read buffer: 320.858 ms, total: 561.091 ms
+
+m: 160, create buffers: 0.026 ms, dequant: 218.145 ms, write buffers: 4.057 ms, segemm:   0.530 ms, read buffer: 318.084 ms, total: 554.012 ms
+m: 160, create buffers: 0.027 ms, dequant: 228.834 ms, write buffers: 4.043 ms, segemm:   0.272 ms, read buffer: 319.633 ms, total: 566.023 ms
+m: 160, create buffers: 0.026 ms, dequant: 230.550 ms, write buffers: 4.061 ms, segemm:   0.529 ms, read buffer: 319.677 ms, total: 568.252 ms
+m: 160, create buffers: 0.027 ms, dequant: 218.370 ms, write buffers: 3.965 ms, segemm:   0.282 ms, read buffer: 320.706 ms, total: 556.541 ms
+m: 160, create buffers: 0.027 ms, dequant: 220.285 ms, write buffers: 3.596 ms, segemm:   0.395 ms, read buffer: 318.526 ms, total: 555.973 ms
+
+m: 176, create buffers: 0.026 ms, dequant: 228.562 ms, write buffers: 3.551 ms, segemm:   0.227 ms, read buffer: 369.975 ms, total: 616.496 ms
+m: 176, create buffers: 0.026 ms, dequant: 218.027 ms, write buffers: 4.399 ms, segemm:   0.279 ms, read buffer: 374.614 ms, total: 610.539 ms
+m: 176, create buffers: 0.025 ms, dequant: 220.807 ms, write buffers: 4.461 ms, segemm:   0.304 ms, read buffer: 366.193 ms, total: 605.185 ms
+m: 176, create buffers: 0.027 ms, dequant: 231.206 ms, write buffers: 4.494 ms, segemm:   0.231 ms, read buffer: 368.220 ms, total: 618.009 ms
+m: 176, create buffers: 0.028 ms, dequant: 231.309 ms, write buffers: 4.739 ms, segemm:   0.265 ms, read buffer: 367.659 ms, total: 617.213 ms
+
+m: 192, create buffers: 0.027 ms, dequant: 229.005 ms, write buffers: 4.528 ms, segemm:   0.431 ms, read buffer: 368.802 ms, total: 615.875 ms
+m: 192, create buffers: 0.026 ms, dequant: 228.815 ms, write buffers: 4.748 ms, segemm:   0.526 ms, read buffer: 369.601 ms, total: 617.819 ms
+m: 192, create buffers: 0.026 ms, dequant: 226.879 ms, write buffers: 4.675 ms, segemm:   0.409 ms, read buffer: 365.412 ms, total: 611.806 ms
+m: 192, create buffers: 0.027 ms, dequant: 218.337 ms, write buffers: 4.506 ms, segemm:   0.382 ms, read buffer: 369.308 ms, total: 605.818 ms
+m: 192, create buffers: 0.027 ms, dequant: 230.180 ms, write buffers: 4.684 ms, segemm:   0.397 ms, read buffer: 366.718 ms, total: 615.246 ms
+
+m: 208, create buffers: 0.027 ms, dequant: 217.966 ms, write buffers: 5.563 ms, segemm:   0.488 ms, read buffer: 418.302 ms, total: 655.645 ms
+m: 208, create buffers: 0.027 ms, dequant: 228.413 ms, write buffers: 4.986 ms, segemm:   0.410 ms, read buffer: 416.172 ms, total: 664.607 ms
+m: 208, create buffers: 0.026 ms, dequant: 228.568 ms, write buffers: 4.993 ms, segemm:   0.506 ms, read buffer: 413.089 ms, total: 661.705 ms
+m: 208, create buffers: 0.027 ms, dequant: 228.626 ms, write buffers: 5.319 ms, segemm:   0.434 ms, read buffer: 416.432 ms, total: 664.116 ms
+m: 208, create buffers: 0.027 ms, dequant: 228.117 ms, write buffers: 4.723 ms, segemm:   0.407 ms, read buffer: 415.417 ms, total: 662.395 ms
+
+m: 224, create buffers: 0.027 ms, dequant: 227.959 ms, write buffers: 4.899 ms, segemm:   0.438 ms, read buffer: 414.147 ms, total: 662.309 ms
+m: 224, create buffers: 0.025 ms, dequant: 230.801 ms, write buffers: 4.218 ms, segemm:   0.198 ms, read buffer: 415.798 ms, total: 664.593 ms
+m: 224, create buffers: 0.026 ms, dequant: 227.977 ms, write buffers: 5.068 ms, segemm:   0.416 ms, read buffer: 415.913 ms, total: 663.072 ms
+m: 224, create buffers: 0.026 ms, dequant: 228.301 ms, write buffers: 5.322 ms, segemm:   0.437 ms, read buffer: 416.874 ms, total: 664.219 ms
+m: 224, create buffers: 0.028 ms, dequant: 228.041 ms, write buffers: 5.223 ms, segemm:   0.414 ms, read buffer: 415.790 ms, total: 663.692 ms
+
+m: 240, create buffers: 0.027 ms, dequant: 227.894 ms, write buffers: 5.562 ms, segemm:   0.441 ms, read buffer: 468.306 ms, total: 715.613 ms
+m: 240, create buffers: 0.026 ms, dequant: 227.913 ms, write buffers: 5.596 ms, segemm:   0.234 ms, read buffer: 465.104 ms, total: 713.304 ms
+m: 240, create buffers: 0.027 ms, dequant: 226.910 ms, write buffers: 5.840 ms, segemm:   0.449 ms, read buffer: 462.557 ms, total: 709.289 ms
+m: 240, create buffers: 0.025 ms, dequant: 227.864 ms, write buffers: 5.613 ms, segemm:   0.243 ms, read buffer: 467.584 ms, total: 714.550 ms
+m: 240, create buffers: 0.027 ms, dequant: 228.447 ms, write buffers: 5.594 ms, segemm:   0.418 ms, read buffer: 467.376 ms, total: 716.433 ms
+
+m: 256, create buffers: 0.026 ms, dequant: 228.775 ms, write buffers: 5.823 ms, segemm:   0.234 ms, read buffer: 468.800 ms, total: 717.234 ms
+m: 256, create buffers: 0.027 ms, dequant: 228.805 ms, write buffers: 5.666 ms, segemm:   0.438 ms, read buffer: 463.870 ms, total: 712.227 ms
+m: 256, create buffers: 0.026 ms, dequant: 231.758 ms, write buffers: 5.699 ms, segemm:   0.477 ms, read buffer: 465.353 ms, total: 716.700 ms
+m: 256, create buffers: 0.027 ms, dequant: 226.107 ms, write buffers: 5.688 ms, segemm:   0.235 ms, read buffer: 459.802 ms, total: 705.433 ms
+m: 256, create buffers: 0.026 ms, dequant: 232.469 ms, write buffers: 5.635 ms, segemm:   0.308 ms, read buffer: 463.565 ms, total: 715.373 ms
+
+
+=== n: 13824, k:  5120 ===
+m:  16, create buffers: 0.027 ms, dequant: 230.350 ms, write buffers: 1.031 ms, segemm:   0.327 ms, read buffer: 137.310 ms, total: 383.554 ms
+m:  16, create buffers: 0.026 ms, dequant: 253.153 ms, write buffers: 1.120 ms, segemm:   0.350 ms, read buffer: 139.378 ms, total: 406.656 ms
+m:  16, create buffers: 0.026 ms, dequant: 278.135 ms, write buffers: 1.151 ms, segemm:   0.355 ms, read buffer: 139.337 ms, total: 433.932 ms
+m:  16, create buffers: 0.026 ms, dequant: 276.404 ms, write buffers: 1.180 ms, segemm:   0.356 ms, read buffer: 139.142 ms, total: 429.939 ms
+m:  16, create buffers: 0.027 ms, dequant: 264.788 ms, write buffers: 1.266 ms, segemm:   0.352 ms, read buffer: 139.263 ms, total: 418.734 ms
+
+m:  32, create buffers: 0.027 ms, dequant: 275.357 ms, write buffers: 1.562 ms, segemm:   0.637 ms, read buffer: 143.502 ms, total: 435.559 ms
+m:  32, create buffers: 0.027 ms, dequant: 292.911 ms, write buffers: 1.662 ms, segemm:   0.356 ms, read buffer: 149.062 ms, total: 458.462 ms
+m:  32, create buffers: 0.026 ms, dequant: 332.246 ms, write buffers: 1.510 ms, segemm:   0.353 ms, read buffer: 152.535 ms, total: 500.985 ms
+m:  32, create buffers: 0.027 ms, dequant: 310.844 ms, write buffers: 1.334 ms, segemm:   0.268 ms, read buffer: 143.763 ms, total: 469.139 ms
+m:  32, create buffers: 0.026 ms, dequant: 293.632 ms, write buffers: 1.547 ms, segemm:   0.359 ms, read buffer: 145.944 ms, total: 454.716 ms
+
+m:  48, create buffers: 0.027 ms, dequant: 312.388 ms, write buffers: 2.054 ms, segemm:   0.679 ms, read buffer: 205.721 ms, total: 533.632 ms
+m:  48, create buffers: 0.027 ms, dequant: 264.367 ms, write buffers: 2.033 ms, segemm:   0.540 ms, read buffer: 190.318 ms, total: 470.168 ms
+m:  48, create buffers: 0.027 ms, dequant: 251.610 ms, write buffers: 1.974 ms, segemm:   0.644 ms, read buffer: 189.571 ms, total: 456.820 ms
+m:  48, create buffers: 0.027 ms, dequant: 238.880 ms, write buffers: 1.799 ms, segemm:   0.644 ms, read buffer: 186.236 ms, total: 440.345 ms
+m:  48, create buffers: 0.027 ms, dequant: 251.141 ms, write buffers: 1.910 ms, segemm:   0.354 ms, read buffer: 190.634 ms, total: 457.498 ms
+
+m:  64, create buffers: 0.027 ms, dequant: 251.997 ms, write buffers: 2.173 ms, segemm:   0.486 ms, read buffer: 190.313 ms, total: 459.994 ms
+m:  64, create buffers: 0.027 ms, dequant: 254.535 ms, write buffers: 2.150 ms, segemm:   0.487 ms, read buffer: 190.463 ms, total: 460.515 ms
+m:  64, create buffers: 0.028 ms, dequant: 249.570 ms, write buffers: 2.098 ms, segemm:   0.492 ms, read buffer: 190.376 ms, total: 455.739 ms
+m:  64, create buffers: 0.025 ms, dequant: 255.188 ms, write buffers: 2.204 ms, segemm:   0.501 ms, read buffer: 190.184 ms, total: 460.903 ms
+m:  64, create buffers: 0.028 ms, dequant: 238.010 ms, write buffers: 1.789 ms, segemm:   0.502 ms, read buffer: 185.095 ms, total: 439.425 ms
+
+m:  80, create buffers: 0.026 ms, dequant: 249.966 ms, write buffers: 2.544 ms, segemm:   0.275 ms, read buffer: 238.923 ms, total: 506.213 ms
+m:  80, create buffers: 0.027 ms, dequant: 227.770 ms, write buffers: 1.838 ms, segemm:   0.413 ms, read buffer: 221.272 ms, total: 464.295 ms
+m:  80, create buffers: 0.026 ms, dequant: 228.265 ms, write buffers: 2.830 ms, segemm:   0.436 ms, read buffer: 224.345 ms, total: 468.955 ms
+m:  80, create buffers: 0.027 ms, dequant: 228.395 ms, write buffers: 2.187 ms, segemm:   0.262 ms, read buffer: 227.223 ms, total: 471.144 ms
+m:  80, create buffers: 0.026 ms, dequant: 232.054 ms, write buffers: 2.435 ms, segemm:   0.277 ms, read buffer: 224.949 ms, total: 473.833 ms
+
+m:  96, create buffers: 0.027 ms, dequant: 230.831 ms, write buffers: 3.003 ms, segemm:   0.308 ms, read buffer: 225.564 ms, total: 472.738 ms
+m:  96, create buffers: 0.029 ms, dequant: 227.522 ms, write buffers: 2.797 ms, segemm:   0.278 ms, read buffer: 223.770 ms, total: 467.465 ms
+m:  96, create buffers: 0.026 ms, dequant: 228.710 ms, write buffers: 2.815 ms, segemm:   0.282 ms, read buffer: 224.013 ms, total: 468.932 ms
+m:  96, create buffers: 0.026 ms, dequant: 226.397 ms, write buffers: 2.802 ms, segemm:   0.281 ms, read buffer: 224.445 ms, total: 466.846 ms
+m:  96, create buffers: 0.027 ms, dequant: 227.214 ms, write buffers: 2.783 ms, segemm:   0.307 ms, read buffer: 226.653 ms, total: 469.967 ms
+
+m: 112, create buffers: 0.026 ms, dequant: 231.419 ms, write buffers: 3.183 ms, segemm:   0.291 ms, read buffer: 274.413 ms, total: 522.325 ms
+m: 112, create buffers: 0.027 ms, dequant: 221.317 ms, write buffers: 6.362 ms, segemm:   0.255 ms, read buffer: 270.637 ms, total: 511.473 ms
+m: 112, create buffers: 0.026 ms, dequant: 219.172 ms, write buffers: 3.274 ms, segemm:   0.317 ms, read buffer: 274.265 ms, total: 509.906 ms
+m: 112, create buffers: 0.027 ms, dequant: 216.719 ms, write buffers: 3.277 ms, segemm:   0.290 ms, read buffer: 271.358 ms, total: 504.662 ms
+m: 112, create buffers: 0.028 ms, dequant: 216.291 ms, write buffers: 3.177 ms, segemm:   0.276 ms, read buffer: 270.463 ms, total: 503.259 ms
+
+m: 128, create buffers: 0.028 ms, dequant: 218.181 ms, write buffers: 3.444 ms, segemm:   0.339 ms, read buffer: 272.330 ms, total: 508.417 ms
+m: 128, create buffers: 0.026 ms, dequant: 220.509 ms, write buffers: 3.502 ms, segemm:   0.329 ms, read buffer: 275.476 ms, total: 512.891 ms
+m: 128, create buffers: 0.027 ms, dequant: 218.966 ms, write buffers: 3.076 ms, segemm:   0.238 ms, read buffer: 271.101 ms, total: 506.531 ms
+m: 128, create buffers: 0.026 ms, dequant: 218.458 ms, write buffers: 3.993 ms, segemm:   0.332 ms, read buffer: 274.505 ms, total: 510.384 ms
+m: 128, create buffers: 0.027 ms, dequant: 218.351 ms, write buffers: 3.083 ms, segemm:   0.274 ms, read buffer: 271.303 ms, total: 506.790 ms
+
+m: 144, create buffers: 0.026 ms, dequant: 221.205 ms, write buffers: 3.839 ms, segemm:   0.388 ms, read buffer: 317.041 ms, total: 555.834 ms
+m: 144, create buffers: 0.025 ms, dequant: 218.685 ms, write buffers: 3.813 ms, segemm:   0.334 ms, read buffer: 317.653 ms, total: 553.804 ms
+m: 144, create buffers: 0.027 ms, dequant: 218.335 ms, write buffers: 3.566 ms, segemm:   0.342 ms, read buffer: 316.570 ms, total: 552.240 ms
+m: 144, create buffers: 0.027 ms, dequant: 217.478 ms, write buffers: 3.837 ms, segemm:   0.333 ms, read buffer: 317.730 ms, total: 553.082 ms
+m: 144, create buffers: 0.025 ms, dequant: 218.362 ms, write buffers: 8.371 ms, segemm:   0.320 ms, read buffer: 316.342 ms, total: 556.644 ms
+
+m: 160, create buffers: 0.026 ms, dequant: 221.906 ms, write buffers: 3.964 ms, segemm:   0.450 ms, read buffer: 316.500 ms, total: 555.766 ms
+m: 160, create buffers: 0.026 ms, dequant: 221.925 ms, write buffers: 3.988 ms, segemm:   0.453 ms, read buffer: 316.465 ms, total: 556.073 ms
+m: 160, create buffers: 0.026 ms, dequant: 218.703 ms, write buffers: 4.073 ms, segemm:   0.396 ms, read buffer: 316.918 ms, total: 553.416 ms
+m: 160, create buffers: 0.027 ms, dequant: 217.449 ms, write buffers: 8.683 ms, segemm:   0.332 ms, read buffer: 316.825 ms, total: 556.497 ms
+m: 160, create buffers: 0.025 ms, dequant: 217.693 ms, write buffers: 4.008 ms, segemm:   0.447 ms, read buffer: 316.700 ms, total: 552.051 ms
+
+m: 176, create buffers: 0.027 ms, dequant: 220.172 ms, write buffers: 4.418 ms, segemm:   0.476 ms, read buffer: 363.639 ms, total: 602.935 ms
+m: 176, create buffers: 0.026 ms, dequant: 218.800 ms, write buffers: 4.463 ms, segemm:   0.467 ms, read buffer: 364.331 ms, total: 602.324 ms
+m: 176, create buffers: 0.026 ms, dequant: 210.264 ms, write buffers: 3.276 ms, segemm:   0.333 ms, read buffer: 364.703 ms, total: 592.993 ms
+m: 176, create buffers: 0.026 ms, dequant: 221.482 ms, write buffers: 4.569 ms, segemm:   0.494 ms, read buffer: 363.843 ms, total: 603.624 ms
+m: 176, create buffers: 0.027 ms, dequant: 216.761 ms, write buffers: 4.274 ms, segemm:   0.386 ms, read buffer: 363.689 ms, total: 598.741 ms
+
+m: 192, create buffers: 0.027 ms, dequant: 217.425 ms, write buffers: 4.940 ms, segemm:   0.489 ms, read buffer: 365.330 ms, total: 601.252 ms
+m: 192, create buffers: 0.028 ms, dequant: 209.669 ms, write buffers: 3.752 ms, segemm:   0.405 ms, read buffer: 358.382 ms, total: 585.399 ms
+m: 192, create buffers: 0.026 ms, dequant: 220.045 ms, write buffers: 5.013 ms, segemm:   0.403 ms, read buffer: 363.541 ms, total: 602.805 ms
+m: 192, create buffers: 0.027 ms, dequant: 219.746 ms, write buffers: 4.185 ms, segemm:   0.411 ms, read buffer: 364.259 ms, total: 601.926 ms
+m: 192, create buffers: 0.028 ms, dequant: 217.731 ms, write buffers: 4.475 ms, segemm:   0.426 ms, read buffer: 362.900 ms, total: 598.786 ms
+
+m: 208, create buffers: 0.027 ms, dequant: 219.495 ms, write buffers: 5.006 ms, segemm:   0.428 ms, read buffer: 409.382 ms, total: 647.719 ms
+m: 208, create buffers: 0.025 ms, dequant: 233.088 ms, write buffers: 4.933 ms, segemm:   0.426 ms, read buffer: 410.384 ms, total: 662.035 ms
+m: 208, create buffers: 0.045 ms, dequant: 230.044 ms, write buffers: 4.974 ms, segemm:   0.370 ms, read buffer: 415.173 ms, total: 664.283 ms
+m: 208, create buffers: 0.028 ms, dequant: 231.019 ms, write buffers: 5.124 ms, segemm:   0.375 ms, read buffer: 410.620 ms, total: 661.218 ms
+m: 208, create buffers: 0.026 ms, dequant: 220.649 ms, write buffers: 4.912 ms, segemm:   0.433 ms, read buffer: 409.716 ms, total: 649.075 ms
+
+m: 224, create buffers: 0.027 ms, dequant: 229.526 ms, write buffers: 5.079 ms, segemm:   0.419 ms, read buffer: 409.461 ms, total: 658.435 ms
+m: 224, create buffers: 0.026 ms, dequant: 230.758 ms, write buffers: 5.139 ms, segemm:   0.463 ms, read buffer: 411.015 ms, total: 660.701 ms
+m: 224, create buffers: 0.026 ms, dequant: 231.490 ms, write buffers: 5.509 ms, segemm:   0.428 ms, read buffer: 409.533 ms, total: 662.030 ms
+m: 224, create buffers: 0.027 ms, dequant: 229.636 ms, write buffers: 4.854 ms, segemm:   0.435 ms, read buffer: 410.699 ms, total: 659.928 ms
+m: 224, create buffers: 0.026 ms, dequant: 229.307 ms, write buffers: 5.241 ms, segemm:   0.448 ms, read buffer: 408.333 ms, total: 656.682 ms
+
+m: 240, create buffers: 0.027 ms, dequant: 219.094 ms, write buffers: 5.455 ms, segemm:   0.508 ms, read buffer: 459.306 ms, total: 697.922 ms
+m: 240, create buffers: 0.025 ms, dequant: 229.122 ms, write buffers: 5.635 ms, segemm:   0.453 ms, read buffer: 457.591 ms, total: 707.160 ms
+m: 240, create buffers: 0.027 ms, dequant: 228.533 ms, write buffers: 5.618 ms, segemm:   0.396 ms, read buffer: 453.591 ms, total: 701.472 ms
+m: 240, create buffers: 0.027 ms, dequant: 229.347 ms, write buffers: 5.668 ms, segemm:   0.462 ms, read buffer: 451.863 ms, total: 700.685 ms
+m: 240, create buffers: 0.026 ms, dequant: 229.673 ms, write buffers: 5.632 ms, segemm:   0.421 ms, read buffer: 454.119 ms, total: 703.425 ms
+
+m: 256, create buffers: 0.027 ms, dequant: 227.853 ms, write buffers: 5.218 ms, segemm:   0.458 ms, read buffer: 454.777 ms, total: 702.049 ms
+m: 256, create buffers: 0.025 ms, dequant: 231.302 ms, write buffers: 5.652 ms, segemm:   0.454 ms, read buffer: 457.585 ms, total: 709.049 ms
+m: 256, create buffers: 0.027 ms, dequant: 229.028 ms, write buffers: 5.789 ms, segemm:   0.521 ms, read buffer: 456.254 ms, total: 705.284 ms
+m: 256, create buffers: 0.026 ms, dequant: 226.841 ms, write buffers: 5.843 ms, segemm:   0.438 ms, read buffer: 453.457 ms, total: 701.309 ms
+m: 256, create buffers: 0.028 ms, dequant: 227.475 ms, write buffers: 5.279 ms, segemm:   0.454 ms, read buffer: 451.919 ms, total: 698.608 ms

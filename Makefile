@@ -112,11 +112,11 @@ ifdef LLAMA_OPENBLAS
 	else
 		LDFLAGS += -lopenblas
 	endif
-endif
-ifeq ($(UNAME_S),Darwin)
-	# openblas installed with Homebew on macOS.
-	CFLAGS  += -I/usr/local/opt/openblas/include
-	LDFLAGS += -L/usr/local/opt/openblas/lib
+	ifeq ($(UNAME_S),Darwin)
+		# openblas installed with Homebew on macOS.
+		CFLAGS  += -I/usr/local/opt/openblas/include
+		LDFLAGS += -L/usr/local/opt/openblas/lib
+	endif
 endif
 ifeq ($(UNAME_S),Linux)
 	# libopenblas64-pthread-dev on ubunntu.

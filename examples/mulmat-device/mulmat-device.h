@@ -1,5 +1,4 @@
-#ifndef GGML_Q40_MULMAT_DEVICE_H
-#define GGML_Q40_MULMAT_DEVICE_H
+#pragma once
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -15,6 +14,15 @@ typedef int ggml_compute_stage_flag_t;
 
 #define COMPUTE_STAGE_FLAG_VALID 1
 #define COMPUTE_STAGE_FLAG_PARALLEL (1 << 1)
+
+enum ggml_blas_type {
+    GGML_BLAS_TYPE_ACCELERATE = 1, // https://developer.apple.com/accelerate
+    GGML_BLAS_TYPE_OPENBLAS, // https://www.openblas.net/
+    GGML_BLAS_TYPE_CLBLAST, // https://cnugteren.github.io/clblast/clblast.html
+    GGML_BLAS_TYPE_CUBLAS, // https://developer.nvidia.com/cublas
+
+    GGML_BLAS_TYPE_COUNT
+};
 
 struct ggml_mulmat_bench_m {
     int M;
@@ -39,7 +47,7 @@ struct ggml_mulmat_bench {
     int version;
 
     char model[4];     // 7B | 13B
-    char gpu_impl[16]; // ACCELERATE, OPENBLAS, CUBLAS
+    char blas_name[16]; // see `ggml_blas_names`
     int n_groups;
     int m_step;
     int num_m;
@@ -53,11 +61,9 @@ struct ggml_mulmat_bench {
 enum ggml_device_type {
     GGML_DEVICE_CPU = 0,
     GGML_DEVICE_GPU,
-    // GGML_DEVICE_GPU_ACCELERATE,
-    // GGML_DEVICE_GPU_OPENBLAS,
-    // GGML_DEVICE_GPU_CUBLAS,
 };
 
+const char * ggml_get_blas_name(void);
 void ggml_mulmat_write_bench_data(struct ggml_mulmat_bench *bench, FILE *fp);
 int ggml_mulmat_read_bench_data(struct ggml_mulmat_bench *bench, FILE *file);
 int ggml_mulmat_estimate_time(struct ggml_mulmat_bench *bench, int M, int N,
@@ -67,4 +73,4 @@ enum ggml_device_type ggml_mulmat_choose_device(struct ggml_mulmat_bench *bench,
 #ifdef __cplusplus
 }
 #endif
-#endif
+

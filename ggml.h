@@ -332,11 +332,18 @@ extern "C" {
         // this is a slow stage that typically runs on GPU with just main thread,
         // so worker threads SHOULD go waiting if possible.
         bool worker_wait;
+
+        // TODO: stage level device and blas.
+        // enum ggml_device_type device;
+
+        // // blas type when device is GPU.
+        // enum ggml_blas_type blas;
     };
 
     // NOTE: newly added in this PR
     struct ggml_compute_tensor_config {
         enum ggml_device_type device;
+
         size_t work_size;
 
         struct ggml_compute_task_config task_stages[3];

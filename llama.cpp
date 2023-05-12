@@ -2166,16 +2166,16 @@ struct llama_context * llama_init_from_file(
             snprintf(buf, sizeof(buf), "mulmat-device-bench.%s.txt", model_name);
             FILE *fp = fopen(buf, "r");
             if (!fp) {
-                fprintf(stderr, "failed to open the mulmat bench file %s\n", buf);
-                return nullptr;
+                fprintf(stderr, "WARN: failed to open the mulmat bench file %s\n", buf);
+            } else {
+                int rc = ggml_mulmat_read_bench_data(&ctx->mulmat_bench, fp);
+                if (rc != 0) {
+                    fprintf(stderr, "failed to load mulmat bench from file %s\n", buf);
+                    return nullptr;
+                }
+                fclose(fp);
+                printf("\n=== loaded mulmat bench from %s ===\n", buf);
             }
-            int rc = ggml_mulmat_read_bench_data(&ctx->mulmat_bench, fp);
-            if (rc != 0) {
-                fprintf(stderr, "failed to load mulmat bench from file %s\n", buf);
-                return nullptr;
-            }
-            fclose(fp);
-            printf("\n=== loaded mulmat bench from %s\n", buf);
         }
     }
 

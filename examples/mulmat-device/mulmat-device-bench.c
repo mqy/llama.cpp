@@ -1,24 +1,18 @@
 #include "examples/mulmat-device/mulmat-device.h"
 #include "ggml.h"
 
+#if defined GGML_USE_CLBLAST
+#include "ggml-opencl.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 #include <inttypes.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#define BENCH_ASSERT(x)                                                        \
-    do {                                                                       \
-        if (!(x)) {                                                            \
-            fprintf(stderr, "BENCH_ASSERT: %s:%d: %s\n", __FILE__, __LINE__,   \
-                    #x);                                                       \
-            abort();                                                           \
-        }                                                                      \
-    } while (0)
 
 #define BENCH_ASSERT_INT_EQUAL(actual, expect, fmt, ...)                       \
     do {                                                                       \
@@ -33,11 +27,10 @@
 
 #define UNUSED(x) (void)(x)
 
-static int64_t time_us(void);
 static int bench_time_avg(int *a, int len);
 static void print_build_blas_tip(void);
 static void progress(int i, int max);
-static void envs_for_gpu_feature(int feature, char *buf, int buf_len);
+static void envs_for_blas(enum ggml_blas_type, char *buf, int buf_len);
 static bool prompt_yes_no(const char *prompt);
 
 static void cmd_bench(struct ggml_mulmat_bench *b);
@@ -72,8 +65,6 @@ static void usage(char *prog) {
 
 // main
 int main(int argc, char **argv) {
-    printf("\n");
-
     if (!ggml_cpu_has_blas()) {
         print_build_blas_tip();
         exit(1);
@@ -107,7 +98,7 @@ int main(int argc, char **argv) {
             .gpu_stages = {(COMPUTE_STAGE_FLAG_VALID |
                             COMPUTE_STAGE_FLAG_PARALLEL),
                            COMPUTE_STAGE_FLAG_VALID, 0},
-#elif defined(GGML_USE_CUBLAS)
+#elif defined(GGML_USE_CUBLAS) || defined(GGML_USE_CLBLAST)
             .gpu_stages = {0, COMPUTE_STAGE_FLAG_VALID, 0},
 #endif
             .groups = NULL,
@@ -147,7 +138,7 @@ int main(int argc, char **argv) {
                 if (rc == 0) { // prompt
                     size_t len = strlen(data_file) + 50;
                     char *prompt = malloc(len);
-                    BENCH_ASSERT(prompt);
+                    GGML_ASSERT(prompt);
                     snprintf(prompt, len,
                              "[%s]: data file '%s' exists, override? (Y|n)",
                              cmd, data_file);
@@ -161,14 +152,14 @@ int main(int argc, char **argv) {
             }
 
             fp = fopen(data_file, "w");
-            BENCH_ASSERT(fp);
+            GGML_ASSERT(fp);
         }
 
         if (strcmp(model, "7B") == 0) {
             bench.n_groups = 3;
             bench.groups =
                 malloc(bench.n_groups * sizeof(struct ggml_mulmat_bench_nk));
-            BENCH_ASSERT(bench.groups);
+            GGML_ASSERT(bench.groups);
             bench.groups[0] = (struct ggml_mulmat_bench_nk){
                 .N = 4096, .K = 4096, .items = NULL};
             bench.groups[1] = (struct ggml_mulmat_bench_nk){
@@ -179,7 +170,7 @@ int main(int argc, char **argv) {
             bench.n_groups = 3;
             bench.groups =
                 malloc(bench.n_groups * sizeof(struct ggml_mulmat_bench_nk));
-            BENCH_ASSERT(bench.groups);
+            GGML_ASSERT(bench.groups);
             bench.groups[0] = (struct ggml_mulmat_bench_nk){
                 .N = 5120, .K = 5120, .items = NULL};
             bench.groups[1] = (struct ggml_mulmat_bench_nk){
@@ -196,26 +187,23 @@ int main(int argc, char **argv) {
         // bench.model
         {
             size_t n = sizeof(bench.model);
-            BENCH_ASSERT(n > strlen(model));
+            GGML_ASSERT(n > strlen(model));
             strncpy(bench.model, model, n);
         }
 
-        // bench.gpu_impl
+        // bench.blas_name
         {
-            const char *gpu_impl = NULL;
-#if defined(GGML_USE_ACCELERATE)
-            gpu_impl = "ACCELERATE";
-#elif defined(GGML_USE_OPENBLAS)
-            gpu_impl = "OPENBLAS";
-#elif defined(GGML_USE_CUBLAS)
-            gpu_imp = "CUBLAS";
-#else
-            abort();
-#endif
-            size_t n = sizeof(bench.gpu_impl);
-            BENCH_ASSERT(n > strlen(gpu_impl));
-            strncpy(bench.gpu_impl, gpu_impl, n);
+            const char *blas_name = ggml_get_blas_name();
+            GGML_ASSERT(blas_name);
+
+            size_t n = sizeof(bench.blas_name);
+            GGML_ASSERT(n > strlen(blas_name));
+            strncpy(bench.blas_name, blas_name, n);
         }
+
+#if defined GGML_USE_CLBLAST
+        ggml_cl_init();
+#endif
 
         cmd_bench(&bench);
 
@@ -249,9 +237,9 @@ int main(int argc, char **argv) {
         }
 
         FILE *fp = fopen(data_file, "r");
-        BENCH_ASSERT(fp);
+        GGML_ASSERT(fp);
         int rc = ggml_mulmat_read_bench_data(&bench, fp);
-        BENCH_ASSERT(rc == 0);
+        GGML_ASSERT(rc == 0);
         fclose(fp);
 
         cmd_analyze(&bench);
@@ -293,7 +281,7 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
             }
         }
 
-        size_t q4_0_buf_size = sizeof(int64_t) * max_NxK;
+        size_t q4_0_buf_size = 2 * max_NxK * sizeof(int64_t);
         q4_0_buf = malloc(q4_0_buf_size);
         if (!q4_0_buf) {
             fprintf(stderr,
@@ -320,15 +308,21 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
         {
             size_t sz = sizeof(struct ggml_mulmat_bench_m) * bench->num_m;
             group->items = malloc(sz);
-            BENCH_ASSERT(group->items);
+            GGML_ASSERT(group->items);
             memset(group->items, 0, sz);
         }
 
+        char progress_line[20];
+
         for (int im = 0; im < bench->num_m; im++) {
             M = bench->m_step * (im + 1);
-            int line_len = 16; // 16: calculated from the next line.
-            printf("%d %d %d ", N, K, M);
+
+            memset(progress_line, 0, sizeof(progress_line));
+            snprintf(progress_line, sizeof(progress_line), "%d %d %d ", N, K, M);
+            printf("%s", progress_line);
             fflush(stdout);
+
+            int line_len = strlen(progress_line);
 
             struct ggml_context *ctx = NULL;
             {
@@ -343,7 +337,7 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
                 };
 
                 ctx = ggml_init(init_params);
-                BENCH_ASSERT(ctx);
+                GGML_ASSERT(ctx);
             }
 
             struct ggml_tensor *src0 = NULL;
@@ -359,7 +353,7 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
                 src0 = ggml_new_tensor_2d(ctx, GGML_TYPE_Q4_0, (int64_t)K,
                                           (int64_t)N);
                 ggml_quantize_q4_0((const float *)src0_f32->data, src0->data,
-                                   (int64_t)N, K, (int64_t *)q4_0_buf);
+                                   N * K, K, (int64_t *)q4_0_buf);
 
                 // src1: M x K
                 src1 = ggml_new_tensor_2d(ctx, GGML_TYPE_F32, (int64_t)K,
@@ -390,11 +384,11 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
 
                     compute_params.type = stage;
                     for (int nb = 0; nb < NUM_BENCH; nb++) {
-                        int t0 = (int)time_us();
+                        int t0 = (int)ggml_time_us();
                         ggml_compute_forward_mul_mat_q_f32(&compute_params,
                                                            src0, src1, dst);
                         bench_item->cpu_records[stage][nb] =
-                            (int)time_us() - t0;
+                            (int)ggml_time_us() - t0;
                         progress(nb, NUM_BENCH);
                     }
                     line_len++;
@@ -407,11 +401,11 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
                 if (bench->gpu_stages[stage] & COMPUTE_STAGE_FLAG_VALID) {
                     compute_params.type = stage;
                     for (int nb = 0; nb < NUM_BENCH; nb++) {
-                        int t0 = (int)time_us();
+                        int t0 = (int)ggml_time_us();
                         ggml_compute_forward_mul_mat_q_f32(&compute_params,
                                                            src0, src1, dst);
                         bench_item->gpu_records[stage][nb] =
-                            (int)time_us() - t0;
+                            (int)ggml_time_us() - t0;
                         progress(nb, NUM_BENCH);
                     }
                     line_len++;
@@ -449,39 +443,37 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
     }
 }
 
-static int64_t time_us(void) {
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return (int64_t)ts.tv_sec * 1000000 + (int64_t)ts.tv_nsec / 1000;
-}
-
 static void print_build_blas_tip(void) {
     const char *make_target = "mulmat-device-bench";
 
     fprintf(stderr,
-            "error: this program was not built with any GPU feature. tips:\n");
+            "error: this program was not built with any BLAS. tips:\n");
 
     char buf[100];
-    envs_for_gpu_feature(1, buf, 100);
-    fprintf(stderr, "* to build with accelerate: make clean; %s make %s\n", buf,
+    envs_for_blas(GGML_BLAS_TYPE_ACCELERATE, buf, 100);
+    fprintf(stderr, "* to build with Accelerate: make clean; %s make %s\n", buf,
             make_target);
-    envs_for_gpu_feature(2, buf, 100);
+    envs_for_blas(GGML_BLAS_TYPE_OPENBLAS, buf, 100);
     fprintf(stderr, "* to build with openBLAS:   make clean; %s make %s\n", buf,
             make_target);
-    envs_for_gpu_feature(3, buf, 100);
+    envs_for_blas(GGML_BLAS_TYPE_CUBLAS, buf, 100);
     fprintf(stderr, "* to build with cuBLAS:     make clean; %s make %s\n", buf,
+            make_target);
+    envs_for_blas(GGML_BLAS_TYPE_CLBLAST, buf, 100);
+    fprintf(stderr, "* to build with CLBLast:    make clean; %s make %s\n", buf,
             make_target);
 }
 
-// feature: 1: apple accelerate, 2: openBLAS, 3: cuBLAS
-static void envs_for_gpu_feature(int feature, char *buf, int buf_len) {
+static void envs_for_blas(enum ggml_blas_type blas, char *buf, int buf_len) {
     memset(buf, 0, buf_len);
-    const char *LLAMA_NO_ACCELERATE = feature == 1 ? " " : "1";
-    const char *LLAMA_OPENBLAS = feature == 2 ? "1" : " ";
-    const char *LLAMA_CUBLAS = feature == 3 ? "1" : " ";
+    const char *LLAMA_NO_ACCELERATE = blas == GGML_BLAS_TYPE_ACCELERATE ? " " : "1";
+    const char *LLAMA_OPENBLAS = blas == GGML_BLAS_TYPE_OPENBLAS ? "1" : " ";
+    const char *LLAMA_CUBLAS = blas == GGML_BLAS_TYPE_CUBLAS ? "1" : " ";
+    const char *LLAMA_CLBLAST = blas == GGML_BLAS_TYPE_CLBLAST ? "1" : " ";
+
     snprintf(buf, buf_len,
-             "LLAMA_NO_ACCELERATE=%s LLAMA_OPENBLAS=%s LLAMA_CUBLAS=%s",
-             LLAMA_NO_ACCELERATE, LLAMA_OPENBLAS, LLAMA_CUBLAS);
+             "LLAMA_NO_ACCELERATE=%s LLAMA_OPENBLAS=%s LLAMA_CUBLAS=%s LLAMA_CLBLAST=%s",
+             LLAMA_NO_ACCELERATE, LLAMA_OPENBLAS, LLAMA_CUBLAS, LLAMA_CLBLAST);
 }
 
 static bool prompt_yes_no(const char *prompt) {
@@ -545,7 +537,7 @@ static int bench_time_avg(int *a, int len) {
     return total / (len - 2);
 }
 
-// TODO: write as column wise CSV format.
+// TODO: write as column-wise CSV format.
 static void cmd_analyze(struct ggml_mulmat_bench *bench) {
     printf("== gpu compute stage for all NK groups ==\n\n");
     {
@@ -707,7 +699,7 @@ static void test__estimate_time(void) {
     struct ggml_mulmat_bench bench = {
         .version = 1,
         .model = "7B",
-        .gpu_impl = "OPENBLAS",
+        .blas_name = "OpenBLAS",
         .n_groups = 1,
         .m_step = 8,
         .num_m = 2,
@@ -827,7 +819,7 @@ static void test__choose_device(void) {
     struct ggml_mulmat_bench bench = {
         .version = 1,
         .model = "7B",
-        .gpu_impl = "OPENBLAS",
+        .blas_name = "OPENBLAS",
         .n_groups = 1,
         .m_step = 8,
         .num_m = 2,

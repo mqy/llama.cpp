@@ -1,8 +1,15 @@
 #include "examples/mulmat-device/mulmat-device.h"
 
+const char* ggml_blas_names[GGML_BLAS_TYPE_COUNT] = {
+    [GGML_BLAS_TYPE_ACCELERATE] = "Accelerate",
+    [GGML_BLAS_TYPE_CLBLAST] ="CLBlast",
+    [GGML_BLAS_TYPE_CUBLAS] ="cuBLAS",
+    [GGML_BLAS_TYPE_OPENBLAS] = "OpenBLAS",
+};
+
 int ggml_mulmat_read_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
     int rc = fscanf(fp, "%d %s %s %d %d %d", &bench->version, bench->model,
-                    bench->gpu_impl, &bench->n_groups, &bench->m_step,
+                    bench->blas_name, &bench->n_groups, &bench->m_step,
                     &bench->num_m);
     if (rc <= 0) {
         return rc;
@@ -52,7 +59,7 @@ int ggml_mulmat_read_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
 
 void ggml_mulmat_write_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
     fprintf(fp, "%d %s %s %d %d %d", bench->version, bench->model,
-            bench->gpu_impl, bench->n_groups, bench->m_step, bench->num_m);
+            bench->blas_name, bench->n_groups, bench->m_step, bench->num_m);
 
     for (int i = 0; i < 3; i++) {
         fprintf(fp, "%2d", bench->cpu_stages[i]);
@@ -74,14 +81,14 @@ void ggml_mulmat_write_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
             fprintf(fp, "%3d", item->M);
             for (int k = 0; k < 3; k++) {
                 if (bench->cpu_stages[k] & COMPUTE_STAGE_FLAG_VALID) {
-                    fprintf(fp, "%8d", item->cpu_time[k]);
+                    fprintf(fp, "%9d", item->cpu_time[k]);
                 } else {
                     fprintf(fp, " 0");
                 }
             }
             for (int k = 0; k < 3; k++) {
                 if (bench->gpu_stages[k] & COMPUTE_STAGE_FLAG_VALID) {
-                    fprintf(fp, "%7d", item->gpu_time[k]);
+                    fprintf(fp, "%9d", item->gpu_time[k]);
                 } else {
                     fprintf(fp, " 0");
                 }
@@ -174,4 +181,18 @@ enum ggml_device_type ggml_mulmat_choose_device(struct ggml_mulmat_bench *b,
     }
 
     return (cpu_time < gpu_time) ? GGML_DEVICE_CPU : GGML_DEVICE_GPU;
+}
+
+const char* ggml_get_blas_name(void) {
+#if defined(GGML_USE_ACCELERATE)
+    return ggml_blas_names[GGML_BLAS_TYPE_ACCELERATE];
+#elif defined(GGML_USE_CLBLAST)
+    return ggml_blas_names[GGML_BLAS_TYPE_CLBLAST];
+#elif defined(GGML_USE_CUBLAS)
+    return ggml_blas_names[GGML_BLAS_TYPE_CUBLAS];
+#elif defined(GGML_USE_OPENBLAS)
+    return ggml_blas_names[GGML_BLAS_TYPE_OPENBLAS];
+#else
+    return NULL;
+#endif
 }
