@@ -88,8 +88,8 @@ int main(int argc, char **argv) {
         struct ggml_mulmat_bench bench = {
             .version = 1,
             .n_groups = 0,
-            .m_step = 32,
-            .num_m = 4,
+            .m_step = 8,
+            .num_m = 16,
             .cpu_stages = {COMPUTE_STAGE_FLAG_VALID,
                            (COMPUTE_STAGE_FLAG_VALID |
                             COMPUTE_STAGE_FLAG_PARALLEL),
@@ -105,9 +105,9 @@ int main(int argc, char **argv) {
         };
 
         if (false) {
-            // for M from 16 through 512.
-            bench.m_step = 32;
-            bench.num_m = 16;
+            // for larger M range.
+            bench.m_step = 16;
+            bench.num_m = 32;
         }
 
         const char *model = argv[2];
