@@ -88,8 +88,8 @@ int main(int argc, char **argv) {
         struct ggml_mulmat_bench bench = {
             .version = 1,
             .n_groups = 0,
-            .m_step = 8,
-            .num_m = 11,
+            .m_step = 32,
+            .num_m = 4,
             .cpu_stages = {COMPUTE_STAGE_FLAG_VALID,
                            (COMPUTE_STAGE_FLAG_VALID |
                             COMPUTE_STAGE_FLAG_PARALLEL),
@@ -156,7 +156,7 @@ int main(int argc, char **argv) {
         }
 
         if (strcmp(model, "7B") == 0) {
-            bench.n_groups = 3;
+            bench.n_groups = 4;
             bench.groups =
                 malloc(bench.n_groups * sizeof(struct ggml_mulmat_bench_nk));
             GGML_ASSERT(bench.groups);
@@ -166,8 +166,10 @@ int main(int argc, char **argv) {
                 .N = 4096, .K = 11008, .items = NULL};
             bench.groups[2] = (struct ggml_mulmat_bench_nk){
                 .N = 11008, .K = 4096, .items = NULL};
+            bench.groups[3] = (struct ggml_mulmat_bench_nk){
+                .N = 32000, .K = 4096, .items = NULL};
         } else if (strcmp(model, "13B") == 0) {
-            bench.n_groups = 3;
+            bench.n_groups = 4;
             bench.groups =
                 malloc(bench.n_groups * sizeof(struct ggml_mulmat_bench_nk));
             GGML_ASSERT(bench.groups);
@@ -177,6 +179,8 @@ int main(int argc, char **argv) {
                 .N = 5120, .K = 13824, .items = NULL};
             bench.groups[2] = (struct ggml_mulmat_bench_nk){
                 .N = 13824, .K = 5120, .items = NULL};
+            bench.groups[3] = (struct ggml_mulmat_bench_nk){
+                .N = 32000, .K = 5120, .items = NULL};
         } else {
             // TODO: support 30B and 65B.
             fprintf(stderr, "[%s]: error: unsupported model: %s", cmd, model);
