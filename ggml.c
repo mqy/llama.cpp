@@ -13853,7 +13853,13 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
 
     const int n_threads = cgraph->n_threads;
 
-    struct ggml_compute_state_shared state_shared;
+    struct ggml_compute_state_shared state_shared = {
+        .n_tasks = 0,
+        .command = 0,
+        .mutex = PTHREAD_MUTEX_INITIALIZER,
+        .cond = PTHREAD_COND_INITIALIZER,
+        .n_waiting = 0,
+    };
     struct ggml_compute_state * workers = NULL;
 
     // create thread pool
@@ -14269,12 +14275,6 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                 ggml_spin_pause();
             }
         }
-
-        rc = pthread_mutex_destroy(&state_shared.mutex);
-        GGML_ASSERT(rc == 0);
-
-        rc = pthread_cond_destroy(&state_shared.cond);
-        GGML_ASSERT(rc == 0);
 
         // join thread pool
         for (int j = 0; j < n_threads - 1; j++) {

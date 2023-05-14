@@ -15,7 +15,7 @@
  16      90   38207 0  15059  22912 0
  ```
 
-See files in [example-bench-results](example-bench-results) for details.
+See files in dir [bench-out](bench-out) for details.
 
 These files are generated on Macbook Pro 2018:
 

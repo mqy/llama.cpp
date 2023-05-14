@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-#define NUM_BENCH 5
+#define NUM_BENCH 3
 
 // task flag: byte 0..2 for task stages; byte 3 for extensions (use blas, etc.)
 

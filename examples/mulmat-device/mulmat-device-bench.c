@@ -14,6 +14,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+//
+// TODO: support all quantization types: Q4_0, Q4_1, Q5_0, Q5_1, Q8_0.
+//       add quant type to bench output file.
+//
+
 #define BENCH_ASSERT_EQUAL(actual, expect, fmt, ...)                           \
     do {                                                                       \
         if (expect != actual) {                                                \
@@ -27,7 +32,7 @@
 
 #define UNUSED(x) (void)(x)
 
-static int bench_time_avg(int *a, int len);
+static int bench_time_min(int *a, int len);
 static void print_blas_build_tips(void);
 static void progress(int i, int max);
 static void print_envs_for_build(enum ggml_blas_type, char *buf, int buf_len);
@@ -424,18 +429,18 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
     free(wdata);
     free(q4_0_buf);
 
-    // stats -> avg.
+    // collect stat records.
     for (int i = 0; i < bench->n_groups; i++) {
         for (int j = 0; j < bench->num_m; j++) {
             struct ggml_mulmat_bench_m *item = &bench->groups[i].items[j];
             for (int stage = 0; stage < 3; stage++) {
                 if (bench->cpu_stages[stage] > 0) {
                     item->cpu_time[stage] =
-                        bench_time_avg(item->cpu_records[stage], NUM_BENCH);
+                        bench_time_min(item->cpu_records[stage], NUM_BENCH);
                 }
                 if (bench->gpu_stages[stage] > 0) {
                     item->gpu_time[stage] =
-                        bench_time_avg(item->gpu_records[stage], NUM_BENCH);
+                        bench_time_min(item->gpu_records[stage], NUM_BENCH);
                 }
             }
         }
@@ -518,7 +523,7 @@ static void progress(int i, int n) {
     fflush(stdout);
 }
 
-static int bench_time_avg(int *a, int len) {
+static int bench_time_min(int *a, int len) {
     // bubble sort `a`.
     for (int i = 0; i < len - 1; i++) {
         for (int j = i + 1; j < len; j++) {
@@ -530,12 +535,13 @@ static int bench_time_avg(int *a, int len) {
         }
     }
 
-    int total = 0;
-    // throw away min and max
-    for (int i = 1; i < len - 1; i++) {
-        total += a[i];
+    int min = 0;
+    for (int i = 0; i < len; i++) {
+        if (a[i] < min) {
+            min = a[i];
+        }
     }
-    return total / (len - 2);
+    return min;
 }
 
 // TODO: write as column-wise CSV format.
