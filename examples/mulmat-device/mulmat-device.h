@@ -17,9 +17,9 @@ typedef int ggml_compute_stage_flag_t;
 
 enum ggml_blas_type {
     GGML_BLAS_TYPE_ACCELERATE = 1, // https://developer.apple.com/accelerate
-    GGML_BLAS_TYPE_OPENBLAS, // https://www.openblas.net/
+    GGML_BLAS_TYPE_OPENBLAS,       // https://www.openblas.net/
     GGML_BLAS_TYPE_CLBLAST, // https://cnugteren.github.io/clblast/clblast.html
-    GGML_BLAS_TYPE_CUBLAS, // https://developer.nvidia.com/cublas
+    GGML_BLAS_TYPE_CUBLAS,  // https://developer.nvidia.com/cublas
 
     GGML_BLAS_TYPE_COUNT
 };
@@ -42,11 +42,10 @@ struct ggml_mulmat_bench_nk {
     struct ggml_mulmat_bench_m *items;
 };
 
-// top bench data to write/read to/from file.
 struct ggml_mulmat_bench {
     int version;
 
-    char model[4];     // 7B | 13B
+    char model[4];      // 7B | 13B
     char blas_name[16]; // see `ggml_blas_names`
     int n_groups;
     int m_step;
@@ -58,19 +57,19 @@ struct ggml_mulmat_bench {
     struct ggml_mulmat_bench_nk *groups;
 };
 
-enum ggml_device_type {
-    GGML_DEVICE_CPU = 0,
-    GGML_DEVICE_GPU,
-};
+const char *ggml_get_blas_name(void);
 
-const char * ggml_get_blas_name(void);
-void ggml_mulmat_write_bench_data(struct ggml_mulmat_bench *bench, FILE *fp);
+void ggml_mulmat_write_bench_data(const struct ggml_mulmat_bench *bench,
+                                  FILE *fp);
+
 int ggml_mulmat_read_bench_data(struct ggml_mulmat_bench *bench, FILE *file);
-int ggml_mulmat_estimate_time(struct ggml_mulmat_bench *bench, int M, int N,
-                              int K, int nth, bool is_cpu);
-enum ggml_device_type ggml_mulmat_choose_device(struct ggml_mulmat_bench *bench,
-                                                int M, int N, int K, int nth);
+
+int ggml_mulmat_estimate_time(const struct ggml_mulmat_bench *bench, int M,
+                              int N, int K, int nth, bool is_cpu);
+
+bool ggml_mulmat_bench_use_blas(const struct ggml_mulmat_bench *b, int M, int N,
+                                int K, int nth);
+
 #ifdef __cplusplus
 }
 #endif
-

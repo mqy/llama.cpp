@@ -14,7 +14,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define BENCH_ASSERT_INT_EQUAL(actual, expect, fmt, ...)                       \
+#define BENCH_ASSERT_EQUAL(actual, expect, fmt, ...)                           \
     do {                                                                       \
         if (expect != actual) {                                                \
             fprintf(stderr,                                                    \
@@ -322,7 +322,8 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
             M = bench->m_step * (im + 1);
 
             memset(progress_line, 0, sizeof(progress_line));
-            snprintf(progress_line, sizeof(progress_line), "%d %d %d ", N, K, M);
+            snprintf(progress_line, sizeof(progress_line), "%d %d %d ", N, K,
+                     M);
             printf("%s", progress_line);
             fflush(stdout);
 
@@ -372,14 +373,13 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
             bench_item->M = M;
 
             struct ggml_compute_params compute_params = {
-                .n_threads = 1,
                 .ith = 0,
                 .nth = 1,
                 .wsize = wdata_size,
                 .wdata = wdata,
             };
 
-            dst->sched.device = GGML_DEVICE_CPU;
+            dst->mul_mat_use_blas = false;
             for (int stage = GGML_TASK_INIT; stage <= GGML_TASK_FINALIZE;
                  stage++) {
                 if (bench->cpu_stages[stage] & COMPUTE_STAGE_FLAG_VALID) {
@@ -399,7 +399,7 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
                 }
             }
 
-            dst->sched.device = GGML_DEVICE_GPU;
+            dst->mul_mat_use_blas = true;
             for (int stage = GGML_TASK_INIT; stage <= GGML_TASK_FINALIZE;
                  stage++) {
                 if (bench->gpu_stages[stage] & COMPUTE_STAGE_FLAG_VALID) {
@@ -450,8 +450,7 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
 static void print_build_blas_tip(void) {
     const char *make_target = "mulmat-device-bench";
 
-    fprintf(stderr,
-            "error: this program was not built with any BLAS. tips:\n");
+    fprintf(stderr, "error: this program was not built with any BLAS. tips:\n");
 
     char buf[100];
     envs_for_blas(GGML_BLAS_TYPE_ACCELERATE, buf, 100);
@@ -470,13 +469,15 @@ static void print_build_blas_tip(void) {
 
 static void envs_for_blas(enum ggml_blas_type blas, char *buf, int buf_len) {
     memset(buf, 0, buf_len);
-    const char *LLAMA_NO_ACCELERATE = blas == GGML_BLAS_TYPE_ACCELERATE ? " " : "1";
+    const char *LLAMA_NO_ACCELERATE =
+        blas == GGML_BLAS_TYPE_ACCELERATE ? " " : "1";
     const char *LLAMA_OPENBLAS = blas == GGML_BLAS_TYPE_OPENBLAS ? "1" : " ";
     const char *LLAMA_CUBLAS = blas == GGML_BLAS_TYPE_CUBLAS ? "1" : " ";
     const char *LLAMA_CLBLAST = blas == GGML_BLAS_TYPE_CLBLAST ? "1" : " ";
 
     snprintf(buf, buf_len,
-             "LLAMA_NO_ACCELERATE=%s LLAMA_OPENBLAS=%s LLAMA_CUBLAS=%s LLAMA_CLBLAST=%s",
+             "LLAMA_NO_ACCELERATE=%s LLAMA_OPENBLAS=%s LLAMA_CUBLAS=%s "
+             "LLAMA_CLBLAST=%s",
              LLAMA_NO_ACCELERATE, LLAMA_OPENBLAS, LLAMA_CUBLAS, LLAMA_CLBLAST);
 }
 
@@ -708,11 +709,9 @@ static void test__estimate_time(void) {
         .m_step = 8,
         .num_m = 2,
         .cpu_stages = {COMPUTE_STAGE_FLAG_VALID,
-                       (COMPUTE_STAGE_FLAG_VALID |
-                        COMPUTE_STAGE_FLAG_PARALLEL),
+                       (COMPUTE_STAGE_FLAG_VALID | COMPUTE_STAGE_FLAG_PARALLEL),
                        0},
-        .gpu_stages = {(COMPUTE_STAGE_FLAG_VALID |
-                        COMPUTE_STAGE_FLAG_PARALLEL),
+        .gpu_stages = {(COMPUTE_STAGE_FLAG_VALID | COMPUTE_STAGE_FLAG_PARALLEL),
                        COMPUTE_STAGE_FLAG_VALID, 0},
     };
     bench.groups = malloc(sizeof(struct ggml_mulmat_bench_nk) * bench.n_groups);
@@ -751,11 +750,11 @@ static void test__estimate_time(void) {
                     ? ggml_mulmat_estimate_time(&bench, M, N, K, nth, true)
                     : ggml_mulmat_estimate_time(&bench, M, N, K, nth, false);
             if (is_cpu) {
-                BENCH_ASSERT_INT_EQUAL(t, item->cpu_time[0] + item->cpu_time[1],
-                                       "#(i: %d, j: %d)", i, j);
+                BENCH_ASSERT_EQUAL(t, item->cpu_time[0] + item->cpu_time[1],
+                                   "#(i: %d, j: %d)", i, j);
             } else {
-                BENCH_ASSERT_INT_EQUAL(t, item->gpu_time[0] + item->gpu_time[1],
-                                       "#(i: %d, j: %d)", i, j);
+                BENCH_ASSERT_EQUAL(t, item->gpu_time[0] + item->gpu_time[1],
+                                   "#(i: %d, j: %d)", i, j);
             }
         }
     }
@@ -771,7 +770,7 @@ static void test__estimate_time(void) {
             for (int j = 0; j < n; j++) {
                 int t = ggml_mulmat_estimate_time(&bench, M_arr[j], N, K, nth,
                                                   is_cpu);
-                BENCH_ASSERT_INT_EQUAL(t, -1, "#(i: %d, j: %d)", i, j);
+                BENCH_ASSERT_EQUAL(t, -1, "#(i: %d, j: %d)", i, j);
             }
         }
     }
@@ -802,11 +801,11 @@ static void test__estimate_time(void) {
                 int t = ggml_mulmat_estimate_time(&bench, test_data[j].M, N, K,
                                                   test_data[j].nth, is_cpu);
                 if (is_cpu) {
-                    BENCH_ASSERT_INT_EQUAL(t, test_data[j].expected_cpu_time,
-                                           "#(i: %d, j: %d)", i, j);
+                    BENCH_ASSERT_EQUAL(t, test_data[j].expected_cpu_time,
+                                       "#(i: %d, j: %d)", i, j);
                 } else {
-                    BENCH_ASSERT_INT_EQUAL(t, test_data[j].expected_gpu_time,
-                                           "#(i: %d, j: %d)", i, j);
+                    BENCH_ASSERT_EQUAL(t, test_data[j].expected_gpu_time,
+                                       "#(i: %d, j: %d)", i, j);
                 }
             }
         }
@@ -816,7 +815,7 @@ static void test__estimate_time(void) {
 struct test__choose_device_data {
     int nth;
     int M;
-    enum ggml_device_type expected_device;
+    bool use_blas;
 };
 
 static void test__choose_device(void) {
@@ -828,11 +827,9 @@ static void test__choose_device(void) {
         .m_step = 8,
         .num_m = 2,
         .cpu_stages = {COMPUTE_STAGE_FLAG_VALID,
-                       (COMPUTE_STAGE_FLAG_VALID |
-                        COMPUTE_STAGE_FLAG_PARALLEL),
+                       (COMPUTE_STAGE_FLAG_VALID | COMPUTE_STAGE_FLAG_PARALLEL),
                        0},
-        .gpu_stages = {(COMPUTE_STAGE_FLAG_VALID |
-                        COMPUTE_STAGE_FLAG_PARALLEL),
+        .gpu_stages = {(COMPUTE_STAGE_FLAG_VALID | COMPUTE_STAGE_FLAG_PARALLEL),
                        COMPUTE_STAGE_FLAG_VALID, 0},
     };
     bench.groups = malloc(sizeof(struct ggml_mulmat_bench_nk) * bench.n_groups);
@@ -865,14 +862,12 @@ static void test__choose_device(void) {
         for (int i = 1; i <= 8; i++) {
             int nth = i;
             for (int j = 0; j < n; j++) {
-                enum ggml_device_type device =
-                    ggml_mulmat_choose_device(&bench, M_arr[j], N, K, nth);
+                bool use_blas =
+                    ggml_mulmat_bench_use_blas(&bench, M_arr[j], N, K, nth);
                 if (j == 0) {
-                    BENCH_ASSERT_INT_EQUAL(device, GGML_DEVICE_CPU,
-                                           "#(i: %d, i: %d)", i, j);
+                    BENCH_ASSERT_EQUAL(use_blas, false, "#(i: %d, i: %d)", i, j);
                 } else {
-                    BENCH_ASSERT_INT_EQUAL(device, GGML_DEVICE_GPU,
-                                           "#(i: %d, i: %d)", i, j);
+                    BENCH_ASSERT_EQUAL(use_blas, true, "#(i: %d, i: %d)", i, j);
                 }
             }
         }
@@ -884,47 +879,47 @@ static void test__choose_device(void) {
             {
                 .nth = 1,
                 .M = 8,
-                .expected_device = GGML_DEVICE_CPU,
+                .use_blas = false,
             },
             {
                 .nth = 1,
                 .M = 12,
-                .expected_device = GGML_DEVICE_CPU,
+                .use_blas = false,
             },
             {
                 .nth = 1,
                 .M = 16,
-                .expected_device = GGML_DEVICE_GPU,
+                .use_blas = true,
             },
             {
                 .nth = 2,
                 .M = 8,
-                .expected_device = GGML_DEVICE_CPU,
+                .use_blas = false,
             },
             {
                 .nth = 2,
                 .M = 12,
-                .expected_device = GGML_DEVICE_CPU,
+                .use_blas = false,
             },
             {
                 .nth = 2,
                 .M = 16,
-                .expected_device = GGML_DEVICE_GPU,
+                .use_blas = true,
             },
             {
                 .nth = 4,
                 .M = 8,
-                .expected_device = GGML_DEVICE_CPU,
+                .use_blas = false,
             },
             {
                 .nth = 4,
                 .M = 12,
-                .expected_device = GGML_DEVICE_CPU,
+                .use_blas = false,
             },
             {
                 .nth = 4,
                 .M = 16,
-                .expected_device = GGML_DEVICE_CPU,
+                .use_blas = false,
             },
         };
 
@@ -933,9 +928,9 @@ static void test__choose_device(void) {
 
         for (int i = 0; i < n; i++) {
             const struct test__choose_device_data *e = &test_data[i];
-            enum ggml_device_type device =
-                ggml_mulmat_choose_device(&bench, e->M, N, K, e->nth);
-            BENCH_ASSERT_INT_EQUAL(device, e->expected_device, "#(i: %d)", i);
+            bool us_blas =
+                ggml_mulmat_bench_use_blas(&bench, e->M, N, K, e->nth);
+            BENCH_ASSERT_EQUAL(us_blas, e->use_blas, "#(i: %d)", i);
         }
     }
 }

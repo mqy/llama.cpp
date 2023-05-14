@@ -267,12 +267,16 @@ extern "C" {
 
         GGML_OP_DUP,
         GGML_OP_ADD,
+        GGML_OP_ADD1,
+        GGML_OP_ACC,
         GGML_OP_SUB,
         GGML_OP_MUL,
         GGML_OP_DIV,
         GGML_OP_SQR,
         GGML_OP_SQRT,
+        GGML_OP_LOG,
         GGML_OP_SUM,
+        GGML_OP_SUM_ROWS,
         GGML_OP_MEAN,
         GGML_OP_REPEAT,
         GGML_OP_ABS,
@@ -282,12 +286,15 @@ extern "C" {
         GGML_OP_RELU,
         GGML_OP_GELU,
         GGML_OP_SILU,
+        GGML_OP_SILU_BACK,
         GGML_OP_NORM, // normalize
         GGML_OP_RMS_NORM,
+        GGML_OP_RMS_NORM_BACK,
 
         GGML_OP_MUL_MAT,
 
         GGML_OP_SCALE,
+        GGML_OP_SET,
         GGML_OP_CPY,
         GGML_OP_CONT,
         GGML_OP_RESHAPE,
@@ -295,9 +302,13 @@ extern "C" {
         GGML_OP_PERMUTE,
         GGML_OP_TRANSPOSE,
         GGML_OP_GET_ROWS,
+        GGML_OP_GET_ROWS_BACK,
+        GGML_OP_DIAG,
         GGML_OP_DIAG_MASK_INF,
+        GGML_OP_DIAG_MASK_ZERO,
         GGML_OP_SOFT_MAX,
         GGML_OP_ROPE,
+        GGML_OP_ROPE_BACK,
         GGML_OP_ALIBI,
         GGML_OP_CONV_1D_1S,
         GGML_OP_CONV_1D_2S,
@@ -326,27 +337,13 @@ extern "C" {
 
     // NOTE: newly added in this PR
     struct ggml_compute_task_stage {
-        enum ggml_device_type device;
-
-        enum ggml_blas_type blas;
-
-        // number of threads to parallel, >= 1
-        bool n_tasks;
+        // number of threads to parallel, 0 means the corresponding task stage
+        // does note exist.
+        int8_t n_tasks;
 
         // this is a slow stage that typically runs on GPU with just main thread,
         // so worker threads SHOULD go waiting if possible.
         bool worker_wait;
-    };
-
-    // NOTE: newly added in this PR
-    struct ggml_compute_tensor_config {
-        enum ggml_device_type device;
-
-        enum ggml_blas_type blas;
-
-        size_t work_size;
-
-        struct ggml_compute_task_stage task_stages[3];
     };
 
     // NOTE: copied from ggml.c
@@ -356,11 +353,8 @@ extern "C" {
         GGML_TASK_FINALIZE,
     };
 
-    // NOTE: copied from ggml.c, added set_config
+    // NOTE: copied from ggml.c.
     struct ggml_compute_params {
-        bool configure_task_stages;
-        int n_threads;
-
         enum ggml_task_type type;
 
         int ith, nth;
@@ -392,7 +386,9 @@ extern "C" {
         struct ggml_tensor * opt[GGML_MAX_OPT];
 
         // thread scheduling
-        struct ggml_compute_tensor_config sched; // will replace n_tasks.
+
+        bool mul_mat_use_blas;
+        struct ggml_compute_task_stage task_stages[3];
 
         // performance
         int     perf_runs;
@@ -403,7 +399,7 @@ extern "C" {
 
         char name[32];
 
-        //char padding[8]; // TODO: remove and add padding to name?
+        //char padding[0]; // TODO: remove and add padding to name?
     };
 
     // computation graph

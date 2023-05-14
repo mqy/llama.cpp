@@ -57,7 +57,8 @@ int ggml_mulmat_read_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
     return 0;
 }
 
-void ggml_mulmat_write_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
+void ggml_mulmat_write_bench_data(const struct ggml_mulmat_bench *bench,
+                                  FILE *fp) {
     fprintf(fp, "%d %s %s %d %d %d", bench->version, bench->model,
             bench->blas_name, bench->n_groups, bench->m_step, bench->num_m);
 
@@ -99,8 +100,9 @@ void ggml_mulmat_write_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
 }
 
 // for given work load and number of threads, estimate cpu or gpu time.
-int ggml_mulmat_estimate_time(struct ggml_mulmat_bench *bench, int M, int N,
-                              int K, int nth, bool is_cpu) {
+// return -1 when unable to estimate.
+int ggml_mulmat_estimate_time(const struct ggml_mulmat_bench *bench, int M,
+                              int N, int K, int nth, bool is_cpu) {
     struct ggml_mulmat_bench_nk *group = NULL;
     for (int i = 0; i < bench->n_groups; i++) {
         if (bench->groups[i].N == N && bench->groups[i].K == K) {
@@ -165,22 +167,22 @@ int ggml_mulmat_estimate_time(struct ggml_mulmat_bench *bench, int M, int N,
 }
 
 // TODO: check impl: cuBLAS, clBLAS, accelerate, openBLAS
-enum ggml_device_type ggml_mulmat_choose_device(struct ggml_mulmat_bench *b,
-                                                int M, int N, int K, int nth) {
+bool ggml_mulmat_bench_use_blas(const struct ggml_mulmat_bench *b, const int M,
+                                const int N, const int K, const int nth) {
     if (M < b->m_step) {
-        return GGML_DEVICE_CPU;
+        return false;
     } else if (M > b->m_step * b->num_m) {
-        return GGML_DEVICE_GPU;
+        return true;
     }
 
     int cpu_time = ggml_mulmat_estimate_time(b, M, N, K, nth, true /* cpu */);
     int gpu_time = ggml_mulmat_estimate_time(b, M, N, K, nth, false /* gpu */);
 
     if (cpu_time < 0 || cpu_time < 0) {
-        return (M < 32 || N < 32 || K < 32) ? GGML_DEVICE_CPU : GGML_DEVICE_GPU;
+        return (M >= 32 && N >= 32 && K >= 32);
     }
 
-    return (cpu_time < gpu_time) ? GGML_DEVICE_CPU : GGML_DEVICE_GPU;
+    return (cpu_time > gpu_time);
 }
 
 const char *ggml_get_blas_name(void) {
