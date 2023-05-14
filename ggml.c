@@ -6698,27 +6698,72 @@ static void ggml_compute_forward_mul_f32(
         const struct ggml_tensor * src1,
         struct ggml_tensor * dst) {
     if (params->configure_task_stages) {
-        dst->sched.task_stages[GGML_TASK_COMPUTE].n_tasks = 1;
+        dst->sched.task_stages[GGML_TASK_COMPUTE].n_tasks = params->n_threads;
         return;
     }
 
-    GGML_ASSERT(params->nth == 1);
     GGML_ASSERT(params->type == GGML_TASK_COMPUTE);
 
     assert(ggml_are_same_shape(src0, src1) && ggml_are_same_shape(src0, dst));
 
-    const int n  = ggml_nrows(src0);
-    const int nc = src0->ne[0];
+    const int ith = params->ith;
+    const int nth = params->nth;
 
-    assert( dst->nb[0] == sizeof(float));
-    assert(src0->nb[0] == sizeof(float));
-    assert(src1->nb[0] == sizeof(float));
+    const int nr  = ggml_nrows(src0);
+    const int64_t ne0 = src0->ne[0];
+    const int64_t ne1 = src0->ne[1];
+    const int64_t ne2 = src0->ne[2];
+    const size_t nb00 = src0->nb[0];
+    const size_t nb01 = src0->nb[1];
+    const size_t nb02 = src0->nb[2];
+    const size_t nb03 = src0->nb[3];
+    const size_t nb10 = src1->nb[0];
+    const size_t nb11 = src1->nb[1];
+    const size_t nb12 = src1->nb[2];
+    const size_t nb13 = src1->nb[3];
+    const size_t nb0 = dst->nb[0];
+    const size_t nb1 = dst->nb[1];
+    const size_t nb2 = dst->nb[2];
+    const size_t nb3 = dst->nb[3];
+    GGML_ASSERT( nb0 == sizeof(float));
+    GGML_ASSERT(nb00 == sizeof(float));
 
-    for (int i = 0; i < n; i++) {
-        ggml_vec_mul_f32(nc,
-                (float *) ((char *) dst->data  + i*( dst->nb[1])),
-                (float *) ((char *) src0->data + i*(src0->nb[1])),
-                (float *) ((char *) src1->data + i*(src1->nb[1])));
+    if (nb10 == sizeof(float)) {
+        for (int ir = ith; ir < nr; ir += nth) {
+            // src0, src1 and dst are same shape => same indices
+            const int i3 = ir/(ne2*ne1);
+            const int i2 = (ir - i3*ne2*ne1)/ne1;
+            const int i1 = (ir - i3*ne2*ne1 - i2*ne1);
+#ifdef GGML_USE_ACCELERATE
+            UNUSED(ggml_vec_mul_f32);
+            vDSP_vmul(
+                    (float *) ((char *) src0->data + i3*nb03 + i2*nb02 + i1*nb01), 1,
+                    (float *) ((char *) src1->data + i3*nb13 + i2*nb12 + i1*nb11), 1,
+                    (float *) ((char *) dst->data  + i3*nb3  + i2*nb2  + i1*nb1 ), 1,
+                    ne0);
+#else
+            ggml_vec_mul_f32(ne0,
+                    (float *) ((char *) dst->data  + i3*nb3  + i2*nb2  + i1*nb1 ),
+                    (float *) ((char *) src0->data + i3*nb03 + i2*nb02 + i1*nb01),
+                    (float *) ((char *) src1->data + i3*nb13 + i2*nb12 + i1*nb11));
+#endif
+                // }
+            // }
+        }
+    } else {
+        // src1 is not contiguous
+        for (int ir = ith; ir < nr; ir += nth) {
+            // src0, src1 and dst are same shape => same indices
+            const int i3 = ir/(ne2*ne1);
+            const int i2 = (ir - i3*ne2*ne1)/ne1;
+            const int i1 = (ir - i3*ne2*ne1 - i2*ne1);
+            float * dst_ptr  = (float *) ((char *) dst->data  + i3*nb3  + i2*nb2  + i1*nb1 );
+            float * src0_ptr = (float *) ((char *) src0->data + i3*nb03 + i2*nb02 + i1*nb01);
+            for (int i0 = 0; i0 < ne0; i0++) {
+                float * src1_ptr = (float *) ((char *) src1->data + i3*nb13 + i2*nb12 + i1*nb11 + i0*nb10);
+                dst_ptr[i0] = src0_ptr[i0] * (*src1_ptr);
+            }
+        }
     }
 }
 
@@ -8501,39 +8546,42 @@ static void ggml_compute_forward_get_rows(
 
 // ggml_compute_forward_diag_mask_inf
 
-static void ggml_compute_forward_diag_mask_inf_f32(
+static void ggml_compute_forward_diag_mask_f32(
         const struct ggml_compute_params * params,
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
-        struct ggml_tensor * dst) {
+        struct ggml_tensor * dst,
+        const float value) {
     if (params->configure_task_stages) {
-        dst->sched.task_stages[GGML_TASK_COMPUTE].n_tasks = 1;
+        dst->sched.task_stages[GGML_TASK_COMPUTE].n_tasks = params->n_threads;
         return;
     }
 
-    GGML_ASSERT(params->nth == 1);
-    GGML_ASSERT(params->type == GGML_TASK_COMPUTE);
-
     assert(src1->type == GGML_TYPE_I32);
-    assert(ggml_nelements(src1) == 1);
+    assert(ggml_nelements(src1) == 2);
 
-    const int n_past = ((int32_t *) src1->data)[0];
+    const int ith = params->ith;
+    const int nth = params->nth;
 
+    const int  n_past  =       ((int32_t *) src1->data)[0];
+    const bool inplace = (bool)((int32_t *) src1->data)[1];
+
+    if (!inplace) {
+        ggml_compute_forward_dup_same_cont(params, src0, dst);
+    }
     // TODO: handle transposed/permuted matrices
-
     const int n  = ggml_nrows(src0);
     const int nc = src0->ne[0];
     const int nr = src0->ne[1];
     const int nz = n/nr;
-
     assert( dst->nb[0] == sizeof(float));
     assert(src0->nb[0] == sizeof(float));
 
     for (int k = 0; k < nz; k++) {
-        for (int j = 0; j < nr; j++) {
+        for (int j = ith; j < nr; j += nth) {
             for (int i = n_past; i < nc; i++) {
                 if (i > n_past + j) {
-                    *(float *)((char *) dst->data + k*dst->nb[2] + j*dst->nb[1] + i*dst->nb[0]) = -INFINITY;
+                    *(float *)((char *) dst->data + k*dst->nb[2] + j*dst->nb[1] + i*dst->nb[0]) = value;
                 }
             }
         }
@@ -8548,7 +8596,7 @@ static void ggml_compute_forward_diag_mask_inf(
     switch (src0->type) {
         case GGML_TYPE_F32:
             {
-                ggml_compute_forward_diag_mask_inf_f32(params, src0, src1, dst);
+                ggml_compute_forward_diag_mask_f32(params, src0, src1, dst, -INFINITY);
             } break;
         default:
             {
