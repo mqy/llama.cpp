@@ -21,18 +21,6 @@ static const char *ggml_blas_names[GGML_BLAS_TYPE_COUNT] = {
     [GGML_BLAS_TYPE_OPENBLAS] = "OpenBLAS",
 };
 
-#if defined(LLAMA_NO_ACCELERATE)
-static const char * build_with_blas_name = ggml_blas_names[GGML_BLAS_TYPE_ACCELERATE];
-#elif defined(LLAMA_CLBLAST)
-static const char * build_with_blas_name = ggml_blas_names[GGML_BLAS_TYPE_CLBLAST];
-#elif defined(LLAMA_CUBLAS)
-static const char * build_with_blas_name = ggml_blas_names[GGML_BLAS_TYPE_CUBLAS];
-#elif defined(LLAMA_OPENBLAS)
-static const char * build_with_blas_name = ggml_blas_names[GGML_BLAS_TYPE_OPENBLAS];
-#else
-static const char * build_with_blas_name = "";
-#endif
-
 const char* ggml_get_blas_names(void) {
     return (const char *)ggml_blas_names;
 }
