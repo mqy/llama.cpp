@@ -1,5 +1,7 @@
 #pragma once
 
+
+
 //
 // GGML Tensor Library
 //
@@ -183,6 +185,8 @@
 #    define GGML_API
 #endif
 
+#include "examples/mulmat-device/mulmat-device.h"
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -338,6 +342,16 @@ extern "C" {
 
     static const size_t GGML_OBJECT_SIZE = sizeof(struct ggml_object);
 
+    struct ggml_compute_task_stage {
+        // number of threads to parallel, 0 means the corresponding task stage
+        // does note exist.
+        u_int8_t n_tasks;
+
+        // this is a slow stage that typically runs on GPU with just main thread,
+        // so worker threads SHOULD go waiting if possible.
+        bool worker_wait;
+    };
+
     // n-dimensional tensor
     struct ggml_tensor {
         enum ggml_type    type;
@@ -361,7 +375,8 @@ extern "C" {
         struct ggml_tensor * opt[GGML_MAX_OPT];
 
         // thread scheduling
-        int n_tasks;
+
+        int32_t task_flag;
 
         // performance
         int     perf_runs;
@@ -380,6 +395,8 @@ extern "C" {
         int n_nodes;
         int n_leafs;
         int n_threads;
+
+        struct ggml_mulmat_bench *mulmat_bench;
 
         size_t work_size;
         struct ggml_tensor * work;
@@ -1122,6 +1139,14 @@ extern "C" {
     } quantize_fns_t;
 
     quantize_fns_t ggml_internal_get_quantize_fn(size_t i);
+
+    // Experimental for mul_mat bench, do not use!
+    void ggml_internal_compute_forward_mul_mat_q_f32_for_bench(
+        int task_type, size_t wsize, void * wdata,
+        const struct ggml_tensor * src0,
+        const struct ggml_tensor * src1,
+              struct ggml_tensor * dst);
+
 
 #ifdef  __cplusplus
 }
