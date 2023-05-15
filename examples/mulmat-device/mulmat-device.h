@@ -68,7 +68,7 @@ struct ggml_mulmat_bench {
     struct ggml_mulmat_bench_nk *groups;
 };
 
-struct ggml_mulmat_bench_time_stat {
+struct ggml_mulmat_bench_time_stats {
     int cpu_only_stages[3];
     int cpu_only_total;
 
@@ -85,9 +85,9 @@ int ggml_mulmat_estimate_time(const struct ggml_mulmat_bench *bench, int M,
                               int N, int K, int nth, bool cpu_only);
 
 // return 0: ok, -1: M out of range or no data.
-int ggml_mulmat_bench_time_stat(const struct ggml_mulmat_bench *b, int M, int N,
+int ggml_mulmat_bench_time_stats(const struct ggml_mulmat_bench *b, int M, int N,
                                 int K, int nth,
-                                struct ggml_mulmat_bench_time_stat *time_stat);
+                                struct ggml_mulmat_bench_time_stats *time_stats);
 
 const char *ggml_get_blas_name(void);
 

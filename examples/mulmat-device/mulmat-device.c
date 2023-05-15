@@ -189,10 +189,10 @@ int ggml_mulmat_estimate_time(const struct ggml_mulmat_bench *bench, int M,
     return -1;
 }
 
-int ggml_mulmat_bench_time_stat(const struct ggml_mulmat_bench *bench,
+int ggml_mulmat_bench_time_stats(const struct ggml_mulmat_bench *bench,
                                 const int M, const int N, const int K,
                                 const int nth,
-                                struct ggml_mulmat_bench_time_stat *time_stat) {
+                                struct ggml_mulmat_bench_time_stats *time_stats) {
     if (M < bench->m_step) {
         return -1;
     } else if (M > bench->m_step * bench->num_m) {
@@ -236,7 +236,7 @@ int ggml_mulmat_bench_time_stat(const struct ggml_mulmat_bench *bench,
         return -1;
     }
 
-    memset(time_stat, 0, sizeof(struct ggml_mulmat_bench_time_stat));
+    memset(time_stats, 0, sizeof(struct ggml_mulmat_bench_time_stats));
 
     // interpolate.
 
@@ -256,8 +256,8 @@ int ggml_mulmat_bench_time_stat(const struct ggml_mulmat_bench *bench,
             if (bench->cpu_only_stages[j] == GGML_TASK_FLAG_N_THREADS) {
                 t /= nth;
             }
-            time_stat->cpu_only_stages[j] = t;
-            time_stat->cpu_only_total += t;
+            time_stats->cpu_only_stages[j] = t;
+            time_stats->cpu_only_total += t;
         }
 
         if (bench->use_blas_stages[j] > 0) {
@@ -270,8 +270,8 @@ int ggml_mulmat_bench_time_stat(const struct ggml_mulmat_bench *bench,
             if (bench->use_blas_stages[j] == GGML_TASK_FLAG_N_THREADS) {
                 t /= nth;
             }
-            time_stat->use_blas_stages[j] = t;
-            time_stat->use_blas_total += t;
+            time_stats->use_blas_stages[j] = t;
+            time_stats->use_blas_total += t;
         }
     }
 

@@ -396,7 +396,7 @@ extern "C" {
         int n_leafs;
         int n_threads;
 
-        bool                       mm_no_blas;
+        bool                       no_blas;
         struct ggml_mulmat_bench * mm_bench;
 
         size_t work_size;

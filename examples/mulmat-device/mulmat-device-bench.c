@@ -852,9 +852,9 @@ static void test__choose_device(void) {
         for (int i = 1; i <= 8; i++) {
             int nth = i;
             for (int j = 0; j < n; j++) {
-                struct ggml_mulmat_bench_time_stat time_stat;
-                int rc = ggml_mulmat_bench_time_stat(&bench, M_arr[j], N, K,
-                                                     nth, &time_stat);
+                struct ggml_mulmat_bench_time_stats time_stats;
+                int rc = ggml_mulmat_bench_time_stats(&bench, M_arr[j], N, K,
+                                                     nth, &time_stats);
                 BENCH_ASSERT_EQUAL(rc, -1, "#(i: %d, i: %d)", i, j);
             }
         }
@@ -905,13 +905,13 @@ static void test__choose_device(void) {
 
         for (int i = 0; i < n; i++) {
             const struct test__choose_device_data *e = &test_data[i];
-            struct ggml_mulmat_bench_time_stat time_stat;
-            int rc = ggml_mulmat_bench_time_stat(&bench, e->M, N, K, e->nth,
-                                                 &time_stat);
+            struct ggml_mulmat_bench_time_stats time_stats;
+            int rc = ggml_mulmat_bench_time_stats(&bench, e->M, N, K, e->nth,
+                                                 &time_stats);
             BENCH_ASSERT_EQUAL(rc, 0, "#(i: %d)", i);
-            BENCH_ASSERT_EQUAL(time_stat.cpu_only_total, e->cpu_only_time,
+            BENCH_ASSERT_EQUAL(time_stats.cpu_only_total, e->cpu_only_time,
                                "#(i: %d)", i);
-            BENCH_ASSERT_EQUAL(time_stat.use_blas_total, e->use_blas_time,
+            BENCH_ASSERT_EQUAL(time_stats.use_blas_total, e->use_blas_time,
                                "#(i: %d)", i);
         }
     }
