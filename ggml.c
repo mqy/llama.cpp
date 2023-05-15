@@ -13668,7 +13668,8 @@ struct ggml_cgraph ggml_build_forward(struct ggml_tensor * tensor) {
         /*.n_nodes      =*/ 0,
         /*.n_leafs      =*/ 0,
         /*.n_threads    =*/ GGML_DEFAULT_N_THREADS,
-        .mulmat_bench   = NULL,
+        /*.mm_no_blas   =*/ false,
+        /*.mm_bench     =*/ NULL,
         /*.work_size    =*/ 0,
         /*.work         =*/ NULL,
         /*.nodes        =*/ { NULL },
@@ -13828,11 +13829,13 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
         }
 
         if (shared->command == GGML_THREAD_COMMAND_WAIT) {
+            //uint64_t t0 = ggml_time_us();
             pthread_mutex_lock(&shared->mutex);
             shared->n_waiting++;
             pthread_cond_wait(&shared->cond, &shared->mutex);
             shared->n_waiting--;
             pthread_mutex_unlock(&shared->mutex);
+            //printf("%d-th thread cond_wait took: %8.3f ms\n", state->params.ith, 1.0*(ggml_time_us() - t0)/1000.0);
         }
 
         if (shared->n_tasks > 0 && state->node != NULL) {
@@ -13847,11 +13850,106 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
     return 0;
 }
 
-void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) {
-    GGML_ASSERT(cgraph->n_threads > 0);
-    GGML_ASSERT(cgraph->n_nodes > 0);
+#define GGML_GRAPH_COMPUTE_DEBUG 1
 
-    const int n_threads = cgraph->n_threads;
+void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) {
+    int n_threads = cgraph->n_threads;
+
+    // setup n_threads and mul_mat use_blas.
+
+    if (!cgraph->mm_no_blas) {
+        // TODO: optimize if we are sure that the M is a fixed value.
+
+#ifdef GGML_GRAPH_COMPUTE_DEBUG
+        int64_t t0 = ggml_time_us();
+        int cpu_only_total = 0;
+        int use_blas_total = 0;
+
+        int one_thread_total_old = 0;
+        int one_thread_total_new = 0;
+#endif
+        const char *blas_name = ggml_get_blas_name();
+
+        // TODO: cache result.
+
+        for (int i = 0; i < cgraph->n_nodes; i++) {
+            struct ggml_tensor * node = cgraph->nodes[i];
+
+            // CAUTION: MUST configure stages explicitly.
+            for (int j = 0; j < 3; j++) {
+                node->task_flag = 0;
+            }
+
+            if (node->op != GGML_OP_MUL_MAT) {
+                continue;
+            }
+
+            if (!ggml_is_contiguous(node->src0) || !ggml_is_contiguous(node->src1)) {
+                continue;
+            }
+        
+            int M = (int)node->ne[1];
+            int N = (int)node->ne[0];
+            int K = (int)node->src1->ne[0];
+
+            // int64_t key = M | (N << 16) | ((int64_t)K << 40);
+
+            bool use_blas = M >= 32 && N >= 32 && K >= 32;
+
+            if (cgraph->mm_bench && blas_name != NULL && strcmp(blas_name, cgraph->mm_bench->blas_name) == 0) {
+                {
+                    struct ggml_mulmat_bench_time_stat time_stat;
+                    int rc = ggml_mulmat_bench_time_stat(cgraph->mm_bench, M, N, K, n_threads, &time_stat);
+                    if (rc == 0) {
+                        use_blas = time_stat.use_blas_total < time_stat.cpu_only_total;
+#ifdef GGML_GRAPH_COMPUTE_DEBUG
+                        cpu_only_total += time_stat.cpu_only_total;
+                        use_blas_total += time_stat.use_blas_total;
+#endif
+                    }
+                }
+#ifdef GGML_GRAPH_COMPUTE_DEBUG
+                { // compare 1 thread
+                    struct ggml_mulmat_bench_time_stat time_stat;
+                    int rc = ggml_mulmat_bench_time_stat(cgraph->mm_bench, M, N, K, 1, &time_stat);
+                    if (rc == 0) {
+                        if (M >= 32 && N >= 32 && K >= 32) {
+                            one_thread_total_old += time_stat.use_blas_total;
+                        } else {
+                            one_thread_total_old += time_stat.cpu_only_total;
+                        }
+                        if (time_stat.use_blas_total < time_stat.cpu_only_total) {
+                            one_thread_total_new += time_stat.use_blas_total;
+                        } else {
+                            one_thread_total_new += time_stat.cpu_only_total;
+                        }
+                    }
+                }
+#endif
+            }
+
+            if (use_blas) {
+                ggml_task_flag_set_blas(&node->task_flag, 1);
+            }
+        }
+
+#ifdef GGML_GRAPH_COMPUTE_DEBUG
+        printf("\nset blas, took %8.3f ms\n", 0.001 * (ggml_time_us() - t0));
+
+        if (use_blas_total < cpu_only_total) {
+            printf("[New %d threads] when use blas, cpu-only total time: %8.3f ms, with-blas total time: %8.3f ms, blas MAY speedup up to: %4.2f %%\n",
+                n_threads,
+                0.001 * cpu_only_total, 0.001 * use_blas_total,
+                100.0*(cpu_only_total - use_blas_total) / cpu_only_total);
+        }
+
+        if (one_thread_total_old > 0) {
+            printf("[1 thread], new total %8.3f ms, old total %8.3f ms, new speedup: %4.2f %%\n",
+                0.001 * one_thread_total_new, 0.001 * one_thread_total_old,
+                100.0 * (one_thread_total_old - one_thread_total_new) / one_thread_total_old);
+        }
+#endif
+    }
 
     struct ggml_compute_state_shared state_shared = {
         .n_tasks = 0,
@@ -13963,27 +14061,8 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                     } break;
                 case GGML_OP_MUL_MAT:
                     {
-                        bool use_blas = false;
-
-                        if (ggml_is_contiguous(node->src0) && ggml_is_contiguous(node->src1)) {
-                            int M = (int)node->ne[1];
-                            int N = (int)node->ne[0];
-                            int K = (int)node->src1->ne[0];
-
-                            if (M >= 32 && N >= 32 && K >= 32) {
-                                use_blas = true;
-                            }
-
-                            if (cgraph->mulmat_bench) {
-                                const char *blas_name = ggml_get_blas_name();
-                                if (blas_name != NULL && strcmp(blas_name, cgraph->mulmat_bench->blas_name) == 0) {
-                                    use_blas = ggml_mulmat_bench_use_blas(cgraph->mulmat_bench, M, N, K, n_threads);
-                                }
-                            }
-                        }
-
+                        bool use_blas = ggml_task_flag_get_blas(node->task_flag);
                         if (use_blas) {
-                            ggml_task_flag_set_blas(&node->task_flag, 1);
                             ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_1_THREAD__WAIT);
                         } else {
                             ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_N_THREADS);
@@ -14196,9 +14275,11 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                     state_shared.command = GGML_THREAD_COMMAND_WAIT;
                 } else if (n_worker_tasks > 0 && state_shared.n_waiting > 0) {
                     state_shared.command = GGML_THREAD_COMMAND_NONE;
+                    //uint64_t t0 = ggml_time_us();
                     pthread_mutex_lock(&state_shared.mutex);
                     pthread_cond_broadcast(&state_shared.cond);
                     pthread_mutex_unlock(&state_shared.mutex);
+                    //printf("main thread cond_wait took: %8.3f ms\n", 1.0*(ggml_time_us() - t0) / 1000.0);
                 }
 
                 int expected_n_waiting = state_shared.command == GGML_THREAD_COMMAND_WAIT? n_threads - 1 : 0;
