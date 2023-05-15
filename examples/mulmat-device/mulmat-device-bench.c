@@ -95,13 +95,13 @@ int main(int argc, char **argv) {
             .n_groups = 0,
             .m_step = 8,
             .num_m = 16,
-            .cpu_stages = {GGML_TASK_FLAG_1_THREAD, GGML_TASK_FLAG_N_THREADS,
-                           0},
+            .cpu_only_stages = {GGML_TASK_FLAG_1_THREAD,
+                                GGML_TASK_FLAG_N_THREADS, 0},
 #if defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS)
-            .gpu_stages = {GGML_TASK_FLAG_N_THREADS,
-                           GGML_TASK_FLAG_1_THREAD__WAIT, 0},
+            .use_blas_stages = {GGML_TASK_FLAG_N_THREADS,
+                                GGML_TASK_FLAG_1_THREAD__WAIT, 0},
 #elif defined(GGML_USE_CUBLAS) || defined(GGML_USE_CLBLAST)
-            .gpu_stages = {0, GGML_TASK_FLAG_1_THREAD, 0},
+            .use_blas_stages = {0, GGML_TASK_FLAG_1_THREAD, 0},
 #endif
             .groups = NULL,
         };
@@ -384,7 +384,7 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
 
             ggml_task_flag_set_blas(&dst->task_flag, 0);
             for (int stage = 0; stage < 3; stage++) {
-                if (bench->cpu_stages[stage] > 0) {
+                if (bench->cpu_only_stages[stage] > 0) {
                     // without this, the first run may be significant slow.
                     memset(wdata, 0, wsize);
 
@@ -392,7 +392,7 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
                         int t0 = (int)ggml_time_us();
                         ggml_internal_compute_forward_mul_mat_q_f32_for_bench(
                             stage, wsize, wdata, src0, src1, dst);
-                        bench_item->cpu_records[stage][nb] =
+                        bench_item->cpu_only_records[stage][nb] =
                             (int)ggml_time_us() - t0;
                         progress(nb, NUM_BENCH);
                     }
@@ -402,12 +402,12 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
 
             ggml_task_flag_set_blas(&dst->task_flag, 1);
             for (int stage = 0; stage < 3; stage++) {
-                if (bench->gpu_stages[stage] > 0) {
+                if (bench->use_blas_stages[stage] > 0) {
                     for (int nb = 0; nb < NUM_BENCH; nb++) {
                         int t0 = (int)ggml_time_us();
                         ggml_internal_compute_forward_mul_mat_q_f32_for_bench(
                             stage, wsize, wdata, src0, src1, dst);
-                        bench_item->gpu_records[stage][nb] =
+                        bench_item->use_blas_records[stage][nb] =
                             (int)ggml_time_us() - t0;
                         progress(nb, NUM_BENCH);
                     }
@@ -434,13 +434,13 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
         for (int j = 0; j < bench->num_m; j++) {
             struct ggml_mulmat_bench_m *item = &bench->groups[i].items[j];
             for (int stage = 0; stage < 3; stage++) {
-                if (bench->cpu_stages[stage] > 0) {
-                    item->cpu_time[stage] =
-                        bench_time_min(item->cpu_records[stage], NUM_BENCH);
+                if (bench->cpu_only_stages[stage] > 0) {
+                    item->cpu_only_time[stage] = bench_time_min(
+                        item->cpu_only_records[stage], NUM_BENCH);
                 }
-                if (bench->gpu_stages[stage] > 0) {
-                    item->gpu_time[stage] =
-                        bench_time_min(item->gpu_records[stage], NUM_BENCH);
+                if (bench->use_blas_stages[stage] > 0) {
+                    item->use_blas_time[stage] = bench_time_min(
+                        item->use_blas_records[stage], NUM_BENCH);
                 }
             }
         }
@@ -524,18 +524,7 @@ static void progress(int i, int n) {
 }
 
 static int bench_time_min(int *a, int len) {
-    // bubble sort `a`.
-    for (int i = 0; i < len - 1; i++) {
-        for (int j = i + 1; j < len; j++) {
-            if (a[j] < a[i]) {
-                int temp = a[j];
-                a[j] = a[i];
-                a[i] = temp;
-            }
-        }
-    }
-
-    int min = 0;
+    int min = INT32_MAX;
     for (int i = 0; i < len; i++) {
         if (a[i] < min) {
             min = a[i];
@@ -583,7 +572,7 @@ static void cmd_analyze(struct ggml_mulmat_bench *bench) {
             }
 
             for (int j = 0; j < num_m; j++) {
-                printf(";%8.3f", group->items[j].gpu_time[1] / 1000.0);
+                printf(";%8.3f", group->items[j].use_blas_time[1] / 1000.0);
             }
             printf("\n");
         }
@@ -603,20 +592,22 @@ static void cmd_analyze(struct ggml_mulmat_bench *bench) {
             printf("\n");
 
             for (int j = 0; j < 3; j++) {
-                if (bench->cpu_stages[j] > 0) {
-                    printf("cpu_%d", j);
+                if (bench->cpu_only_stages[j] > 0) {
+                    printf("cpu_only_%d", j);
                     for (int k = 0; k < bench->num_m; k++) {
-                        printf(";%8.3f", group->items[k].cpu_time[j] / 1000.0);
+                        printf(";%8.3f",
+                               group->items[k].cpu_only_time[j] / 1000.0);
                     }
                     printf("\n");
                 }
             }
 
             for (int j = 0; j < 3; j++) {
-                if (bench->gpu_stages[j] > 0) {
-                    printf("gpu_%d", j);
+                if (bench->use_blas_stages[j] > 0) {
+                    printf("use_blas_%d", j);
                     for (int k = 0; k < bench->num_m; k++) {
-                        printf(";%8.3f", group->items[k].gpu_time[j] / 1000.0);
+                        printf(";%8.3f",
+                               group->items[k].use_blas_time[j] / 1000.0);
                     }
                     printf("\n");
                 }
@@ -650,9 +641,9 @@ static void cmd_analyze(struct ggml_mulmat_bench *bench) {
                 for (int j = 0; j < bench->num_m; j++) {
                     double total = 0.0;
                     for (int stage = 0; stage < 3; stage++) {
-                        if (bench->cpu_stages[stage] > 0) {
-                            int t = group->items[j].cpu_time[stage];
-                            if (bench->cpu_stages[stage] & ((1 << 1))) {
+                        if (bench->cpu_only_stages[stage] > 0) {
+                            int t = group->items[j].cpu_only_time[stage];
+                            if (bench->cpu_only_stages[stage] & ((1 << 1))) {
                                 t /= nth;
                             }
                             total += t / 1000.0;
@@ -666,9 +657,9 @@ static void cmd_analyze(struct ggml_mulmat_bench *bench) {
                 for (int j = 0; j < bench->num_m; j++) {
                     double total = 0.0;
                     for (int stage = 0; stage < 3; stage++) {
-                        if (bench->gpu_stages[stage] > 0) {
-                            int t = group->items[j].gpu_time[stage];
-                            if (bench->gpu_stages[stage] ==
+                        if (bench->use_blas_stages[stage] > 0) {
+                            int t = group->items[j].use_blas_time[stage];
+                            if (bench->use_blas_stages[stage] ==
                                 GGML_TASK_FLAG_N_THREADS) {
                                 t /= nth;
                             }
@@ -706,9 +697,10 @@ static void test__estimate_time(void) {
         .n_groups = 1,
         .m_step = 8,
         .num_m = 2,
-        .cpu_stages = {GGML_TASK_FLAG_1_THREAD, GGML_TASK_FLAG_N_THREADS, 0},
-        .gpu_stages = {GGML_TASK_FLAG_N_THREADS, GGML_TASK_FLAG_1_THREAD__WAIT,
-                       0},
+        .cpu_only_stages = {GGML_TASK_FLAG_1_THREAD, GGML_TASK_FLAG_N_THREADS,
+                            0},
+        .use_blas_stages = {GGML_TASK_FLAG_N_THREADS,
+                            GGML_TASK_FLAG_1_THREAD__WAIT, 0},
     };
     bench.groups = malloc(sizeof(struct ggml_mulmat_bench_nk) * bench.n_groups);
     bench.groups[0] = (struct ggml_mulmat_bench_nk){
@@ -719,13 +711,13 @@ static void test__estimate_time(void) {
         malloc(sizeof(struct ggml_mulmat_bench_m) * bench.num_m);
     bench.groups[0].items[0] = (struct ggml_mulmat_bench_m){
         .M = 8,
-        .cpu_time = {10, 20, 0},
-        .gpu_time = {30, 40, 0},
+        .cpu_only_time = {10, 20, 0},
+        .use_blas_time = {30, 40, 0},
     };
     bench.groups[0].items[1] = (struct ggml_mulmat_bench_m){
         .M = 16,
-        .cpu_time = {50, 60, 0},
-        .gpu_time = {70, 80, 0},
+        .cpu_only_time = {50, 60, 0},
+        .use_blas_time = {70, 80, 0},
     };
 
     const int N = bench.groups[0].N;
@@ -746,11 +738,13 @@ static void test__estimate_time(void) {
                     ? ggml_mulmat_estimate_time(&bench, M, N, K, nth, true)
                     : ggml_mulmat_estimate_time(&bench, M, N, K, nth, false);
             if (is_cpu) {
-                BENCH_ASSERT_EQUAL(t, item->cpu_time[0] + item->cpu_time[1],
-                                   "#(i: %d, j: %d)", i, j);
+                BENCH_ASSERT_EQUAL(
+                    t, item->cpu_only_time[0] + item->cpu_only_time[1],
+                    "#(i: %d, j: %d)", i, j);
             } else {
-                BENCH_ASSERT_EQUAL(t, item->gpu_time[0] + item->gpu_time[1],
-                                   "#(i: %d, j: %d)", i, j);
+                BENCH_ASSERT_EQUAL(
+                    t, item->use_blas_time[0] + item->use_blas_time[1],
+                    "#(i: %d, j: %d)", i, j);
             }
         }
     }
@@ -811,7 +805,8 @@ static void test__estimate_time(void) {
 struct test__choose_device_data {
     int nth;
     int M;
-    bool use_blas;
+    int cpu_only_time;
+    int use_blas_time;
 };
 
 static void test__choose_device(void) {
@@ -822,8 +817,10 @@ static void test__choose_device(void) {
         .n_groups = 1,
         .m_step = 8,
         .num_m = 2,
-        .cpu_stages = {GGML_TASK_FLAG_1_THREAD, GGML_TASK_FLAG_N_THREADS, 0},
-        .gpu_stages = {GGML_TASK_FLAG_N_THREADS, GGML_TASK_FLAG_1_THREAD, 0},
+        .cpu_only_stages = {GGML_TASK_FLAG_1_THREAD, GGML_TASK_FLAG_N_THREADS,
+                            0},
+        .use_blas_stages = {GGML_TASK_FLAG_N_THREADS, GGML_TASK_FLAG_1_THREAD,
+                            0},
     };
     bench.groups = malloc(sizeof(struct ggml_mulmat_bench_nk) * bench.n_groups);
     bench.groups[0] = (struct ggml_mulmat_bench_nk){
@@ -834,13 +831,13 @@ static void test__choose_device(void) {
         malloc(sizeof(struct ggml_mulmat_bench_m) * bench.num_m);
     bench.groups[0].items[0] = (struct ggml_mulmat_bench_m){
         .M = 8,
-        .cpu_time = {10, 100, 0},
-        .gpu_time = {100, 200, 0},
+        .cpu_only_time = {2, 4, 0},
+        .use_blas_time = {4, 4, 0},
     };
     bench.groups[0].items[1] = (struct ggml_mulmat_bench_m){
         .M = 16,
-        .cpu_time = {20, 300, 0},
-        .gpu_time = {100, 100, 0},
+        .cpu_only_time = {4, 8, 0},
+        .use_blas_time = {4, 4, 0},
     };
 
     const int N = bench.groups[0].N;
@@ -855,14 +852,10 @@ static void test__choose_device(void) {
         for (int i = 1; i <= 8; i++) {
             int nth = i;
             for (int j = 0; j < n; j++) {
-                bool use_blas =
-                    ggml_mulmat_bench_use_blas(&bench, M_arr[j], N, K, nth);
-                if (j == 0) {
-                    BENCH_ASSERT_EQUAL(use_blas, false, "#(i: %d, i: %d)", i,
-                                       j);
-                } else {
-                    BENCH_ASSERT_EQUAL(use_blas, true, "#(i: %d, i: %d)", i, j);
-                }
+                struct ggml_mulmat_bench_time_stat time_stat;
+                int rc = ggml_mulmat_bench_time_stat(&bench, M_arr[j], N, K,
+                                                     nth, &time_stat);
+                BENCH_ASSERT_EQUAL(rc, -1, "#(i: %d, i: %d)", i, j);
             }
         }
     }
@@ -873,58 +866,53 @@ static void test__choose_device(void) {
             {
                 .nth = 1,
                 .M = 8,
-                .use_blas = false,
+                .cpu_only_time = 6,
+                .use_blas_time = 8,
             },
             {
                 .nth = 1,
                 .M = 12,
-                .use_blas = false,
+                .cpu_only_time = 9,
+                .use_blas_time = 8,
             },
             {
                 .nth = 1,
                 .M = 16,
-                .use_blas = true,
+                .cpu_only_time = 12,
+                .use_blas_time = 8,
             },
             {
                 .nth = 2,
                 .M = 8,
-                .use_blas = false,
+                .cpu_only_time = 4,
+                .use_blas_time = 6,
             },
             {
                 .nth = 2,
                 .M = 12,
-                .use_blas = false,
+                .cpu_only_time = 6,
+                .use_blas_time = 6,
             },
             {
                 .nth = 2,
                 .M = 16,
-                .use_blas = true,
-            },
-            {
-                .nth = 4,
-                .M = 8,
-                .use_blas = false,
-            },
-            {
-                .nth = 4,
-                .M = 12,
-                .use_blas = false,
-            },
-            {
-                .nth = 4,
-                .M = 16,
-                .use_blas = false,
-            },
-        };
+                .cpu_only_time = 8,
+                .use_blas_time = 6,
+            }};
 
         int n =
             (int)(sizeof(test_data) / sizeof(struct test__choose_device_data));
 
         for (int i = 0; i < n; i++) {
             const struct test__choose_device_data *e = &test_data[i];
-            bool us_blas =
-                ggml_mulmat_bench_use_blas(&bench, e->M, N, K, e->nth);
-            BENCH_ASSERT_EQUAL(us_blas, e->use_blas, "#(i: %d)", i);
+            struct ggml_mulmat_bench_time_stat time_stat;
+            int rc = ggml_mulmat_bench_time_stat(&bench, e->M, N, K, e->nth,
+                                                 &time_stat);
+            BENCH_ASSERT_EQUAL(rc, 0, "#(i: %d)", i);
+            BENCH_ASSERT_EQUAL(time_stat.cpu_only_total, e->cpu_only_time,
+                               "#(i: %d)", i);
+            BENCH_ASSERT_EQUAL(time_stat.use_blas_total, e->use_blas_time,
+                               "#(i: %d)", i);
         }
     }
 }

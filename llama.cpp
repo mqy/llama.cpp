@@ -237,7 +237,7 @@ struct llama_context {
     int    buf_last = 0;
     size_t buf_max_size[LLAMA_MAX_SCRATCH_BUFFERS] = { 0 };
 
-    struct ggml_mulmat_bench mulmat_bench;
+    struct ggml_mulmat_bench mm_bench;
 
     void use_buf(struct ggml_context * ctx, int i) {
 #if defined(LLAMA_USE_SCRATCH)
@@ -1136,7 +1136,7 @@ static bool llama_eval_internal(
 
     ggml_cgraph gf = {};
     gf.n_threads = n_threads;
-    gf.mulmat_bench = &lctx.mulmat_bench;
+    gf.mm_bench = &lctx.mm_bench;
 
     struct ggml_tensor * embd = ggml_new_tensor_1d(ctx0, GGML_TYPE_I32, N);
     ggml_set_name(embd, "embd");
@@ -2205,7 +2205,7 @@ struct llama_context * llama_init_from_file(
             if (!fp) {
                 fprintf(stderr, "WARN: failed to open the mulmat bench file %s\n", buf);
             } else {
-                int rc = ggml_mulmat_read_bench_data(&ctx->mulmat_bench, fp);
+                int rc = ggml_mulmat_read_bench_data(&ctx->mm_bench, fp);
                 if (rc != 0) {
                     fprintf(stderr, "failed to load mulmat bench from file %s\n", buf);
                     return nullptr;
