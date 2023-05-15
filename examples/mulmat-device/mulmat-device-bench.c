@@ -14,11 +14,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-//
-// TODO: support all quantization types: Q4_0, Q4_1, Q5_0, Q5_1, Q8_0.
-//       add quant type to bench output file.
-//
-
 #define BENCH_ASSERT_EQUAL(actual, expect, fmt, ...)                           \
     do {                                                                       \
         if (expect != actual) {                                                \
@@ -47,20 +42,26 @@ static void test__choose_device(void);
 
 static void usage(char *prog) {
     const char *usage_lines[] = {
-        "usage:\n",
-        "* %s bench   <model> [data-file] [-y]\n",
-        "  model: 7B or 13B.\n",
-        "  data-file: the data file to write to, write to stdout if absent.\n",
-        "  -y always answer \"yes\" to all prompts.\n",
-        "* %s analyze <data-file>\n",
-        "* %s test\n",
-        "* %s help\n",
+        "usage: %s [bench ...] | [analyze FILE] | test | help\n\n",
+        "bench [-m MODEL] [-t TYPE] [-f FILE] [-y]\n",
+        "-model  MODEL   7B | 13B | 30B | 64B\n",
+        "                default 7B\n",
+        "-q_type TYPE    Q4_0 | Q4_1 | Q5_0 | Q5_1 | Q8_0 | Q8_1\n",
+        "                default Q4_0\n",
+        "-step_m STEP_M  the step of M, also as start value\n",
+        "                suggest STEP_M %% 8 == 0\n",
+        "                default 8\n",
+        "-num_m  NUM_M   number of M, total M = STEP_M * NUM_M\n",
+        "                default 16\n",
+        "-file   FILE    data file to write\n",
+        "                default stdout\n",
+        "-y              always answer \"yes\" to all prompts\n",
     };
 
     int len = (int)(sizeof(usage_lines) / sizeof(char *));
     for (int i = 0; i < len; i++) {
         const char *line = usage_lines[i];
-        if (line[0] == '*') {
+        if (i == 0) {
             fprintf(stderr, line, prog);
         } else {
             fprintf(stderr, "%s", line);
@@ -75,25 +76,18 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    if (argc < 2) {
-        fprintf(stderr, "error: need sub command");
-        usage(argv[0]);
-        exit(1);
+    char *cmd = NULL;
+    if (argc == 1) {
+        cmd = "bench";
+    } else {
+        cmd = argv[1];
     }
 
-    char *cmd = argv[1];
-
     if (strcmp(cmd, "bench") == 0) {
-        if (argc < 3) {
-            fprintf(stderr, "[%s]: too few args", cmd);
-            usage(argv[0]);
-            exit(1);
-        }
-
         struct ggml_mulmat_bench bench = {
             .version = 1,
             .n_groups = 0,
-            .m_step = 8,
+            .step_m = 8,
             .num_m = 16,
             .cpu_only_stages = {GGML_TASK_FLAG_1_THREAD,
                                 GGML_TASK_FLAG_N_THREADS, 0},
@@ -106,40 +100,61 @@ int main(int argc, char **argv) {
             .groups = NULL,
         };
 
-        if (false) {
-            // for larger M range.
-            bench.m_step = 16;
-            bench.num_m = 32;
-        }
-
-        const char *model = argv[2];
-
-        const char *data_file = NULL;
-        FILE *fp = NULL;
-
+        const char *arg_model = NULL;
+        const char *arg_q_type = NULL;
+        const char *arg_step_m = NULL;
+        const char *arg_num_m = NULL;
+        const char *arg_file = NULL;
         bool always_yes = false;
 
-        if (argc == 4 || argc == 5) {
-            for (int i = 3; i < argc; i++) {
-                if (strcmp(argv[i], "-y") == 0) {
-                    always_yes = true;
-                } else {
-                    data_file = argv[i];
+        for (int i = 2; i < argc; i++) {
+            if (strcmp(argv[i], "-model") == 0) {
+                if (i + 1 < argc) {
+                    arg_model = argv[i + 1];
+                    ++i;
                 }
+            } else if (strcmp(argv[i], "-q_type") == 0) {
+                if (i + 1 < argc) {
+                    arg_q_type = argv[i + 1];
+                    ++i;
+                }
+            } else if (strcmp(argv[i], "-step_m") == 0) {
+                if (i + 1 < argc) {
+                    arg_step_m = argv[i + 1];
+                    ++i;
+                }
+            } else if (strcmp(argv[i], "-num_m") == 0) {
+                if (i + 1 < argc) {
+                    arg_num_m = argv[i + 1];
+                    ++i;
+                }
+            } else if (strcmp(argv[i], "-file") == 0) {
+                if (i + 1 < argc) {
+                    arg_file = argv[i + 1];
+                    ++i;
+                }
+            } else if (strcmp(argv[i], "-y") == 0) {
+                always_yes = true;
+            } else {
+                fprintf(stderr, "[%s]: invalid arg: %s\n", cmd, argv[i]);
+                usage(argv[0]);
+                exit(1);
             }
         }
 
-        if (data_file != NULL && !always_yes) {
+        FILE *fp = NULL;
+
+        if (arg_file != NULL && !always_yes) {
             struct stat st;
-            int rc = stat(data_file, &st);
+            int rc = stat(arg_file, &st);
             UNUSED(st);
             if (rc == 0) { // prompt
-                size_t len = strlen(data_file) + 50;
+                size_t len = strlen(arg_file) + 50;
                 char *prompt = malloc(len);
                 GGML_ASSERT(prompt);
                 snprintf(prompt, len,
                          "[%s]: data file '%s' exists, override? (Y|n)", cmd,
-                         data_file);
+                         arg_file);
 
                 if (!prompt_yes_no(prompt)) {
                     printf("Aborted.\n");
@@ -148,11 +163,15 @@ int main(int argc, char **argv) {
                 free(prompt);
             }
 
-            fp = fopen(data_file, "w");
+            fp = fopen(arg_file, "w");
             GGML_ASSERT(fp);
         }
 
-        if (strcmp(model, "7B") == 0) {
+        if (arg_model == NULL) {
+            arg_model = "7B";
+        }
+
+        if (strcmp(arg_model, "7B") == 0) {
             bench.n_groups = 4;
             bench.groups =
                 malloc(bench.n_groups * sizeof(struct ggml_mulmat_bench_nk));
@@ -165,7 +184,7 @@ int main(int argc, char **argv) {
                 .N = 11008, .K = 4096, .items = NULL};
             bench.groups[3] = (struct ggml_mulmat_bench_nk){
                 .N = 32000, .K = 4096, .items = NULL};
-        } else if (strcmp(model, "13B") == 0) {
+        } else if (strcmp(arg_model, "13B") == 0) {
             bench.n_groups = 4;
             bench.groups =
                 malloc(bench.n_groups * sizeof(struct ggml_mulmat_bench_nk));
@@ -178,18 +197,87 @@ int main(int argc, char **argv) {
                 .N = 13824, .K = 5120, .items = NULL};
             bench.groups[3] = (struct ggml_mulmat_bench_nk){
                 .N = 32000, .K = 5120, .items = NULL};
+        } else if (strcmp(arg_model, "30B") == 0) {
+            // TODO
+            abort();
+        } else if (strcmp(arg_model, "30B") == 0) {
+            // TODO
+            abort();
         } else {
-            // TODO: support 30B and 65B.
-            fprintf(stderr, "[%s]: error: unsupported model: %s", cmd, model);
+            fprintf(stderr, "[%s]: error: unknown model: %s\n", cmd, arg_model);
             usage(argv[0]);
             exit(1);
+        }
+
+        enum ggml_type q_type;
+        if (arg_q_type == NULL) {
+            arg_q_type = "Q4_0";
+            q_type = GGML_TYPE_Q4_0;
+        }
+
+        if (strcmp(arg_q_type, "Q4_0") == 0) {
+            q_type = GGML_TYPE_Q4_0;
+        } else if (strcmp(arg_q_type, "Q4_1") == 0) {
+            q_type = GGML_TYPE_Q4_1;
+        } else if (strcmp(arg_q_type, "Q5_0") == 0) {
+            q_type = GGML_TYPE_Q5_0;
+        } else if (strcmp(arg_q_type, "Q5_1") == 0) {
+            q_type = GGML_TYPE_Q5_1;
+        } else if (strcmp(arg_q_type, "Q8_0") == 0) {
+            q_type = GGML_TYPE_Q8_0;
+        } else if (strcmp(arg_q_type, "Q8_1") == 0) {
+            q_type = GGML_TYPE_Q8_1;
+        } else {
+            fprintf(stderr, "[%s]: error: unsupported q_type: %s\n", cmd,
+                    arg_q_type);
+            usage(argv[0]);
+            exit(1);
+        }
+
+        // bench.q_type, bench.arg_q_type
+        {
+            bench.q_type = q_type;
+            size_t n = sizeof(bench.q_type_name);
+            GGML_ASSERT(n > strlen(arg_q_type));
+            strncpy(bench.q_type_name, arg_q_type, n);
         }
 
         // bench.model
         {
             size_t n = sizeof(bench.model);
-            GGML_ASSERT(n > strlen(model));
-            strncpy(bench.model, model, n);
+            GGML_ASSERT(n > strlen(arg_model));
+            strncpy(bench.model, arg_model, n);
+        }
+
+        // bench.model
+        {
+            if (arg_step_m != NULL) {
+                int step_m = atoi(arg_step_m);
+                if (step_m <= 0) {
+                    fprintf(stderr, "[%s]: error: invalid step_m: %s\n", cmd,
+                            arg_step_m);
+                    usage(argv[0]);
+                    exit(1);
+                }
+                bench.step_m = step_m;
+            }
+            if (arg_num_m != NULL) {
+                int num_m = atoi(arg_num_m);
+                if (num_m <= 0) {
+                    fprintf(stderr, "[%s]: error: invalid num_m: %s\n", cmd,
+                            arg_num_m);
+                    usage(argv[0]);
+                    exit(1);
+                }
+                bench.num_m = num_m;
+            }
+        }
+
+        // bench.model
+        {
+            size_t n = sizeof(bench.model);
+            GGML_ASSERT(n > strlen(arg_model));
+            strncpy(bench.model, arg_model, n);
         }
 
         // bench.blas_name
@@ -206,18 +294,8 @@ int main(int argc, char **argv) {
         ggml_cl_init();
 #endif
 
-        if (always_yes) {
-            printf("Bench for %s ...\n", bench.blas_name);
-        } else {
-            char buf[64];
-            snprintf(buf, 64, "Will bench for %s, are you sure? (Y|n)",
-                     bench.blas_name);
-
-            if (!prompt_yes_no(buf)) {
-                printf("Aborted.\n");
-                exit(2);
-            }
-        }
+        printf("[BENCH] model name: %s, q_type: %s, blas: %s.\n", bench.model,
+               bench.q_type_name, bench.blas_name);
 
         cmd_bench(&bench);
 
@@ -226,12 +304,12 @@ int main(int argc, char **argv) {
             fclose(fp);
         }
 
-        if (data_file != NULL) {
-            printf("[%s]: result was written to %s\n", cmd, data_file);
+        if (arg_file != NULL) {
+            printf("[%s]: result was written to %s\n", cmd, arg_file);
         }
     } else if (strcmp(cmd, "analyze") == 0) {
         if (argc < 3) {
-            fprintf(stderr, "[%s]: error: too few args", cmd);
+            fprintf(stderr, "[%s]: error: too few args\n", cmd);
             usage(argv[0]);
             exit(1);
         }
@@ -282,7 +360,7 @@ int main(int argc, char **argv) {
 
 void cmd_bench(struct ggml_mulmat_bench *bench) {
     size_t wsize = 0;
-    void *q4_0_buf = NULL;
+    void *q_buf = NULL;
     void *wdata = NULL;
 
     // alloc q4_0_buf and wdata with max size.
@@ -295,12 +373,22 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
             }
         }
 
-        size_t q4_0_buf_size = 2 * max_NxK * sizeof(int64_t);
-        q4_0_buf = malloc(q4_0_buf_size);
-        if (!q4_0_buf) {
+        size_t q_buf_size;
+        switch (bench->q_type) {
+        case GGML_TYPE_Q4_0:
+        case GGML_TYPE_Q4_1:
+            q_buf_size = 2 * max_NxK * sizeof(int64_t);
+            break;
+        default:
+            // TODO
+            abort();
+        }
+
+        q_buf = malloc(q_buf_size);
+        if (!q_buf) {
             fprintf(stderr,
-                    "failed to allocate memory for q4_0_buf, size: %zu MiB\n",
-                    q4_0_buf_size / 1024 / 1024);
+                    "failed to allocate memory for q_buf, size: %zu MiB\n",
+                    q_buf_size / 1024 / 1024);
             exit(1);
         }
         wsize = max_NxK * sizeof(float);
@@ -329,7 +417,7 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
         char progress_line[20];
 
         for (int im = 0; im < bench->num_m; im++) {
-            M = bench->m_step * (im + 1);
+            M = bench->step_m * (im + 1);
 
             memset(progress_line, 0, sizeof(progress_line));
             snprintf(progress_line, sizeof(progress_line), "%d %d %d ", N, K,
@@ -365,10 +453,22 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
                     ctx, GGML_TYPE_F32, (int64_t)K, (int64_t)N);
                 ggml_set_f32(src0_f32, 0.1f);
 
-                src0 = ggml_new_tensor_2d(ctx, GGML_TYPE_Q4_0, (int64_t)K,
+                src0 = ggml_new_tensor_2d(ctx, bench->q_type, (int64_t)K,
                                           (int64_t)N);
-                ggml_quantize_q4_0((const float *)src0_f32->data, src0->data,
-                                   N * K, K, (int64_t *)q4_0_buf);
+
+                switch (bench->q_type) {
+                case GGML_TYPE_Q4_0:
+                    ggml_quantize_q4_0((const float *)src0_f32->data,
+                                       src0->data, N * K, K, (int64_t *)q_buf);
+                    break;
+                case GGML_TYPE_Q4_1:
+                    ggml_quantize_q4_1((const float *)src0_f32->data,
+                                       src0->data, N * K, K, (int64_t *)q_buf);
+                    break;
+                default:
+                    // TODO
+                    abort();
+                }
 
                 // src1: M x K
                 src1 = ggml_new_tensor_2d(ctx, GGML_TYPE_F32, (int64_t)K,
@@ -427,7 +527,7 @@ void cmd_bench(struct ggml_mulmat_bench *bench) {
     }
 
     free(wdata);
-    free(q4_0_buf);
+    free(q_buf);
 
     // collect stat records.
     for (int i = 0; i < bench->n_groups; i++) {
@@ -695,7 +795,7 @@ static void test__estimate_time(void) {
         .model = "7B",
         .blas_name = "OpenBLAS",
         .n_groups = 1,
-        .m_step = 8,
+        .step_m = 8,
         .num_m = 2,
         .cpu_only_stages = {GGML_TASK_FLAG_1_THREAD, GGML_TASK_FLAG_N_THREADS,
                             0},
@@ -815,7 +915,7 @@ static void test__choose_device(void) {
         .model = "7B",
         .blas_name = "OPENBLAS",
         .n_groups = 1,
-        .m_step = 8,
+        .step_m = 8,
         .num_m = 2,
         .cpu_only_stages = {GGML_TASK_FLAG_1_THREAD, GGML_TASK_FLAG_N_THREADS,
                             0},
@@ -854,7 +954,7 @@ static void test__choose_device(void) {
             for (int j = 0; j < n; j++) {
                 struct ggml_mulmat_bench_time_stats time_stats;
                 int rc = ggml_mulmat_bench_time_stats(&bench, M_arr[j], N, K,
-                                                     nth, &time_stats);
+                                                      nth, &time_stats);
                 BENCH_ASSERT_EQUAL(rc, -1, "#(i: %d, i: %d)", i, j);
             }
         }
@@ -907,7 +1007,7 @@ static void test__choose_device(void) {
             const struct test__choose_device_data *e = &test_data[i];
             struct ggml_mulmat_bench_time_stats time_stats;
             int rc = ggml_mulmat_bench_time_stats(&bench, e->M, N, K, e->nth,
-                                                 &time_stats);
+                                                  &time_stats);
             BENCH_ASSERT_EQUAL(rc, 0, "#(i: %d)", i);
             BENCH_ASSERT_EQUAL(time_stats.cpu_only_total, e->cpu_only_time,
                                "#(i: %d)", i);

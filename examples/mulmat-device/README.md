@@ -3,7 +3,7 @@
 ### Example data
 
 ```
-1 7B Accelerate 4 8 2 1 3 0 3 2 0
+1 7B Q4_0 Accelerate 4 8 2 1 3 0 3 2 0
 4096 4096
   8      46    9329 0   6401   6284 0
  16      93   19410 0   6056   6433 0
@@ -13,6 +13,9 @@
 11008 4096
   8      44   22161 0  15264  22031 0
  16      90   38207 0  15059  22912 0
+32000 4096
+  8        8  48768 0  83870  60724 0
+ 16       16  97744 0  83893  63991 0
  ```
 
 See files in dir [bench-out](bench-out) for details.
@@ -29,9 +32,11 @@ These files are generated on Macbook Pro 2018:
 head
 groups+
 
-head := version model blas_name num_groups m_step num_m stage_flags(first 3 for cpu, rest 3 for gpu)
+head := version model q_type blas_name num_groups m_step num_m stage_flags(first 3 for cpu-only, rest 3 for use-blas)
 
 model: "7B" | "13B" | "30B" | "65B"
+
+q_type: "Q4_0" | "Q4_1" | "Q5_0" | "Q5_1" | "Q8_0" | "Q8_1"
 
 blas_name: "Accelerate" | "OpenBLAS" | "cuBLAS" | "clBlast"
 
@@ -41,7 +46,7 @@ groups := group+
 
 group := N K M_record+
 
-M_record := M stage_times(first 3 for cpu, rest 3 for gpu)
+M_record := M stage_times(first 3 for cpu-only, rest 3 for use-blas)
 
 stage_times := init_time compute_time finalize_time
 ```
@@ -52,17 +57,15 @@ Enum of stage flag value:
 - 2: single thread + worker idle wait
 - 3: multi threads
 
-Time unit is us. A column is all zeros when that stage does not exist.
+Time unit is `us`. A column is all zeros when that stage does not exist.
 
 ### Limitations
 
-Due to device capability:
-
-- Only tested "7B" and "13B".
-- I can not test cuBLAS.
+- Only tested 7B and 13B.
+- Only tested Q4_0, Q4_1.
+- Can not test cuBLAS.
 
 ### TODOs
 
-- get NKs for 30B and 65B, support both models. 
-- support CLBLAS
+- get NKs for 30B and 65B, support both models.
 - ...

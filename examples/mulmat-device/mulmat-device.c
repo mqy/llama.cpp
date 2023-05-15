@@ -26,9 +26,9 @@ static const char *ggml_blas_names[GGML_BLAS_TYPE_COUNT] = {
 const char *ggml_get_blas_names(void) { return (const char *)ggml_blas_names; }
 
 int ggml_mulmat_read_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
-    int rc = fscanf(fp, "%d %s %s %d %d %d", &bench->version, bench->model,
-                    bench->blas_name, &bench->n_groups, &bench->m_step,
-                    &bench->num_m);
+    int rc = fscanf(fp, "%d %s %s %s %d %d %d", &bench->version, bench->model,
+                    bench->q_type_name, bench->blas_name, &bench->n_groups,
+                    &bench->step_m, &bench->num_m);
     if (rc <= 0) {
         return rc;
     }
@@ -77,8 +77,9 @@ int ggml_mulmat_read_bench_data(struct ggml_mulmat_bench *bench, FILE *fp) {
 
 void ggml_mulmat_write_bench_data(const struct ggml_mulmat_bench *bench,
                                   FILE *fp) {
-    fprintf(fp, "%d %s %s %d %d %d", bench->version, bench->model,
-            bench->blas_name, bench->n_groups, bench->m_step, bench->num_m);
+    fprintf(fp, "%d %s %s %s %d %d %d", bench->version, bench->model,
+            bench->q_type_name, bench->blas_name, bench->n_groups,
+            bench->step_m, bench->num_m);
 
     for (int i = 0; i < 3; i++) {
         fprintf(fp, "%2d", bench->cpu_only_stages[i]);
@@ -133,7 +134,7 @@ int ggml_mulmat_estimate_time(const struct ggml_mulmat_bench *bench, int M,
         return -1;
     }
 
-    if (M < bench->m_step || M > bench->m_step * bench->num_m) {
+    if (M < bench->step_m || M > bench->step_m * bench->num_m) {
         return -1;
     }
 
@@ -189,13 +190,13 @@ int ggml_mulmat_estimate_time(const struct ggml_mulmat_bench *bench, int M,
     return -1;
 }
 
-int ggml_mulmat_bench_time_stats(const struct ggml_mulmat_bench *bench,
-                                const int M, const int N, const int K,
-                                const int nth,
-                                struct ggml_mulmat_bench_time_stats *time_stats) {
-    if (M < bench->m_step) {
+int ggml_mulmat_bench_time_stats(
+    const struct ggml_mulmat_bench *bench, const int M, const int N,
+    const int K, const int nth,
+    struct ggml_mulmat_bench_time_stats *time_stats) {
+    if (M < bench->step_m) {
         return -1;
-    } else if (M > bench->m_step * bench->num_m) {
+    } else if (M > bench->step_m * bench->num_m) {
         return -1;
     }
 

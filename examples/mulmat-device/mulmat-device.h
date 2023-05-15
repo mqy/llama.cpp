@@ -33,8 +33,6 @@ enum ggml_blas_type {
     GGML_BLAS_TYPE_COUNT
 };
 
-#define GGML_MAX_N_THREADS 32
-
 struct ggml_mulmat_bench_m {
     int M;
 
@@ -58,8 +56,10 @@ struct ggml_mulmat_bench {
 
     char model[4];      // 7B | 13B
     char blas_name[16]; // see `ggml_blas_names`
+    char q_type_name[8];
+    int q_type;
     int n_groups;
-    int m_step;
+    int step_m;
     int num_m;
 
     uint32_t cpu_only_stages[3];
@@ -85,9 +85,9 @@ int ggml_mulmat_estimate_time(const struct ggml_mulmat_bench *bench, int M,
                               int N, int K, int nth, bool cpu_only);
 
 // return 0: ok, -1: M out of range or no data.
-int ggml_mulmat_bench_time_stats(const struct ggml_mulmat_bench *b, int M, int N,
-                                int K, int nth,
-                                struct ggml_mulmat_bench_time_stats *time_stats);
+int ggml_mulmat_bench_time_stats(
+    const struct ggml_mulmat_bench *b, int M, int N, int K, int nth,
+    struct ggml_mulmat_bench_time_stats *time_stats);
 
 const char *ggml_get_blas_name(void);
 
