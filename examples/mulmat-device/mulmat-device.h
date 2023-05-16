@@ -12,9 +12,12 @@ extern "C" {
 
 // task flag: byte 0..2 for task stages; byte 3 for extensions (use blas, etc.)
 
-#define GGML_TASK_FLAG_1_THREAD 0x1
-#define GGML_TASK_FLAG_1_THREAD__WAIT 0x2
-#define GGML_TASK_FLAG_N_THREADS 0x3
+// GGML_TASK_FLAG_T1: total 1 task, workers keep spinning.
+// GGML_TASK_FLAG_TN: total N tasks, all workers involve in computing.
+// GGML_TASK_FLAG_T1_WAIT: total 1 task, workers go waiting.
+#define GGML_TASK_FLAG_T1 0x1
+#define GGML_TASK_FLAG_T1_WAIT 0x2
+#define GGML_TASK_FLAG_TN 0x3
 
 void ggml_task_flag_set_blas(int32_t *flag, int8_t value);
 

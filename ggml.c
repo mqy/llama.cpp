@@ -33,6 +33,7 @@
 
 typedef volatile LONG atomic_int;
 typedef atomic_int atomic_bool;
+typedef atomic_int atomic_flag;
 
 static void atomic_store(atomic_int* ptr, LONG val) {
     InterlockedExchange(ptr, val);
@@ -45,6 +46,13 @@ static LONG atomic_fetch_add(atomic_int* ptr, LONG inc) {
 }
 static LONG atomic_fetch_sub(atomic_int* ptr, LONG dec) {
     return atomic_fetch_add(ptr, -(dec));
+}
+
+static inline LONG atomic_flag_test_and_set(atomic_flag* ptr) {
+    return InterlockedCompareExchange(ptr, 1, 0);
+}
+static inline LONG atomic_flag_clear(atomic_flag* ptr) {
+    return InterlockedExchange(ptr, 0);
 }
 
 typedef CRITICAL_SECTION   pthread_mutex_t;
@@ -13786,6 +13794,20 @@ typedef pthread_t ggml_thread_t;
 
 #endif
 
+
+//#define GGML_THREAD_DEBUG 1
+#if (GGML_THREAD_DEBUG >= 1)
+#define GGML_PRINT_THREAD_DEBUG(...) printf(__VA_ARGS__)
+#else
+#define GGML_PRINT_THREAD_DEBUG(...)
+#endif
+
+#if (GGML_THREAD_DEBUG >= 2)
+#define GGML_PRINT_THREAD_DEBUG_2(...) printf(__VA_ARGS__)
+#else
+#define GGML_PRINT_THREAD_DEBUG_2(...)
+#endif
+
 static inline void ggml_spin_pause(void) {
     // copied from ggml_lock_lock()
 #if defined(__x86_64__) || (defined(_MSC_VER) && defined(_M_AMD64))
@@ -13793,64 +13815,200 @@ static inline void ggml_spin_pause(void) {
 #endif
 }
 
-#define GGML_THREAD_COMMAND_NONE 0x0
-#define GGML_THREAD_COMMAND_WAIT 0x1
-#define GGML_THREAD_COMMAND_STOP 0x2
+static inline void ggml_spin_lock(volatile atomic_flag *obj) {
+    while (atomic_flag_test_and_set(obj)) {
+        ggml_spin_pause();
+    }
+}
+
+static inline void ggml_spin_unlock(volatile atomic_flag *obj) {
+    atomic_flag_clear(obj);
+}
 
 struct ggml_compute_state_shared {
-    // number of tasks to run. worker decrease it.
-    atomic_int      n_tasks;
-
-    // -1 to ask all threads to waiting.
-    // -2 to stop all threads.
-    atomic_int      command;
-
+    atomic_flag spin;
     pthread_mutex_t mutex;
-    pthread_cond_t  cond;
-    atomic_int      n_waiting;
+    pthread_cond_t cond;
+
+    atomic_int n_tasks;
+    atomic_int n_waiting;
+
+    atomic_bool wait_now;
+    atomic_bool wait_on_task_done;
+    atomic_bool stop;
 };
 
 struct ggml_compute_state {
     ggml_thread_t thrd;
 
     struct ggml_compute_params params;
-    struct ggml_tensor * node;
+    struct ggml_tensor *node;
 
-    struct ggml_compute_state_shared * shared;
+    struct ggml_compute_state_shared *shared;
 };
 
-static thread_ret_t ggml_graph_compute_thread(void * data) {
-    struct ggml_compute_state * state = (struct ggml_compute_state *)data;
-    struct ggml_compute_state_shared * shared = state->shared;
+// NOTE: must be protected by state->shared->spin
+static inline void ggml_graph_compute_thread_cond_wait(struct ggml_compute_state *state) {
+    GGML_PRINT_THREAD_DEBUG_2("%d-th cond_wait locking\n", state->params.ith);
+    int rc;
 
-    while (true) {
-        if (shared->command == GGML_THREAD_COMMAND_STOP) {
-            break;
+    rc = pthread_mutex_lock(&state->shared->mutex);
+    GGML_ASSERT(rc == 0);
+
+    GGML_PRINT_THREAD_DEBUG_2("%d-th cond_waiting\n", state->params.ith);
+
+    state->shared->n_waiting++;  //atomic_fetch_add(&state->shared->n_waiting, 1);
+    ggml_spin_unlock(&state->shared->spin);
+
+    rc = pthread_cond_wait(&state->shared->cond, &state->shared->mutex);
+    GGML_ASSERT(rc == 0);
+
+    rc = pthread_mutex_unlock(&state->shared->mutex);
+    GGML_ASSERT(rc == 0);
+
+    GGML_PRINT_THREAD_DEBUG_2("%d-th cond_wait done\n", state->params.ith);
+
+    ggml_spin_lock(&state->shared->spin);
+    state->shared->n_waiting--; // atomic_fetch_add(&state->shared->n_waiting, -1);
+
+    GGML_PRINT_THREAD_DEBUG_2("%d-th cond_wait unlocked\n", state->params.ith);
+}
+
+static inline void ggml_graph_compute_thread_cond_broadcast(struct ggml_compute_state_shared *shared) {
+    GGML_PRINT_THREAD_DEBUG(">>>> cond_broadcast ...\n");
+    int rc;
+
+    rc = pthread_mutex_lock(&shared->mutex);
+    GGML_ASSERT(rc == 0);
+
+    rc = pthread_cond_broadcast(&shared->cond);
+    GGML_ASSERT(rc == 0);
+
+    rc = pthread_mutex_unlock(&shared->mutex);
+    GGML_ASSERT(rc == 0);
+
+    GGML_PRINT_THREAD_DEBUG(">>>> cond_broadcast: done\n");
+}
+
+// NOTE: must be protected by shared->spin
+static inline void ggml_graph_compute_thread_setup_workers(
+        int8_t stage_flags[3],
+        enum ggml_task_type type,
+        struct ggml_compute_state_shared *shared,
+        int n_threads) {
+    GGML_PRINT_THREAD_DEBUG(">>>> setup workers ...\n");
+    const int n_worker_threads = n_threads - 1;
+    uint8_t flag = stage_flags[type];
+
+    switch (flag) {
+    case GGML_TASK_FLAG_T1:
+    case GGML_TASK_FLAG_T1_WAIT:
+        if (flag == GGML_TASK_FLAG_T1_WAIT) {
+            if (shared->n_waiting < n_worker_threads) {
+                shared->wait_now = true;
+                GGML_PRINT_THREAD_DEBUG(">>>> wait_now was set, expect %d workers wait\n",
+                                        n_worker_threads);
+                ggml_spin_unlock(&shared->spin);
+                while (shared->n_waiting != n_worker_threads) {
+                    ggml_spin_pause();
+                }
+                ggml_spin_lock(&shared->spin);
+                GGML_PRINT_THREAD_DEBUG(">>>> saw %d workers waiting\n", n_worker_threads);
+            }
+        }
+        break;
+    case GGML_TASK_FLAG_TN:
+        if (shared->n_waiting > 0) {
+            GGML_PRINT_THREAD_DEBUG(">>>> expect %d active workers\n", n_worker_threads);
+            shared->wait_now = false;
+            ggml_spin_unlock(&shared->spin);
+            while (shared->n_waiting != 0) {
+                ggml_graph_compute_thread_cond_broadcast(shared);
+                ggml_spin_pause();
+            }
+            ggml_spin_lock(&shared->spin);
+            GGML_PRINT_THREAD_DEBUG(">>>> saw %d active workers\n", n_worker_threads);
         }
 
-        if (shared->command == GGML_THREAD_COMMAND_WAIT) {
-            //uint64_t t0 = ggml_time_us();
-            pthread_mutex_lock(&shared->mutex);
-            shared->n_waiting++;
-            pthread_cond_wait(&shared->cond, &shared->mutex);
-            shared->n_waiting--;
-            pthread_mutex_unlock(&shared->mutex);
-            //printf("%d-th thread cond_wait took: %8.3f ms\n", state->params.ith, (ggml_time_us() - t0) / 1000.0);
+        // Optimize energy: wait_on_task_done.
+        //
+        // Facts:
+        // 1. The execution time of worker threads can vary from as many as tens of us.
+        //    Main thread waits for all worker threads done before start next stage/node.
+        // 2. There is small delay from the time the worker thread finishes executing until
+        //    the main thread initiates wait_now command.
+        //
+        // Often this benifits forward_mul_mat_q_f32 with Accelerate/OpenBLAS which
+        // runs init stage in parallel and compute stage in main thread.
+        // 
+        // We MANY also check following nodes, but that's a bit complicated.
+        // So just check foloowing stages from within current node.
+
+        shared->wait_on_task_done = false;
+
+        for (int i = type + 1; i <= GGML_TASK_FINALIZE; i++) {
+            flag = stage_flags[i];
+            if (flag == GGML_TASK_FLAG_TN) {
+                break;
+            }
+            if (flag == GGML_TASK_FLAG_T1_WAIT) {
+                shared->wait_on_task_done = true;
+                GGML_PRINT_THREAD_DEBUG(">>>> wait_on_task_done is enabled\n");
+                break;
+            }
+        }
+        break;
+    default:
+        GGML_ASSERT(false);
+    }
+    GGML_PRINT_THREAD_DEBUG(">>>> setup workers: done\n");
+}
+
+static thread_ret_t ggml_graph_compute_thread(void *data) {
+    GGML_PRINT_THREAD_DEBUG("%d-th running\n", state->params.ith);
+
+    struct ggml_compute_state *state = (struct ggml_compute_state *)data;
+    struct ggml_compute_state_shared *shared = state->shared;
+
+    while (!shared->stop) {
+        if (shared->wait_now) {
+            ggml_spin_lock(&shared->spin);
+            if (state->node == NULL) {
+                ggml_graph_compute_thread_cond_wait(state);
+            }
+            ggml_spin_unlock(&shared->spin);
         }
 
-        if (shared->n_tasks > 0 && state->node != NULL) {
-            ggml_compute_forward(&state->params, state->node);
-            state->node = NULL;
-            --shared->n_tasks;
+        if (shared->n_tasks > 0) {
+            if (state->node != NULL) {
+                GGML_PRINT_THREAD_DEBUG_2("%d-th computing ...\n", state->params.ith);
+
+                ggml_compute_forward(&state->params, state->node);
+
+                ggml_spin_lock(&shared->spin);
+                state->node = NULL;
+                shared->n_tasks--; // atomic_fetch_add(&shared->n_tasks, -1);
+
+                GGML_PRINT_THREAD_DEBUG_2("%d-th done. shared->n_tasks: %d\n",
+                    state->params.ith, shared->n_tasks);
+
+                if (state->shared->wait_on_task_done) {
+                    if (state->node == NULL) {
+                        ggml_graph_compute_thread_cond_wait(state);
+                    }
+                }
+                ggml_spin_unlock(&shared->spin);
+            }
         }
 
         ggml_spin_pause();
     }
 
+    GGML_PRINT_THREAD_DEBUG("%d-th exited\n", state->params.ith);
     return 0;
 }
 
-//#define GGML_GRAPH_COMPUTE_DEBUG 1
+// #define GGML_GRAPH_COMPUTE_PLAN_BLAS_DEBUG 1
 
 struct ggml_mulmat_bench_cache_element {
     int M;
@@ -13877,7 +14035,7 @@ static uint64_t ggml_mulmat_bench_cache_hash(int M, int N, int K) {
 }
 
 void ggml_graph_compute_plan_blas(struct ggml_cgraph *cgraph) {
-#ifdef GGML_GRAPH_COMPUTE_DEBUG
+#ifdef GGML_GRAPH_COMPUTE_PLAN_BLAS_DEBUG
     int64_t t0 = ggml_time_us();
     int cpu_only_total = 0;
     int use_blas_total = 0;
@@ -13914,8 +14072,8 @@ void ggml_graph_compute_plan_blas(struct ggml_cgraph *cgraph) {
         int N = (int)node->ne[0];
         int K = (int)node->src1->ne[0];
 
-#ifdef GGML_GRAPH_COMPUTE_DEBUG
-        if (GGML_GRAPH_COMPUTE_DEBUG > 1) {
+#ifdef GGML_GRAPH_COMPUTE_PLAN_BLAS_DEBUG
+        if (GGML_GRAPH_COMPUTE_PLAN_BLAS_DEBUG > 1) {
             printf("MUL_MAT: M: %d, N: %d, K: %d\n", M, N, K);
         }
 #endif
@@ -13952,13 +14110,13 @@ void ggml_graph_compute_plan_blas(struct ggml_cgraph *cgraph) {
                     use_blas = ts->use_blas_total < ts->cpu_only_total;
                 }
 
-#ifdef GGML_GRAPH_COMPUTE_DEBUG
+#ifdef GGML_GRAPH_COMPUTE_PLAN_BLAS_DEBUG
                 cpu_only_total += ts->cpu_only_total;
                 use_blas_total += ts->use_blas_total;
 #endif
             }
 
-#ifdef GGML_GRAPH_COMPUTE_DEBUG
+#ifdef GGML_GRAPH_COMPUTE_PLAN_BLAS_DEBUG
             { // compare 1 thread
                 struct ggml_mulmat_bench_time_stats time_stats;
                 int rc = ggml_mulmat_bench_time_stats(cgraph->mm_bench, M, N, K,
@@ -13984,7 +14142,7 @@ void ggml_graph_compute_plan_blas(struct ggml_cgraph *cgraph) {
         }
     }
 
-#ifdef GGML_GRAPH_COMPUTE_DEBUG
+#ifdef GGML_GRAPH_COMPUTE_PLAN_BLAS_DEBUG
     printf("\n[Plan blas] took %4.3f ms\n", (ggml_time_us() - t0) / 1000.0);
 
     if (use_blas_total < cpu_only_total) {
@@ -14013,28 +14171,29 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
         ggml_graph_compute_plan_blas(cgraph);
     }
 
-    struct ggml_compute_state_shared state_shared = {
-        .n_tasks = 0,
-        .command = 0,
-        .mutex = PTHREAD_MUTEX_INITIALIZER,
-        .cond = PTHREAD_COND_INITIALIZER,
-        .n_waiting = 0,
-    };
+    struct ggml_compute_state_shared state_shared;
     struct ggml_compute_state * workers = NULL;
 
     // create thread pool
     if (n_threads > 1) {
-        int rc;
-        memset(&state_shared, 0, sizeof(struct ggml_compute_state_shared));
-        rc = pthread_mutex_init(&state_shared.mutex, NULL);
-        GGML_ASSERT(rc == 0);
-        rc = pthread_cond_init(&state_shared.cond, NULL);
-        GGML_ASSERT(rc == 0);
+        state_shared = (struct ggml_compute_state_shared){
+            .spin = { 0 },
+            .mutex = PTHREAD_MUTEX_INITIALIZER,
+            .cond = PTHREAD_COND_INITIALIZER,
+            .n_tasks = 0,
+            .n_waiting = 0,
+            .wait_now = false,
+            .wait_on_task_done = false,
+            .stop = false,
+        };
 
-        workers = alloca(sizeof(struct ggml_compute_state)*(n_threads - 1));
+        size_t sz_workers = sizeof(struct ggml_compute_state) * (n_threads - 1);
+        workers = alloca(sz_workers);
         GGML_ASSERT(workers);
+        memset(workers, 0, sz_workers);
 
         // NOTE: we could delay creating workers.
+        int rc;
         for (int j = 0; j < n_threads - 1; j++) {
             workers[j].shared = &state_shared;
             rc = ggml_thread_create(&workers[j].thrd, NULL, ggml_graph_compute_thread, &workers[j]);
@@ -14054,7 +14213,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                 case GGML_OP_CPY:
                 case GGML_OP_DUP:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_1_THREAD);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_T1);
 
                         size_t cur = 0;
                         if (ggml_is_quantized(node->type)) {
@@ -14066,7 +14225,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                 case GGML_OP_ADD:
                 case GGML_OP_ADD1:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_N_THREADS);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_TN);
 
                         size_t cur = 0;
 
@@ -14078,8 +14237,8 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                     } break;
                 case GGML_OP_ACC:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_INIT, GGML_TASK_FLAG_1_THREAD);
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_N_THREADS);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_INIT, GGML_TASK_FLAG_T1);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_TN);
 
                         size_t cur = 0;
 
@@ -14104,7 +14263,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                 case GGML_OP_STEP:
                 case GGML_OP_RELU:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_1_THREAD);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_T1);
                     } break;
                 case GGML_OP_MUL:
                 case GGML_OP_GELU:
@@ -14114,15 +14273,15 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                 case GGML_OP_RMS_NORM:
                 case GGML_OP_RMS_NORM_BACK:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_N_THREADS);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_TN);
                     } break;
                 case GGML_OP_MUL_MAT:
                     {
                         bool use_blas = ggml_task_flag_get_blas(node->task_flag);
                         if (use_blas) {
-                            ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_1_THREAD__WAIT);
+                            ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_T1_WAIT);
                         } else {
-                            ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_N_THREADS);
+                            ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_TN);
                         }
 
                         size_t cur = 0;
@@ -14135,7 +14294,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                                 cur = GGML_TYPE_SIZE[GGML_TYPE_F32]*(node->src0->ne[0]*node->src0->ne[1]);
 #endif
                             } else {
-                                ggml_task_flag_set(&node->task_flag, GGML_TASK_INIT, GGML_TASK_FLAG_1_THREAD);
+                                ggml_task_flag_set(&node->task_flag, GGML_TASK_INIT, GGML_TASK_FLAG_T1);
                                 cur = GGML_TYPE_SIZE[GGML_TYPE_F16]*ggml_nelements(node->src1);
                             }
                         } else if (node->src0->type == GGML_TYPE_F32 && node->src1->type == GGML_TYPE_F32) {
@@ -14149,11 +14308,11 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
 #if defined(GGML_USE_CUBLAS)
                                 cur = ggml_cuda_mul_mat_get_wsize(node->src0, node->src1, node);
 #elif defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS)
-                                ggml_task_flag_set(&node->task_flag, GGML_TASK_INIT, GGML_TASK_FLAG_N_THREADS);
+                                ggml_task_flag_set(&node->task_flag, GGML_TASK_INIT, GGML_TASK_FLAG_TN);
 #endif
                                 cur = GGML_TYPE_SIZE[GGML_TYPE_F32]*(node->src0->ne[0]*node->src0->ne[1]);
                             } else {
-                                ggml_task_flag_set(&node->task_flag, GGML_TASK_INIT, GGML_TASK_FLAG_1_THREAD);
+                                ggml_task_flag_set(&node->task_flag, GGML_TASK_INIT, GGML_TASK_FLAG_T1);
                                 const enum ggml_type type_q = quantize_fns[node->src0->type].vec_dot_type;
                                 cur = GGML_TYPE_SIZE[type_q]*ggml_nelements(node->src1)/GGML_BLCK_SIZE[type_q];
                             }
@@ -14165,12 +14324,12 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                     } break;
                 case GGML_OP_SCALE:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_N_THREADS);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_TN);
                     } break;
                 case GGML_OP_SET:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_INIT, GGML_TASK_FLAG_1_THREAD);
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_1_THREAD);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_INIT, GGML_TASK_FLAG_T1);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_T1);
 
                     } break;
                 case GGML_OP_CONT:
@@ -14183,24 +14342,24 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                 case GGML_OP_DIAG:
                 case GGML_OP_DIAG_MASK_ZERO:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_1_THREAD);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_T1);
                     } break;
                 case GGML_OP_DIAG_MASK_INF:
                 case GGML_OP_SOFT_MAX:
                 case GGML_OP_ROPE:
                 case GGML_OP_ROPE_BACK:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_N_THREADS);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_TN);
                     } break;
                 case GGML_OP_ALIBI:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_1_THREAD); //TODO
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_T1); //TODO
                     } break;
                 case GGML_OP_CONV_1D_1S:
                 case GGML_OP_CONV_1D_2S:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_INIT, GGML_TASK_FLAG_1_THREAD);
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_N_THREADS);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_INIT, GGML_TASK_FLAG_T1);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_TN);
 
                         GGML_ASSERT(node->src0->ne[3] == 1);
                         GGML_ASSERT(node->src1->ne[2] == 1);
@@ -14229,7 +14388,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                     } break;
                 case GGML_OP_FLASH_ATTN:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_N_THREADS);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_TN);
 
                         size_t cur = 0;
 
@@ -14249,7 +14408,7 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                     } break;
                 case GGML_OP_FLASH_FF:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_N_THREADS);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_TN);
 
                         size_t cur = 0;
 
@@ -14268,11 +14427,11 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
                 case GGML_OP_MAP_UNARY:
                 case GGML_OP_MAP_BINARY:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_1_THREAD);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_T1);
                     } break;
                 case GGML_OP_NONE:
                     {
-                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_1_THREAD);
+                        ggml_task_flag_set(&node->task_flag, GGML_TASK_COMPUTE, GGML_TASK_FLAG_T1);
                     } break;
                 case GGML_OP_COUNT:
                     {
@@ -14314,54 +14473,47 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
         // This is the params for main thread.
         struct ggml_compute_params params;
 
-        for (enum ggml_task_type type = GGML_TASK_INIT; type <= GGML_TASK_FINALIZE; type++) {
-            int8_t stage_flag = ggml_task_flag_get(node->task_flag, type);
-            if (stage_flag == 0) {
+        int8_t stage_flags[3];
+        for (int j = GGML_TASK_INIT; j <= GGML_TASK_FINALIZE; j++) {
+            stage_flags[j] = ggml_task_flag_get(node->task_flag, j);
+        }
+
+        for (int type = GGML_TASK_INIT; type <= GGML_TASK_FINALIZE; type++) {
+            if (stage_flags[type] == 0) {
                 continue;
             }
 
-            int n_tasks = 1;
-            if (stage_flag == GGML_TASK_FLAG_N_THREADS) {
-                n_tasks = n_threads;
-            }
-            int n_worker_tasks = n_tasks - 1;
+            // n_tasks is the total number of parallel computing tasks (including main).
+            int n_tasks = (stage_flags[type] == GGML_TASK_FLAG_TN)? n_threads : 1;
 
-            // Ensure: enough active threads, and idle wait for slow task stage.
+            ggml_spin_lock(&state_shared.spin);
+
             if (n_threads > 1) {
-                if (n_worker_tasks == 0 && state_shared.n_waiting == 0 && (stage_flag == GGML_TASK_FLAG_1_THREAD__WAIT)) {
-                    state_shared.command = GGML_THREAD_COMMAND_WAIT;
-                } else if (n_worker_tasks > 0 && state_shared.n_waiting > 0) {
-                    state_shared.command = GGML_THREAD_COMMAND_NONE;
-                    //uint64_t t0 = ggml_time_us();
-                    pthread_mutex_lock(&state_shared.mutex);
-                    pthread_cond_broadcast(&state_shared.cond);
-                    pthread_mutex_unlock(&state_shared.mutex);
-                    //printf("main thread cond_wait took: %8.3f ms\n", (ggml_time_us() - t0) / 1000.0);
-                }
-
-                int expected_n_waiting = state_shared.command == GGML_THREAD_COMMAND_WAIT? n_threads - 1 : 0;
-                while (state_shared.n_waiting != expected_n_waiting) {
-                    ggml_spin_pause();
-                }
+                ggml_graph_compute_thread_setup_workers(stage_flags, type, 
+                    &state_shared, n_threads);
             }
 
             // launch thread pool
-            if (n_worker_tasks > 0) {
-                for (int j = 0; j < n_worker_tasks; j++) {
-                    workers[j].params = (struct ggml_compute_params) {
-                        .type  = type,
-                        .ith   = j + 1,
-                        .nth   = n_tasks,
-                        .wsize = cgraph->work ? ggml_nbytes(cgraph->work) : 0,
-                        .wdata = cgraph->work ? cgraph->work->data : NULL,
+            if (n_tasks > 1) {
+                // setup compute task parameters.
+                for (int j = 0; j < n_tasks - 1; j++) {
+                    workers[j].params = (struct ggml_compute_params){
+                        .type = type,
+                        .ith = j + 1,
+                        .nth = n_tasks,
+                        .wsize = cgraph->work? ggml_nbytes(cgraph->work) : 0,
+                        .wdata = cgraph->work? cgraph->work->data : NULL,
                     };
                     workers[j].node = node;
                 }
-                state_shared.n_tasks = n_worker_tasks;
+                state_shared.n_tasks = n_tasks - 1;
+                GGML_PRINT_THREAD_DEBUG(">>>> assigned %d tasks to workers\n", n_tasks - 1);
             }
 
-            // Main thread always run the 0-th task.  When n_threads is an odd number, the
-            // last task may be smaller than previous ones. TODO: main run the last task?
+            ggml_spin_unlock(&state_shared.spin);
+
+            // main thread always run the 0-th task.
+            // TODO: assert(params->nth == 1) instead of assert(params->ith == 0)
             {
                 params.type = type;
                 params.ith = 0;
@@ -14373,10 +14525,12 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
             }
 
             // wait for tasks done.
-            if (n_worker_tasks > 0) {
+            if (n_tasks > 1) {
+                GGML_PRINT_THREAD_DEBUG(">>>> waiting %d worker tasks done ...\n", n_tasks - 1);
                 while (state_shared.n_tasks != 0) {
                     ggml_spin_pause();
                 }
+                GGML_PRINT_THREAD_DEBUG(">>>> waiting worker tasks done: ok.\n");
             }
         }
 
@@ -14391,34 +14545,17 @@ void ggml_graph_compute(struct ggml_context * ctx, struct ggml_cgraph * cgraph) 
         }
     }
 
-
-    // cleanup.
+    // join thread pool
     if (n_threads > 1) {
-        // stop
-        state_shared.command = GGML_THREAD_COMMAND_STOP;
+        GGML_PRINT_THREAD_DEBUG(">>>> stop thread pool ...\n");
+        state_shared.stop = true;
+        ggml_graph_compute_thread_cond_broadcast(&state_shared);
 
-        int rc;
-        // wakeup
-        if (state_shared.n_waiting >  0) {
-            rc = pthread_mutex_lock(&state_shared.mutex);
-            GGML_ASSERT(rc == 0);
-
-            rc = pthread_cond_broadcast(&state_shared.cond);
-            GGML_ASSERT(rc == 0);
-
-            rc = pthread_mutex_unlock(&state_shared.mutex);
-            GGML_ASSERT(rc == 0);
-
-            while (state_shared.n_waiting != 0) {
-                ggml_spin_pause();
-            }
-        }
-
-        // join thread pool
         for (int j = 0; j < n_threads - 1; j++) {
-            rc = ggml_thread_join(workers[j].thrd, NULL);
+            int rc = ggml_thread_join(workers[j].thrd, NULL);
             GGML_ASSERT(rc == 0);
         }
+        GGML_PRINT_THREAD_DEBUG(">>>> stop thread pool: done\n");
     }
 
     // performance stats (graph)

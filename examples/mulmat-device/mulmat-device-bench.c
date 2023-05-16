@@ -89,13 +89,12 @@ int main(int argc, char **argv) {
             .n_groups = 0,
             .step_m = 8,
             .num_m = 16,
-            .cpu_only_stages = {GGML_TASK_FLAG_1_THREAD,
-                                GGML_TASK_FLAG_N_THREADS, 0},
+            .cpu_only_stages = {GGML_TASK_FLAG_T1, GGML_TASK_FLAG_TN, 0},
 #if defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS)
-            .use_blas_stages = {GGML_TASK_FLAG_N_THREADS,
-                                GGML_TASK_FLAG_1_THREAD__WAIT, 0},
+            .use_blas_stages = {GGML_TASK_FLAG_TN,
+                                GGML_TASK_FLAG_T1_WAIT, 0},
 #elif defined(GGML_USE_CUBLAS) || defined(GGML_USE_CLBLAST)
-            .use_blas_stages = {0, GGML_TASK_FLAG_1_THREAD, 0},
+            .use_blas_stages = {0, GGML_TASK_FLAG_T1, 0},
 #endif
             .groups = NULL,
         };
@@ -760,7 +759,7 @@ static void cmd_analyze(struct ggml_mulmat_bench *bench) {
                         if (bench->use_blas_stages[stage] > 0) {
                             int t = group->items[j].use_blas_time[stage];
                             if (bench->use_blas_stages[stage] ==
-                                GGML_TASK_FLAG_N_THREADS) {
+                                GGML_TASK_FLAG_TN) {
                                 t /= nth;
                             }
                             total += t / 1000.0;
@@ -797,10 +796,8 @@ static void test__estimate_time(void) {
         .n_groups = 1,
         .step_m = 8,
         .num_m = 2,
-        .cpu_only_stages = {GGML_TASK_FLAG_1_THREAD, GGML_TASK_FLAG_N_THREADS,
-                            0},
-        .use_blas_stages = {GGML_TASK_FLAG_N_THREADS,
-                            GGML_TASK_FLAG_1_THREAD__WAIT, 0},
+        .cpu_only_stages = {GGML_TASK_FLAG_T1, GGML_TASK_FLAG_TN, 0},
+        .use_blas_stages = {GGML_TASK_FLAG_TN, GGML_TASK_FLAG_T1_WAIT, 0},
     };
     bench.groups = malloc(sizeof(struct ggml_mulmat_bench_nk) * bench.n_groups);
     bench.groups[0] = (struct ggml_mulmat_bench_nk){
@@ -917,10 +914,8 @@ static void test__choose_device(void) {
         .n_groups = 1,
         .step_m = 8,
         .num_m = 2,
-        .cpu_only_stages = {GGML_TASK_FLAG_1_THREAD, GGML_TASK_FLAG_N_THREADS,
-                            0},
-        .use_blas_stages = {GGML_TASK_FLAG_N_THREADS, GGML_TASK_FLAG_1_THREAD,
-                            0},
+        .cpu_only_stages = {GGML_TASK_FLAG_T1, GGML_TASK_FLAG_TN, 0},
+        .use_blas_stages = {GGML_TASK_FLAG_TN, GGML_TASK_FLAG_T1, 0},
     };
     bench.groups = malloc(sizeof(struct ggml_mulmat_bench_nk) * bench.n_groups);
     bench.groups[0] = (struct ggml_mulmat_bench_nk){

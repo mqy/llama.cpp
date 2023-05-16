@@ -2,17 +2,17 @@
 
 #include "examples/mulmat-device/mulmat-device.h"
 
-void ggml_task_flag_set_blas(int32_t *flag, int8_t value) {
+inline void ggml_task_flag_set_blas(int32_t *flag, int8_t value) {
     *flag |= (value << 24);
 }
 
-int8_t ggml_task_flag_get_blas(int32_t flag) { return (flag >> 24) & 0xFF; }
+inline int8_t ggml_task_flag_get_blas(int32_t flag) { return (flag >> 24) & 0xFF; }
 
-void ggml_task_flag_set(int32_t *flag, int stage, int8_t value) {
+inline void ggml_task_flag_set(int32_t *flag, int stage, int8_t value) {
     *flag |= (value << (8 * stage));
 }
 
-int8_t ggml_task_flag_get(int32_t flag, int stage) {
+inline int8_t ggml_task_flag_get(int32_t flag, int stage) {
     return (flag >> (8 * stage)) & 0xFF;
 }
 
@@ -149,7 +149,7 @@ int ggml_mulmat_estimate_time(const struct ggml_mulmat_bench *bench, int M,
                 if (sv > 0) {
                     int t = cpu_only ? item->cpu_only_time[j]
                                      : item->use_blas_time[j];
-                    if (sv == GGML_TASK_FLAG_N_THREADS) {
+                    if (sv == GGML_TASK_FLAG_TN) {
                         t /= nth;
                     }
                     total += t;
@@ -177,7 +177,7 @@ int ggml_mulmat_estimate_time(const struct ggml_mulmat_bench *bench, int M,
                                       : next->use_blas_time[j];
 
                     double t = pv + (nv - pv) * x;
-                    if (sv == GGML_TASK_FLAG_N_THREADS) {
+                    if (sv == GGML_TASK_FLAG_TN) {
                         t /= nth;
                     }
                     total += t;
@@ -254,7 +254,7 @@ int ggml_mulmat_bench_time_stats(
                 int nv = next->cpu_only_time[j];
                 t += x * (nv - pv);
             }
-            if (bench->cpu_only_stages[j] == GGML_TASK_FLAG_N_THREADS) {
+            if (bench->cpu_only_stages[j] == GGML_TASK_FLAG_TN) {
                 t /= nth;
             }
             time_stats->cpu_only_stages[j] = t;
@@ -268,7 +268,7 @@ int ggml_mulmat_bench_time_stats(
                 int nv = next->use_blas_time[j];
                 t += x * (nv - pv);
             }
-            if (bench->use_blas_stages[j] == GGML_TASK_FLAG_N_THREADS) {
+            if (bench->use_blas_stages[j] == GGML_TASK_FLAG_TN) {
                 t /= nth;
             }
             time_stats->use_blas_stages[j] = t;
