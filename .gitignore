@@ -33,6 +33,7 @@ models/*
 /benchmark-matmult
 /vdot
 /Pipfile
+/mulmat-tune
 
 build-info.h
 arm_neon.h

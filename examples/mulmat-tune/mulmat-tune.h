@@ -36,7 +36,7 @@ enum ggml_blas_type {
     GGML_BLAS_TYPE_COUNT
 };
 
-struct ggml_mulmat_bench_m {
+struct ggml_mulmat_tune_m {
     int M;
 
     int cpu_only_time[3];
@@ -47,14 +47,14 @@ struct ggml_mulmat_bench_m {
     int use_blas_records[3][NUM_BENCH];
 };
 
-struct ggml_mulmat_bench_nk {
+struct ggml_mulmat_tune_nk {
     int N;
     int K;
 
-    struct ggml_mulmat_bench_m *items;
+    struct ggml_mulmat_tune_m *items;
 };
 
-struct ggml_mulmat_bench {
+struct ggml_mulmat_tune {
     int version;
 
     char model[4];      // 7B | 13B
@@ -68,10 +68,10 @@ struct ggml_mulmat_bench {
     uint32_t cpu_only_stages[3];
     uint32_t use_blas_stages[3];
 
-    struct ggml_mulmat_bench_nk *groups;
+    struct ggml_mulmat_tune_nk *groups;
 };
 
-struct ggml_mulmat_bench_time_stats {
+struct ggml_mulmat_tune_time_stats {
     int cpu_only_stages[3];
     int cpu_only_total;
 
@@ -79,18 +79,17 @@ struct ggml_mulmat_bench_time_stats {
     int use_blas_total;
 };
 
-void ggml_mulmat_write_bench_data(const struct ggml_mulmat_bench *bench,
-                                  FILE *fp);
+void ggml_mulmat_write_tune_data(const struct ggml_mulmat_tune *tune, FILE *fp);
 
-int ggml_mulmat_read_bench_data(struct ggml_mulmat_bench *bench, FILE *file);
+int ggml_mulmat_read_tune_data(struct ggml_mulmat_tune *tune, FILE *file);
 
-int ggml_mulmat_estimate_time(const struct ggml_mulmat_bench *bench, int M,
-                              int N, int K, int nth, bool cpu_only);
+int ggml_mulmat_estimate_time(const struct ggml_mulmat_tune *tune, int M, int N,
+                              int K, int nth, bool cpu_only);
 
 // return 0: ok, -1: M out of range or no data.
-int ggml_mulmat_bench_time_stats(
-    const struct ggml_mulmat_bench *b, int M, int N, int K, int nth,
-    struct ggml_mulmat_bench_time_stats *time_stats);
+int ggml_mulmat_tune_time_stats(const struct ggml_mulmat_tune *b, int M, int N,
+                                int K, int nth,
+                                struct ggml_mulmat_tune_time_stats *time_stats);
 
 const char *ggml_get_blas_name(void);
 
