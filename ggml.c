@@ -9957,7 +9957,7 @@ static void ggml_compute_forward_mul_mat_q_f32(
     //}
 }
 
-void ggml_internal_compute_forward_mul_mat_q_f32_for_bench(
+void ggml_internal_compute_forward_mul_mat_q_f32_for_fine_tune(
     int task_type, size_t wsize, void *wdata,
     const struct ggml_tensor * src0,
     const struct ggml_tensor * src1,
@@ -13677,7 +13677,7 @@ struct ggml_cgraph ggml_build_forward(struct ggml_tensor * tensor) {
         /*.n_leafs      =*/ 0,
         /*.n_threads    =*/ GGML_DEFAULT_N_THREADS,
         /*.mm_no_blas   =*/ false,
-        /*.mm_bench     =*/ NULL,
+        /*.mm_tune      =*/ NULL,
         /*.work_size    =*/ 0,
         /*.work         =*/ NULL,
         /*.nodes        =*/ { NULL },
@@ -14010,19 +14010,19 @@ static thread_ret_t ggml_graph_compute_thread(void *data) {
 
 // #define GGML_GRAPH_COMPUTE_PLAN_BLAS_DEBUG 1
 
-struct ggml_mulmat_bench_cache_element {
+struct ggml_mulmat_tune_cache_element {
     int M;
     int N;
     int K;
 
     bool valid;
-    struct ggml_mulmat_bench_time_stats time_stats;
+    struct ggml_mulmat_tune_time_stats time_stats;
 };
 
 #define FNV_OFFSET 14695981039346656037UL
 #define FNV_PRIME 1099511628211UL
 
-static uint64_t ggml_mulmat_bench_cache_hash(int M, int N, int K) {
+static uint64_t ggml_mulmat_tune_cache_hash(int M, int N, int K) {
     char buf[30];
     snprintf(buf, 30, "%d%d%d", M, N, K);
 
@@ -14047,7 +14047,7 @@ void ggml_graph_compute_plan_blas(struct ggml_cgraph *cgraph) {
     const char *blas_name = ggml_get_blas_name();
 
     const int mm_cache_len = 16;
-    struct ggml_mulmat_bench_cache_element mm_cache[mm_cache_len];
+    struct ggml_mulmat_tune_cache_element mm_cache[mm_cache_len];
     memset(mm_cache, 0, sizeof(mm_cache));
 
     // TODO: optimize if we are sure that the M is a fixed value.
@@ -14080,20 +14080,20 @@ void ggml_graph_compute_plan_blas(struct ggml_cgraph *cgraph) {
 
         bool use_blas = M >= 32 && N >= 32 && K >= 32;
 
-        if (cgraph->mm_bench && blas_name != NULL &&
-            strcmp(blas_name, cgraph->mm_bench->blas_name) == 0) {
+        if (cgraph->mm_tune && blas_name != NULL &&
+            strcmp(blas_name, cgraph->mm_tune->blas_name) == 0) {
             {
-                int slot = ggml_mulmat_bench_cache_hash(M, N, K) % mm_cache_len;
-                struct ggml_mulmat_bench_cache_element *e = &mm_cache[slot];
-                struct ggml_mulmat_bench_time_stats *ts = NULL;
+                int slot = ggml_mulmat_tune_cache_hash(M, N, K) % mm_cache_len;
+                struct ggml_mulmat_tune_cache_element *e = &mm_cache[slot];
+                struct ggml_mulmat_tune_time_stats *ts = NULL;
 
                 if (e->M == M && e->N == N && e->K == K) {
                     if (e->valid) {
                         ts = &e->time_stats;
                     }
                 } else {
-                    int rc = ggml_mulmat_bench_time_stats(
-                        cgraph->mm_bench, M, N, K, cgraph->n_threads,
+                    int rc = ggml_mulmat_tune_time_stats(
+                        cgraph->mm_tune, M, N, K, cgraph->n_threads,
                         &e->time_stats);
                     if (rc == 0) {
                         e->valid = true;
@@ -14118,8 +14118,8 @@ void ggml_graph_compute_plan_blas(struct ggml_cgraph *cgraph) {
 
 #ifdef GGML_GRAPH_COMPUTE_PLAN_BLAS_DEBUG
             { // compare 1 thread
-                struct ggml_mulmat_bench_time_stats time_stats;
-                int rc = ggml_mulmat_bench_time_stats(cgraph->mm_bench, M, N, K,
+                struct ggml_mulmat_tune_time_stats time_stats;
+                int rc = ggml_mulmat_tune_time_stats(cgraph->mm_tune, M, N, K,
                                                       1, &time_stats);
                 if (rc == 0) {
                     if (M >= 32 && N >= 32 && K >= 32) {

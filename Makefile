@@ -1,5 +1,5 @@
 # Define the default target now so that it is always the first target
-default: main quantize quantize-stats perplexity embedding vdot mulmat-device-bench
+default: main quantize quantize-stats perplexity embedding vdot mulmat-tune
 
 ifndef UNAME_S
 UNAME_S := $(shell uname -s)
@@ -188,7 +188,7 @@ $(info I CC:       $(CCV))
 $(info I CXX:      $(CXXV))
 $(info )
 
-OBJS += mulmat-device.o
+OBJS += mulmat-tune.o
 
 #
 # Build library
@@ -253,13 +253,13 @@ benchmark-matmult: examples/benchmark/benchmark-matmult.cpp build-info.h ggml.o 
 vdot: pocs/vdot/vdot.cpp ggml.o $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
-mulmat-device.o: examples/mulmat-device/mulmat-device.c \
-	examples/mulmat-device/mulmat-device.h
+mulmat-tune.o: examples/mulmat-tune/mulmat-tune.c \
+	examples/mulmat-tune/mulmat-tune.h
 	$(CC)  $(CFLAGS) -c $< -o $@
 
-mulmat-device-bench: examples/mulmat-device/mulmat-device-bench.c \
+mulmat-tune: examples/mulmat-tune/mulmat-tune-tool.c \
 	ggml.o $(OBJS)
-	$(CC)  $(CFLAGS) $^ -o mulmat-device-bench $(LDFLAGS)
+	$(CC)  $(CFLAGS) $^ -o mulmat-tune $(LDFLAGS)
 
 .PHONY: tests
 tests:

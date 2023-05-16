@@ -237,7 +237,7 @@ struct llama_context {
     int    buf_last = 0;
     size_t buf_max_size[LLAMA_MAX_SCRATCH_BUFFERS] = { 0 };
 
-    struct ggml_mulmat_bench mm_bench;
+    struct ggml_mulmat_tune mm_tune;
 
     void use_buf(struct ggml_context * ctx, int i) {
 #if defined(LLAMA_USE_SCRATCH)
@@ -1136,7 +1136,7 @@ static bool llama_eval_internal(
 
     ggml_cgraph gf = {};
     gf.n_threads = n_threads;
-    gf.mm_bench = &lctx.mm_bench;
+    gf.mm_tune = &lctx.mm_tune;
 
     struct ggml_tensor * embd = ggml_new_tensor_1d(ctx0, GGML_TYPE_I32, N);
     ggml_set_name(embd, "embd");
@@ -2188,9 +2188,9 @@ struct llama_context * llama_init_from_file(
     }
 
     {
-        // TODO: sorry can we load this bench file before the slow model loading?
-        // TODO: data file many not be consistant to program, how to solve this problem?
-        // TODO: add command line arg --mulmat-device-bench-file.
+        // TODO: sorry can we load the data file before the slow model loading?
+        // TODO: data file many not be consistant with program, how to solve this problem?
+        // TODO: add command line arg (e.g --mulmat-tune) ?
         if (ctx->model.type == MODEL_7B || ctx->model.type == MODEL_13B) {
             const char * model_name = NULL;
             if (ctx->model.type == MODEL_7B) {
@@ -2198,20 +2198,21 @@ struct llama_context * llama_init_from_file(
             } else if (ctx->model.type == MODEL_13B) {
                 model_name = "13b";
             }
+
             char buf[200];
             memset(buf, 0, sizeof(buf));
-            snprintf(buf, sizeof(buf), "mulmat-device-bench.%s.txt", model_name);
+            snprintf(buf, sizeof(buf), "mulmat-tune.%s.txt", model_name);
             FILE *fp = fopen(buf, "r");
             if (!fp) {
-                fprintf(stderr, "WARN: failed to open the mulmat bench file %s\n", buf);
+                fprintf(stderr, "\nWARN: failed to open the mulmat tune file %s\n", buf);
             } else {
-                int rc = ggml_mulmat_read_bench_data(&ctx->mm_bench, fp);
+                int rc = ggml_mulmat_read_tune_data(&ctx->mm_tune, fp);
                 if (rc != 0) {
-                    fprintf(stderr, "failed to load mulmat bench from file %s\n", buf);
+                    fprintf(stderr, "failed to load mulmat tune from file %s\n", buf);
                     return nullptr;
                 }
                 fclose(fp);
-                printf("\n=== loaded mulmat bench from %s ===\n", buf);
+                printf("\n=== loaded mulmat tune from %s ===\n", buf);
             }
         }
     }
