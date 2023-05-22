@@ -239,6 +239,8 @@ struct llama_context {
     int    buf_last = 0;
     size_t buf_max_size[LLAMA_MAX_SCRATCH_BUFFERS] = { 0 };
 
+    struct ggml_mulmat_tune mm_tune;
+
     void use_buf(struct ggml_context * ctx, int i) {
 #if defined(LLAMA_USE_SCRATCH)
         size_t last_size = 0;
@@ -1208,10 +1210,9 @@ static bool llama_eval_internal(
 
     struct ggml_context * ctx0 = ggml_init(params);
 
-    // for big prompts, if BLAS is enabled, it is better to use only one thread
-    // otherwise, the threads are spin-lock waiting for the BLAS calls and are degrading the performance
     ggml_cgraph gf = {};
-    gf.n_threads = N >= 32 && ggml_cpu_has_blas() && !ggml_cpu_has_gpublas() ? 1 : n_threads;
+    gf.n_threads = n_threads;
+    gf.mm_tune = &lctx.mm_tune;
 
     struct ggml_tensor * embd = ggml_new_tensor_1d(ctx0, GGML_TYPE_I32, N);
     ggml_set_name(embd, "embd");
@@ -2254,6 +2255,34 @@ struct llama_context * llama_init_from_file(
 
         ctx->buf_scratch[0].resize(MEM_REQ_SCRATCH0().at(ctx->model.type));
         ctx->buf_scratch[1].resize(MEM_REQ_SCRATCH1().at(ctx->model.type));
+    }
+
+    {
+        // TODO: data file may be outdated, support online bench on start?
+        // TODO: add command line arg (e.g --mulmat-tune) ?
+        {
+            const char *file = "mulmat-tune.txt";
+            FILE *fp = fopen(file, "r");
+            if (!fp) {
+                fprintf(stderr, "\nWARN: failed to open file %s\n", file);
+            } else {
+                int rc = ggml_mulmat_tune_read_data(&ctx->mm_tune, fp);
+                fclose(fp);
+
+                if (rc != 0) {
+                    fprintf(stderr, "\nERROR: failed to load file %s, error code: %d\n", file, rc);
+                    return nullptr;
+                }
+
+                fprintf(stderr, "\nINFO: loaded file %s\n", file);
+
+                rc = ggml_mulmat_tune_validate(&ctx->mm_tune, NULL, -1);
+                if (rc != 0) {
+                    fprintf(stderr, "\nERROR: failed to validate file %s, error code: %d\n", file, rc);
+                    return nullptr;
+                }
+            }
+        }
     }
 
     return ctx;

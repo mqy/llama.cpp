@@ -1,0 +1,45 @@
+=== model: ggml-model-q4_0.bin, threads: 2, questions:  1 ===
+llama_print_timings: prompt eval time =  2289.86 ms /    14 tokens (  163.56 ms per token)
+llama_print_timings:        eval time =  1867.24 ms /     7 runs   (  266.75 ms per token)
+=== model: ggml-model-q4_0.bin, threads: 2, questions:  2 ===
+llama_print_timings: prompt eval time =  5623.72 ms /    27 tokens (  208.29 ms per token)
+llama_print_timings:        eval time =  1852.12 ms /     7 runs   (  264.59 ms per token)
+=== model: ggml-model-q4_0.bin, threads: 2, questions:  3 ===
+llama_print_timings: prompt eval time =  5874.20 ms /    40 tokens (  146.85 ms per token)
+llama_print_timings:        eval time =  1841.14 ms /     7 runs   (  263.02 ms per token)
+=== model: ggml-model-q4_0.bin, threads: 2, questions:  4 ===
+llama_print_timings: prompt eval time =  5977.65 ms /    53 tokens (  112.79 ms per token)
+llama_print_timings:        eval time =  1836.39 ms /     7 runs   (  262.34 ms per token)
+=== model: ggml-model-q4_0.bin, threads: 2, questions:  5 ===
+llama_print_timings: prompt eval time =  6213.83 ms /    66 tokens (   94.15 ms per token)
+llama_print_timings:        eval time =  1853.57 ms /     7 runs   (  264.80 ms per token)
+=== model: ggml-model-q4_0.bin, threads: 2, questions:  6 ===
+llama_print_timings: prompt eval time =  6917.77 ms /    80 tokens (   86.47 ms per token)
+llama_print_timings:        eval time =  1859.21 ms /     7 runs   (  265.60 ms per token)
+=== model: ggml-model-q4_0.bin, threads: 2, questions:  7 ===
+llama_print_timings: prompt eval time =  7049.68 ms /    94 tokens (   75.00 ms per token)
+llama_print_timings:        eval time =  1879.65 ms /     7 runs   (  268.52 ms per token)
+=== model: ggml-model-q4_0.bin, threads: 2, questions:  8 ===
+llama_print_timings: prompt eval time =  7329.04 ms /   108 tokens (   67.86 ms per token)
+llama_print_timings:        eval time =  1987.26 ms /     7 runs   (  283.89 ms per token)
+=== model: ggml-model-q4_0.bin, threads: 2, questions:  9 ===
+llama_print_timings: prompt eval time =  8057.23 ms /   122 tokens (   66.04 ms per token)
+llama_print_timings:        eval time =  1944.04 ms /     7 runs   (  277.72 ms per token)
+=== model: ggml-model-q4_0.bin, threads: 2, questions: 10 ===
+llama_print_timings: prompt eval time =  8252.88 ms /   136 tokens (   60.68 ms per token)
+llama_print_timings:        eval time =  1990.54 ms /     7 runs   (  284.36 ms per token)
+=== model: ggml-model-q4_0.bin, threads: 2, questions: 11 ===
+llama_print_timings: prompt eval time =  8889.08 ms /   152 tokens (   58.48 ms per token)
+llama_print_timings:        eval time =  2049.08 ms /     7 runs   (  292.73 ms per token)
+=== model: ggml-model-q4_0.bin, threads: 2, questions: 12 ===
+llama_print_timings: prompt eval time =  9320.59 ms /   168 tokens (   55.48 ms per token)
+llama_print_timings:        eval time =  1984.62 ms /     7 runs   (  283.52 ms per token)
+=== model: ggml-model-q4_0.bin, threads: 2, questions: 13 ===
+llama_print_timings: prompt eval time = 10079.09 ms /   184 tokens (   54.78 ms per token)
+llama_print_timings:        eval time =  2038.45 ms /     7 runs   (  291.21 ms per token)
+=== model: ggml-model-q4_0.bin, threads: 2, questions: 14 ===
+llama_print_timings: prompt eval time = 10600.01 ms /   200 tokens (   53.00 ms per token)
+llama_print_timings:        eval time =  1985.71 ms /     7 runs   (  283.67 ms per token)
+=== model: ggml-model-q4_0.bin, threads: 2, questions: 15 ===
+llama_print_timings: prompt eval time = 11654.53 ms /   216 tokens (   53.96 ms per token)
+llama_print_timings:        eval time =  2043.20 ms /     7 runs   (  291.89 ms per token)

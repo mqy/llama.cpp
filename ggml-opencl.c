@@ -146,6 +146,17 @@ __kernel void dequantize_row_q8_0(__global struct block_q8_0* x, __global float*
         }                                                           \
     } while (0)
 
+#define ASSERT(cond)                                                           \
+    do {                                                                       \
+        if (!(cond)) {                                                         \
+            fprintf(stderr, "Assert failed at %s:%d\n", __FILE__, __LINE__);   \
+            exit(1);                                                           \
+        }                                                                      \
+    } while (0)
+
+#define MIN(x, y) (x) < (y) ? (x) : (y)
+#define MAX(x, y) (x) > (y) ? (x) : (y)
+
 static cl_platform_id platform;
 static cl_device_id device;
 static cl_context context;
@@ -154,6 +165,12 @@ static cl_program program;
 static cl_kernel kernel_q4_0, kernel_q4_1, kernel_q5_0, kernel_q5_1, kernel_q8_0;
 static cl_mem cl_buffer_a, cl_buffer_qb, cl_buffer_b, cl_buffer_c;
 static size_t cl_size_a = 0, cl_size_qb = 0, cl_size_b = 0, cl_size_c = 0;
+
+static size_t device_global_mem_size = 0;
+static size_t device_max_mem_alloc_size = 0;
+
+static bool is_blocking_queue = false;
+static bool ggml_cl_inited = false;
 
 static cl_program build_program_from_source(cl_context ctx, cl_device_id dev, const char* program_buffer) {
     cl_program p;
@@ -185,6 +202,11 @@ static cl_program build_program_from_source(cl_context ctx, cl_device_id dev, co
 }
 
 void ggml_cl_init(void) {
+    if (ggml_cl_inited) {
+        return;
+    }
+    ggml_cl_inited = true;
+
     cl_int err = 0;
 
     struct cl_device;
@@ -256,7 +278,7 @@ void ggml_cl_init(void) {
     }
 
     if (n_devices == 0) {
-        fprintf(stderr, "ggml_opencl: could find any OpenCL devices.\n");
+        fprintf(stderr, "ggml_opencl: could not find any OpenCL devices.\n");
         exit(1);
     }
 
@@ -326,6 +348,22 @@ void ggml_cl_init(void) {
         default_device = &selected_devices[0];
     }
 
+    char *GGML_OPENCL_DEVICE_GLOBAL_MEM_SIZE =
+        getenv("GGML_OPENCL_DEVICE_GLOBAL_MEM_SIZE_MB");
+    if (GGML_OPENCL_DEVICE_GLOBAL_MEM_SIZE != NULL) {
+        device_global_mem_size =
+            (size_t)atoi(GGML_OPENCL_DEVICE_GLOBAL_MEM_SIZE);
+        device_global_mem_size *= 1024 * 1024;
+    }
+
+    char *GGML_OPENCL_DEVICE_MAX_MEM_ALLOC_SIZE =
+        getenv("GGML_OPENCL_DEVICE_MAX_MEM_ALLOC_SIZE_MB");
+    if (GGML_OPENCL_DEVICE_MAX_MEM_ALLOC_SIZE != NULL) {
+        device_max_mem_alloc_size =
+            (size_t)atoi(GGML_OPENCL_DEVICE_MAX_MEM_ALLOC_SIZE);
+        device_max_mem_alloc_size *= 1024 * 1024;
+    }
+
     fprintf(stderr, "ggml_opencl: selecting platform: '%s'\n", default_device->platform->name);
     fprintf(stderr, "ggml_opencl: selecting device: '%s'\n", default_device->name);
     if (default_device->type != CL_DEVICE_TYPE_GPU) {
@@ -343,7 +381,7 @@ void ggml_cl_init(void) {
 
     CL_CHECK((queue = clCreateCommandQueue(context, device, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err),
         (err != CL_INVALID_PROPERTY && err != CL_INVALID_VALUE ? err :
-        (queue = clCreateCommandQueue(context, device, 0, &err), err)
+        (queue = clCreateCommandQueue(context, device, 0, &err), is_blocking_queue = true, err)
     )));
 
     program = build_program_from_source(context, device, program_source);
@@ -354,6 +392,65 @@ void ggml_cl_init(void) {
     CL_CHECK((kernel_q5_0 = clCreateKernel(program, "dequantize_row_q5_0", &err), err));
     CL_CHECK((kernel_q5_1 = clCreateKernel(program, "dequantize_row_q5_1", &err), err));
     CL_CHECK((kernel_q8_0 = clCreateKernel(program, "dequantize_row_q8_0", &err), err));
+}
+
+static int ggml_cl_calculate_n_pass(size_t size_a, size_t size_b, size_t size_c,
+                            size_t size_qb) {
+    // https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetDeviceInfo.html
+    // CL_DEVICE_MAX_MEM_ALLOC_SIZE:
+    // Max size of memory object allocation in bytes. The minimum value is
+    // max(min(1024 × 1024 × 1024, 1/4th of CL_DEVICE_GLOBAL_MEM_SIZE), 32 ×
+    // 1024 × 1024) for devices that are not of type CL_DEVICE_TYPE_CUSTOM.
+
+    int n_pass_0 = 0;
+    if (device_global_mem_size > 0) {
+        for (int i = 1;;i *= 2) {
+            if ((size_a + (size_b + size_c + size_qb) / i) <= device_global_mem_size) {
+                n_pass_0 = i;
+                break;
+            }
+        }
+    }
+
+    size_t alloc_limit = device_max_mem_alloc_size;
+    if (alloc_limit == 0 && device_global_mem_size > 0) {
+        alloc_limit = MAX(MIN(1024 * 1024 * 1024, device_global_mem_size / 4),
+                          32 * 1024 * 1024);
+    }
+
+    int n_pass_1 = -1;
+    if (alloc_limit > 0) {
+        if (size_a <= alloc_limit) {
+            for (int i = 1;;i *= 2) {
+                if (size_b / i <= alloc_limit &&
+                    size_c / i <= alloc_limit &&
+                    size_qb / i <= alloc_limit) {
+                    n_pass_1 = i;
+                    break;
+                }
+            }
+        }
+    }
+
+    int n_pass = MAX(n_pass_0, n_pass_1);
+    if (n_pass < 1) {
+        n_pass = 1;
+    }
+
+    // printf("size_a: %.3f MB, size_b: %.3f MiB, size_c: %.3f MiB, size_qb: %.3f MiB\n",
+    //     1.0 * size_a / 1024 / 1024,
+    //     1.0 * size_b / 1024 / 1024,
+    //     1.0 * size_c / 1024 / 1024,
+    //     1.0 * size_qb / 1024 / 1024);
+
+    // printf("device_global_mem_size: %.3f MiB, device_max_mem_alloc_size: %.3f MiB, "
+    //     "alloc_limit: %.3f MiB, n_pass: %d\n",
+    //     1.0 * device_global_mem_size / 1024 / 1024,
+    //     1.0 * device_max_mem_alloc_size / 1024 / 1024,
+    //     1.0 * alloc_limit / 1024 / 1024,
+    //     n_pass);
+
+    return n_pass;
 }
 
 static void ggml_cl_malloc(size_t req_size, size_t* cur_size, cl_mem_flags flags, cl_mem* buf) {
@@ -378,7 +475,7 @@ void ggml_cl_sgemm_wrapper(
         float *host_c, const int ldc, const int btype) {
 
     cl_kernel kernel;
-    size_t global = n * k, local, size_qb;
+    size_t global = n * k, local, size_qb = 0;
     bool dequant;
 
     switch (btype) {
@@ -420,9 +517,57 @@ void ggml_cl_sgemm_wrapper(
         abort();
     }
 
-    const size_t size_a =  m * k * sizeof(float);
-    const size_t size_b =  n * k * sizeof(float);
-    const size_t size_c =  m * n * sizeof(float);
+    const size_t size_a = m * k * sizeof(float);
+    size_t size_b = n * k * sizeof(float);
+    size_t size_c = m * n * sizeof(float);
+
+    // Old devices tend unable to run out-of-order queue, and suffer from low
+    // memory. So let's try n pass.
+
+    int n_pass = 1;
+    if (device_global_mem_size > 0 || device_max_mem_alloc_size > 0) {
+        int rc = ggml_cl_calculate_n_pass(size_a, size_b, size_c, size_qb);
+        if (rc > 1) {
+            n_pass = rc;
+        }
+    }
+
+    int N = n;
+    int LDC = ldc;
+
+    if (n_pass > 1) {
+        ASSERT(size_b % n_pass == 0);
+        ASSERT(size_c % n_pass == 0);
+        ASSERT(size_qb % n_pass == 0);
+        ASSERT(n % n_pass == 0);
+        ASSERT(ldc % n_pass == 0);
+
+        size_b /= n_pass;
+        size_c /= n_pass;
+        size_qb /= n_pass;
+        N = n / n_pass;
+        LDC = ldc / n_pass;
+
+        // To avoid OOM, release buffers when we are not going to use that many.
+
+        if (size_a < cl_size_a) {
+            clReleaseMemObject(cl_buffer_a);
+            cl_size_a = 0;
+        }
+
+        if (size_b < cl_size_b) {
+            clReleaseMemObject(cl_buffer_b);
+            cl_size_b = 0;
+        }
+        if (size_c < cl_size_c) {
+            clReleaseMemObject(cl_buffer_c);
+            cl_size_c = 0;
+        }
+        if (size_qb < cl_size_qb) {
+            clReleaseMemObject(cl_buffer_qb);
+            cl_size_qb = 0;
+        }
+    }
 
     // Prepare buffers
     ggml_cl_malloc(size_a, &cl_size_a, CL_MEM_READ_ONLY, &cl_buffer_a);
@@ -432,43 +577,65 @@ void ggml_cl_sgemm_wrapper(
     ggml_cl_malloc(size_b, &cl_size_b, CL_MEM_READ_WRITE, &cl_buffer_b);
     ggml_cl_malloc(size_c, &cl_size_c, CL_MEM_WRITE_ONLY, &cl_buffer_c);
 
+    float *temp_host_c = host_c;
+    if (n_pass > 1) {
+        temp_host_c = malloc(sizeof(float) * size_c / n_pass);
+    }
+
     cl_event ev_a, ev_qb, ev_b;
 
-    if (dequant) {
-        CL_CHECK(clSetKernelArg(kernel, 0, sizeof(cl_mem), &cl_buffer_qb));
-        CL_CHECK(clSetKernelArg(kernel, 1, sizeof(cl_mem), &cl_buffer_b));
-        CL_CHECK(clEnqueueWriteBuffer(queue, cl_buffer_qb, CL_FALSE, 0, size_qb, host_b, 0, NULL, &ev_qb));
-    } else {
-        CL_CHECK(clEnqueueWriteBuffer(queue, cl_buffer_b, CL_FALSE, 0, size_b, host_b, 0, NULL, &ev_b));
+    cl_bool blocking_write = is_blocking_queue? CL_TRUE : CL_FALSE;
+
+    for (int pass = 0; pass < n_pass; pass++) {
+        if (dequant) {
+            CL_CHECK(clSetKernelArg(kernel, 0, sizeof(cl_mem), &cl_buffer_qb));
+            CL_CHECK(clSetKernelArg(kernel, 1, sizeof(cl_mem), &cl_buffer_b));
+            CL_CHECK(clEnqueueWriteBuffer(queue, cl_buffer_qb, blocking_write, 0, size_qb, host_b + (pass * size_b/sizeof(float)), 0, NULL, &ev_qb));
+        } else {
+            CL_CHECK(clEnqueueWriteBuffer(queue, cl_buffer_b, blocking_write, 0, size_b, host_b + (pass * size_b/sizeof(float)), 0, NULL, &ev_b));
+        }
+
+        CL_CHECK(clEnqueueWriteBuffer(queue, cl_buffer_a, blocking_write, 0, size_a, host_a, 0, NULL, &ev_a));
+        if (dequant) {
+            CL_CHECK(clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global, &local, 1, &ev_qb, &ev_b));
+            clReleaseEvent(ev_qb);
+        }
+        clWaitForEvents(1, &ev_a);
+        clWaitForEvents(1, &ev_b);
+        clReleaseEvent(ev_a);
+        clReleaseEvent(ev_b);
+
+        cl_event ev_sgemm;
+        CLBLAST_CHECK(CLBlastSgemm((CLBlastLayout)order,
+            (CLBlastTranspose)trans_a, (CLBlastTranspose)trans_b,
+            m, N, k,
+            alpha,
+            cl_buffer_a, 0, lda,
+            cl_buffer_b, 0, ldb,
+            beta,
+            cl_buffer_c, 0, LDC,
+            &queue, &ev_sgemm));
+
+        cl_event ev_c;
+        clEnqueueReadBuffer(queue, cl_buffer_c, CL_TRUE, 0, size_c, temp_host_c, 1, &ev_sgemm, &ev_c);
+
+        // Wait for completion
+        clWaitForEvents(1, &ev_c);
+        clReleaseEvent(ev_sgemm);
+        clReleaseEvent(ev_c);
+
+        if (n_pass > 1) {
+            // copy c to host_c row by row.
+            // TODO: optimize performance.
+            size_t block_offset = pass * N;
+            for (int im = 0; im < m; im++) {
+                memcpy((void *)(host_c + im * n + block_offset),
+                        (const void *)(temp_host_c + im * N), N * sizeof(float));
+            }
+        }
     }
 
-    CL_CHECK(clEnqueueWriteBuffer(queue, cl_buffer_a, CL_FALSE, 0, size_a, host_a, 0, NULL, &ev_a));
-    if (dequant) {
-        CL_CHECK(clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global, &local, 1, &ev_qb, &ev_b));
-        CL_CHECK(clReleaseEvent(ev_qb));
+    if (n_pass > 1) {
+        free(temp_host_c);
     }
-    CL_CHECK(clWaitForEvents(1, &ev_a));
-    CL_CHECK(clWaitForEvents(1, &ev_b));
-    CL_CHECK(clReleaseEvent(ev_a));
-    CL_CHECK(clReleaseEvent(ev_b));
-
-    cl_event ev_sgemm;
-    CLBLAST_CHECK(CLBlastSgemm(
-        (CLBlastLayout)order,
-        (CLBlastTranspose)trans_a, (CLBlastTranspose)trans_b,
-        m, n, k,
-        alpha,
-        cl_buffer_a, 0, lda,
-        cl_buffer_b, 0, ldb,
-        beta,
-        cl_buffer_c, 0, ldc,
-        &queue, &ev_sgemm));
-
-    cl_event ev_c;
-    CL_CHECK(clEnqueueReadBuffer(queue, cl_buffer_c, CL_TRUE, 0, size_c, host_c, 1, &ev_sgemm, &ev_c));
-
-    // Wait for completion
-    CL_CHECK(clWaitForEvents(1, &ev_c));
-    CL_CHECK(clReleaseEvent(ev_sgemm));
-    CL_CHECK(clReleaseEvent(ev_c));
 }
