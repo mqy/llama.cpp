@@ -251,8 +251,12 @@ extern "C" {
     };
 
     enum ggml_backend {
-        GGML_BACKEND_CPU = 0,
-        GGML_BACKEND_CUDA = 1,
+        GGML_BACKEND_UNKNOWN = 0,
+        GGML_BACKEND_CPU = 1,
+        GGML_BACKEND_CUDA = 2,
+        GGML_BACKEND_ACCELERATE = 3,
+        GGML_BACKEND_OPENBLAS = 4,
+        GGML_BACKEND_CLBLAST = 5,
     };
 
     // model file types
@@ -366,7 +370,7 @@ extern "C" {
 
         // thread scheduling
 
-        int32_t task_flag;
+        struct ggml_task_conf task_conf[3];
 
         // performance
         int     perf_runs;
@@ -377,7 +381,7 @@ extern "C" {
 
         char name[32];
 
-        char padding[16];
+        char padding[20];
     };
 
     // computation graph
@@ -386,7 +390,6 @@ extern "C" {
         int n_leafs;
         int n_threads;
 
-        bool                      no_blas;
         struct ggml_mulmat_tune * mm_tune;
 
         size_t work_size;
@@ -1132,8 +1135,9 @@ extern "C" {
     quantize_fns_t ggml_internal_get_quantize_fn(size_t i);
 
     // Experimental for mul_mat tune, do not use!
-    void ggml_internal_compute_forward_mul_mat_q_f32_for_fine_tune(
-        int task_type, size_t wsize, void * wdata,
+    void ggml_internal_compute_forward_mul_mat(
+        struct ggml_task_conf conf[3], int stage,
+        size_t wsize, void * wdata,
         const struct ggml_tensor * src0,
         const struct ggml_tensor * src1,
               struct ggml_tensor * dst);

@@ -10,88 +10,86 @@ extern "C" {
 
 #define NUM_BENCH 3
 
-// task flag: byte 0..2 for task stages; byte 3 for extensions (use blas, etc.)
+#define GGML_MULMAT_TUNE_MAX_PROFILES 8
+#define GGML_MULMAT_TUNE_MAX_SHAPES 4
 
-// GGML_TASK_FLAG_T1: total 1 task, workers keep spinning.
-// GGML_TASK_FLAG_TN: total N tasks, all workers involve in computing.
-// GGML_TASK_FLAG_T1_WAIT: total 1 task, workers go waiting.
-#define GGML_TASK_FLAG_T1 0x1
-#define GGML_TASK_FLAG_T1_WAIT 0x2
-#define GGML_TASK_FLAG_TN 0x3
-
-void ggml_task_flag_set_blas(int32_t *flag, int8_t value);
-
-int8_t ggml_task_flag_get_blas(int32_t flag);
-
-void ggml_task_flag_set(int32_t *flag, int stage, int8_t value);
-
-int8_t ggml_task_flag_get(int32_t v, int stage);
-
-enum ggml_blas_type {
-    GGML_BLAS_TYPE_ACCELERATE = 0, // https://developer.apple.com/accelerate
-    GGML_BLAS_TYPE_OPENBLAS,       // https://www.openblas.net/
-    GGML_BLAS_TYPE_CLBLAST, // https://cnugteren.github.io/clblast/clblast.html
-    GGML_BLAS_TYPE_CUBLAS,  // https://developer.nvidia.com/cublas
-
-    GGML_BLAS_TYPE_COUNT
+struct ggml_task_conf {
+    int backend; // enum ggml_backend
+    bool parallel;
+    bool wait;
 };
 
 struct ggml_mulmat_tune_m {
     int M;
 
-    int cpu_only_time[3];
-    int use_blas_time[3];
-
-    // These are not save to data file.
-    int cpu_only_records[3][NUM_BENCH];
-    int use_blas_records[3][NUM_BENCH];
+    int stages_time[3];
 };
 
-struct ggml_mulmat_tune_nk {
+struct ggml_mulmat_tune_shape {
     int N;
     int K;
-
-    struct ggml_mulmat_tune_m *items;
 };
 
 struct ggml_mulmat_tune {
     int version;
 
-    char model[4];      // 7B | 13B
-    char blas_name[16]; // see `ggml_blas_names`
-    char q_type_name[8];
-    int q_type;
-    int n_groups;
-    int step_m;
-    int num_m;
+    char model[4];
 
-    uint32_t cpu_only_stages[3];
-    uint32_t use_blas_stages[3];
+    int gpu_backend; // enum ggml_backend
+    char gpu_backend_name[16];
 
-    struct ggml_mulmat_tune_nk *groups;
+    int type; // enum ggml_type
+    char type_name[8];
+
+    int m_step;
+    int m_num;
+
+    int n_shapes;
+    struct ggml_mulmat_tune_shape shapes[GGML_MULMAT_TUNE_MAX_SHAPES];
+
+    int n_profiles;
+    struct ggml_task_conf conf[GGML_MULMAT_TUNE_MAX_PROFILES][3];
+
+    // n_shapes * m_num * n_profiles
+    struct ggml_mulmat_tune_m *items;
+};
+
+struct ggml_mulmat_tune_profile_time {
+    struct ggml_task_conf *task_conf;
+    int stage_time[3];
+    int total_time;
 };
 
 struct ggml_mulmat_tune_time_stats {
-    int cpu_only_stages[3];
-    int cpu_only_total;
-
-    int use_blas_stages[3];
-    int use_blas_total;
+    int n_profiles;
+    struct ggml_mulmat_tune_profile_time
+        profile_time[GGML_MULMAT_TUNE_MAX_PROFILES];
 };
 
-void ggml_mulmat_write_tune_data(const struct ggml_mulmat_tune *tune, FILE *fp);
+void ggml_task_conf_format_name(struct ggml_task_conf *conf, char *buf,
+                                int buf_len);
 
-int ggml_mulmat_read_tune_data(struct ggml_mulmat_tune *tune, FILE *file);
+int ggml_mulmat_tune_validate(struct ggml_mulmat_tune *tune,
+                              const char *model_name, int type);
 
-int ggml_mulmat_estimate_time(const struct ggml_mulmat_tune *tune, int M, int N,
-                              int K, int nth, bool cpu_only);
+int ggml_mulmat_tune_setup_model(struct ggml_mulmat_tune *tune,
+                                 const char *model);
+
+void ggml_mulmat_tune_setup_task_conf(struct ggml_mulmat_tune *tune);
+
+int ggml_mulmat_tune_write_data(const struct ggml_mulmat_tune *tune, FILE *fp);
+
+int ggml_mulmat_tune_read_data(struct ggml_mulmat_tune *tune, FILE *file);
 
 // return 0: ok, -1: M out of range or no data.
 int ggml_mulmat_tune_time_stats(const struct ggml_mulmat_tune *b, int M, int N,
                                 int K, int nth,
                                 struct ggml_mulmat_tune_time_stats *time_stats);
 
-const char *ggml_get_blas_name(void);
+// returns enum ggml_backend
+int ggml_get_backend(void);
+
+const char *ggml_get_backend_name(void);
 
 #ifdef __cplusplus
 }

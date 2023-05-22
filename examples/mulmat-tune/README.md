@@ -5,82 +5,126 @@
 When either Accelerate or OpenBLAS was enabled, for long prompt tokens (M >=32),
 graph compute is run with 1 thread.
 
-Things to improve:
+**Things to Improve**
 
-1. Run graph compute for Accelerate or OpenBLAS with N threads.
-2. Parallel task initialization stage for Accelerate/OpenBLAS.
+- Run graph compute for Accelerate or OpenBLAS with N threads.
+- Parallel task initialization stage for Accelerate/OpenBLAS.
 
-Observations on my device.
+**Observations (Given N, K)**
 
-1. De-quantization in CPU takes fixed time for given N x K combination.
-2. GPU out-performs CPU for big workload (for example M = 32).
-   When workload doubles, the GPU time almost no change or steadily grows.
-   With given N/K and 1-thread, the line curves of GPU time may go down at some
-   place. In additional, the use-blas time may out-performs cpu-only at M-16.
-3. De-quantization time takes significant time: >= 1/2 for M <= 128, about 1/10
-   for M == 512.
-4. Accelerate performs good than OpenBLAS (about -10%).
-   To test ClBLAST, I fixed ggml-opencl.c.
+- CPU init time: very small (less than 1 ms), grows with M.
+- CPU de-quantization time: determined only by N x K combination, about 50% of
+  total time for M <= 128, about 10% for M == 512.
+- GPU mulmat time: large, almost no change or steadily grows when workload doubles.
 
-Solutions:
+**Solutions**
 
-1. Improve threading infrastructure: combine `spin` + `pthread cond-wait/broadcast`.
-2. Extend task stage config: allow parallel any stage, and allow configure wait.
-3. A tool for collecting execution times: model, Qxx, M/N/K, cpu-only/use-blas.
-4. The bench result can be loaded into llama for comparing run time of `cpu-only`
-   and `use-blas` with given M/N/K/n_threads, then choose the best execution plan.
+- Improve task config:
+  * define conf profiles (for example, init in CPU, compute in GPU);
+  * define for any stage: compute in parallel or not, idle wait or not.
+  Therefor the task stages with GPU backend are not limited to 1 thread.
+- Update mul_mat BLAS codes: allow dequantize in CPU or GPU (if possible).
+- Improve threading infra: combine `spin` + `pthread cond-wait/broadcast`.
+- A tune tool for benching. With bench data, given N/K and n_threads, we could
+  estimate time for any M (if within range), thus could select the fastest profile.
+
+We do bench and save bench results. Every llama model defines limited (N, K) pairs. 
+Given M/N/K, we can run every compute stage (if exists) for some times, choose
+the minimal overall time as reference value.
+
+On llama start, load bench data. Before compute node, we select the fastest profile.
+When compute, the `dst->task_conf` along with `params` controls which part of the
+codes to run.
+
+See section "**How To Estimate Execution Time**" for the reference algorithm.
+
+**Important data structures**
+
+```c
+// update
+enum ggml_backend {
+    GGML_BACKEND_UNKNOWN = 0, // new
+    GGML_BACKEND_CPU = 1, // original value 0
+    GGML_BACKEND_CUDA = 2, // new
+    GGML_BACKEND_ACCELERATE = 3, // new
+    GGML_BACKEND_OPENBLAS = 4, // new
+    GGML_BACKEND_CLBLAST = 5, // new
+};
+
+// new
+struct ggml_task_conf {
+    int backend; // enum ggml_backend
+    bool parallel;
+    bool wait;
+};
+
+struct ggml_tensor {
+    //...
+    struct ggml_task_conf task_conf[3]; // new
+    //...
+}
+```
+
+**Explicitly define task conf profiles**
+
+```c
+void ggml_mulmat_tune_setup_task_conf(struct ggml_mulmat_tune *tune) {
+    tune->n_profiles = 1;
+    // cpu init + cpu compute
+    tune->conf[0][0] = (struct ggml_task_conf){
+        .backend = GGML_BACKEND_CPU,
+    };
+    tune->conf[0][1] = (struct ggml_task_conf){
+        .backend = GGML_BACKEND_CPU,
+        .parallel = true,
+    };
+#if defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS)
+    tune->n_profiles++;
+    // cpu init + gpu compute
+    tune->conf[1][0] = (struct ggml_task_conf){
+        .backend = GGML_BACKEND_CPU,
+        .parallel = true,
+    };
+    tune->conf[1][1] = (struct ggml_task_conf){
+        .backend = tune->gpu_backend,
+        .wait = true,
+    };
+#elif defined(GGML_USE_CUBLAS) || defined(GGML_USE_CLBLAST)
+    tune->n_profiles++;
+    // gpu only: compute
+    tune->conf[1][1] = (struct ggml_task_conf){
+        .backend = tune->gpu_backend,
+        .wait = true,
+    };
+#else
+    abort();
+#endif
+}
+```
 
 ## Benefits
 
-1. A experimental show case of fine tune.
-2. Prompt eval time may decrease up to -40%.
-3. Try balance between best performance and energy at given number of thread.
-4. Complicated but may be better threading infrastructure for flexibility, COULD
-   be extended to run de-quantization in CPU for cuBLAS or CLBlast.
+- A experimental show case fine tunning based on bench.
+- Try balance between best performance and energy at given number of thread.
+- Better infra: task stage config, config profiles, threading (spin + wait).
+- Run de-quantization in CPU for Accelerate/OpenBLAS.
+  The eval time of long prompt decreases a lot. For example, `examples/chat.sh`
+  with 4 threads, the prompt eval time of 99 tokens MAY decrease up to **-40%**.
 
-## Limitations
+Just like Accelerate/OpenBLAS, the de-quantization time in CUDA/ClBlast MAY NOT
+compete multiple CPU threads on some devices. In case of this, we can add a profile
+for them to run de-quantization in CPU and run mul_mat in GPU.
 
-- Only tested 7B and 13B.
-- Only tested Q4_0.
-- OS can not use cuBLAS.
-- The codes are in draft state, with many TODOs.
+## Limitations and TODOs
+
+- Only tested models 7B and 13B with type Q4_0.
+- TODO: support Q5_0, Q5_1, Q8_0, Q8_1, ...
+- My OS/device can not use cuBLAS, so can not generate example bench result.
+  TODO: evaluate performance and energy for cuBlas and ClBlast.
+- Anti-inconsistency is not implemented.
+  TODO: validate model, type, stage settings.
+- The codes are in draft state, with many shortcomings and TODOs.
 - Big change, hard to review, evaluate and merge.
-
-## Examples
-
-The token eval time almost same. But prompt eval time may decrease pretty much.
-
-**chat-with-bob 7B Q4_0**
-
-```
-./main -m ./models/7B/ggml-model-q4_0.bin -c 512 -b 1024 -n 256 --keep 48 -t 4 --repeat_penalty 1.0 --color -i -r "User:" -f prompts/chat-with-bob.txt
-```
-
-Prompt eval time:
-
-* -20% (2 threads)
-* -40% (4 threads) 
-
-**7B wiki.valid.raw**
-
-```
-./perplexity -m models/7B/ggml-model-q4_0.bin -f ./models/wikitext-2-raw/wiki.valid.raw --mlock
-```
-
-Prompt eval time:
-
-* -9% (2 threads)
-* -13% (4 threads)
-
-**prompt.sh**
-
-```
-./examples/mulmat-tune/prompt.sh -b -f
-```
-
-10% ~ 18% decrease with 2 or 4 threads. 
-
-Run ```./examples/mulmat-tune/prompt.sh -h``` for help.
 
 ## How to Evaluate
 
@@ -102,21 +146,21 @@ Run ```./examples/mulmat-tune/prompt.sh -h``` for help.
 usage: ./mulmat-tune [bench ...] | [analyze FILE] | test | help
 
 bench [-m MODEL] [-t TYPE] [-f FILE] [-y]
--model  MODEL   7B | 13B | 30B | 64B
-                default 7B
--q_type TYPE    Q4_0 | Q4_1 | Q5_0 | Q5_1 | Q8_0 | Q8_1
-                default Q4_0
--step_m STEP_M  the step of M, also as start value
-                suggest STEP_M %% 8 == 0
-                default 8
--num_m  NUM_M   number of M, total M = STEP_M * NUM_M
-                default 16
--file   FILE    data file to write
-                default stdout
--y              always answer "yes" to all prompts
+-model  MODEL  7B | 13B | 30B | 64B
+               default 7B
+-type   TYPE   Q4_0 |  Q4_1 | Q5_0 | Q5_1 | Q8_0 | Q8_1 | F16_F32 | F32
+               default Q4_0
+-m_step M_STEP the step of M, also as start value
+               suggest M_STEP %% 8 == 0
+               default 8
+-m_num  M_NUM  number of M, total M = M_STEP * M_NUM
+               default 16
+-file   FILE   data file to write
+               default stdout
+-y             always answer "yes" to all prompts
 ```
 
-NOTE: at present, only supports model 7B/13B, q_type Q4_0/Q4_1.
+NOTE: at present, only supports model 7B/13B, type Q4_0/Q4_1.
 
 Examples:
 
@@ -125,48 +169,51 @@ Examples:
 ./mulmat-tune
 
 # to run 13B and Q4_1 with alway-yes
-./mulmat-tune bench -model 13B -q_type Q4_1 -y
+./mulmat-tune bench -model 13B -type Q4_1 -y
 
-# customized step_m (16 * 8)
-./mulmat-tune bench -model 13B -step_m 16 -num_m 8
+# customized m_step (16 * 8)
+./mulmat-tune bench -model 13B -m_step 16 -num_m 8
 
 # save to file
-./mulmat-tune bench -model 13B -file mulmat-tune.13b.txt
+./mulmat-tune bench -model 13B -file mulmat-tune.txt
 ```
 
-Apart from the default "bench" sub-command, you MAY want to run "analyze" to see
-the estimated `cpu-only` and `use-blas` time per M/N/K/n_threads. It's good to draw
-them, interesting!
+Apart from the default `bench` sub-command, you MAY want to run `analyze` to see
+the comprehensive analysis, such as affect of `n_threads`.
 
 ## How to Evaluate
 
-1. Prepare the bench file for your model. SHOULD run in idle and cool status.
-2. Put the file into the llama.cpp dir.
-   File name pattern: ```mulmat-tune.<MODEL>.txt```, where ```<MODEL>``` is "7b"
-   or "13b" -- NOTE: lower case.
-3. Run your favorite program: main, perplexity, etc. The program will print debug
-   log when or when not found the file.
-   I suggest do not use too many threads, 4 threads almost works best on my
-   5-year old device with total 12 cores (6 physical cores).
+- Prepare the bench file for your model. SHOULD run in idle and cool status.
+- Place `mulmat-tune.txt` into the llama.cpp dir.
+- Run your favorite program: main, perplexity, etc. The program will print debug
+  log when or when not found the file.
+  I suggest do not use too many threads, 4 threads almost works best on my 5-year
+  old device with total 12 cores (6 physical cores).
 
 ## Bench Data Format
 
 **Example**
 
 ```
-1 7B Q4_0 Accelerate 4 8 2 1 3 0 3 2 0
+1 7B Q4_0 3 ACCELERATE 4 8 3 2
+1 0 0 1 1 0 0 0 0
+1 1 0 3 0 1 0 0 0
 4096 4096
-  8      46    9329 0   6401   6284 0
- 16      93   19410 0   6056   6433 0
-4096 11008
-  8     111   20209 0  14990   9901 0
- 16     265   39140 0  15022  10543 0
+  8        8     7477 0    12438     6448 0
+ 16       22    14387 0    12468     7173 0
+ 24       31    18584 0    10948     6641 0
+4094 11008
+  8       24    16279 0    29243     8578 0
+ 16       48    32857 0    29370     9313 0
+ 24       73    51046 0    29593     9684 0
 11008 4096
-  8      44   22161 0  15264  22031 0
- 16      90   38207 0  15059  22912 0
+  8        9    16783 0    28571    20398 0
+ 16       17    32989 0    28463    21112 0
+ 24       25    48836 0    28881    21928 0
 32000 4096
-  8        8  48768 0  83870  60724 0
- 16       16  97744 0  83893  63991 0
+  8        8    49100 0    83752    63537 0
+ 16       18    97093 0    83577    66874 0
+ 24       24   141918 0    83565    71988 0
  ```
 
 See files in dir [bench-out](bench-out) for details.
@@ -183,30 +230,33 @@ These files are generated on Macbook Pro 2018:
 head
 groups+
 
-head := version model q_type blas_name num_groups m_step num_m stage_flags(first 3 for cpu-only, rest 3 for use-blas)
+head := version model type gpu_backend gpu_backend_name n_shapes m_step num_m n_profiles
+task_conf_profile+
+shape
+bench_item+
 
+# head
+version: 1
 model: "7B" | "13B" | "30B" | "65B"
+type: "Q4_0" | "Q4_1" | "Q5_0" | "Q5_1" | "Q8_0" | "Q8_1" | ...
+gpu_backend: 1 | 2 | 3 | 4
+gpu_backend_name: "CUDA" | "ACCELERATE" | "OPENBLAS" | "CLBLAST"
+n_shapes: 4
+m_step: 8
+m_num: 16
 
-q_type: "Q4_0" | "Q4_1" | "Q5_0" | "Q5_1" | "Q8_0" | "Q8_1"
+task_conf_profile: stage_conf(init) stage_conf(compute) stage_conf(finalize)
+stage_conf: backend parallel wait
+backend: 0 | 1 | 2 | 3 | 4
+parallel: 0 | 1
+wait: 0 | 1
 
-blas_name: "Accelerate" | "OpenBLAS" | "cuBLAS" | "clBlast"
+shape := N K
 
-stage_flags := init_flag compute_flag finalize_flag
-
-groups := group+
-
-group := N K M_record+
-
-M_record := M stage_times(first 3 for cpu-only, rest 3 for use-blas)
-
-stage_times := init_time compute_time finalize_time
+bench_item: M profile_time+
+profile_time := stage_time[3]
+stage_time[3]: init_time, compute_time, finalize_time
 ```
-
-Enum of stage flag value:
-- 0: stage not exists
-- 1: single thread
-- 2: single thread + worker idle wait
-- 3: multi threads
 
 Time unit is `us`. A column is all zeros when that stage does not exist.
 
@@ -214,7 +264,7 @@ Time unit is `us`. A column is all zeros when that stage does not exist.
 
 For Accelerate/OpenBLAS, mul_mat_q_f32, the init stage is run on CPU, and is
 paralleled in this CL. The `cpu-only` approach runs init stage with 1 threads and
-compute stage in N threads. The `use-blas` approach runs init stage in CPU with
+compute stage in N threads. The `with_gpu` approach runs init stage in CPU with
 N threads, and run compute stage in GPU with 1 thread.
 
 For any given M/N/K/n_threads, we interpolate time for M between two `M`s.
@@ -232,34 +282,52 @@ For any thread number `nth`:
 
 ```
 cpu_only_time = cpu_init_time + cpu_compute_time / nth
-use_blas_time = cpu_init_time / nth + blas_compute_time
+with_gpu_time = cpu_init_time / nth + gpu_compute_time
 ```
 
-Plan blas is executed at the very beginning of ```ggml_compute_graph```.
+Backend-planning is executed at the very beginning of `ggml_graph_compute()`.
 Generally speaking, at most 16 data records is enough with max M = 8 * 16 = 128.
 So the total plan time is very small: tens of us. When use a simple cache, the
 time goes down to about 10 us.
 
+Open question: why not try calculate `t = aM + b`?
+
 ## Wait-Notify Overhead
 
-Each call is about 10 us, may vary 5x. Since every mul_mat that run with blas
+Each call is about 10 us, may vary 5x. Since every mul_mat that run with-gpu
 takes several ms to hundreds of ms, and the average boost is large, so the
 wait-notify overhead is acceptable. 
 
 ## High Level Guide to Code Review
 
-Major changes:
+**Major changes**
 
-1. examples/mulmat-tune provides the tool, data file format and data
-   structure/APIs for graph compute. Some of them are expected be integrated
-   into ggml.c/ggml.h.
-2. ggml.h: exposes a test function for mulmat-tune-bench.c; new fields and structs.
-3. ggml.c: threading, update to ggml_compute_forward_q_xxx.
-4. Makefile: minor changes.
-5. ggml-opencl.c for tests only, performs bad on my device. Changes are not quite
-   relevant to this pull request.
+- examples/mulmat-tune provides the tool, data file format and data
+  structure/APIs for graph compute. Some of them are expected be integrated
+  into ggml.c/ggml.h.
+- ggml.h: exposes a test function for mulmat-tune-bench.c; new fields and structs.
+- ggml.c: threading, update to `ggml_compute_forward_mul_mat_q_f32()`.
+  Defined several macros for debugging.
+- llama.cpp: temp work-round to load mulmat tune file (mulmat-tune.txt).
+- ggml-opencl.c fixed OOM error -- for local testing only. Changes are not quite
+  relevant to this pull request. The OpenCL + ClBlast (from macOS and Homebew)
+  performs 5-10x slower than Accelerate on my device. Not familiar with how to
+  fine tune ClBlast.
 
-Also defined several macros for debugging.
+**Assumed Merge RoadMap**
+
+- Task flag: rename `ggml_tensor`.`n_task` as `task_flag`, apply related changes.
+- Adjust `ggml_compute_forward_mul_mat_q_f32()` for Accelerate/OpenBLAS: add new
+  init stage that can parallel. Make existing compute functions compatible to
+  incoming `ggml_graph_compute v2`.
+- Add experimental mulmat tune tool.
+- Keep current implementation of `ggml_graph_compute`, add the experimental `v2`.
+  The v2 relies on mulmat tune. The v1 and v2 can be differentiated with compile
+  flag or env value.
+- Add command line args for v2: --tune. The result is used directly, and/or save
+  to data file for later reuse.
+
+===
 
 I'm new to machine learning this year and have almost no knowledge of AI models
 and algorithms. There must be a lot of problems with this CL, please do not

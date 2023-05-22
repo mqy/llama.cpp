@@ -2188,31 +2188,29 @@ struct llama_context * llama_init_from_file(
     }
 
     {
-        // TODO: sorry can we load the data file before the slow model loading?
-        // TODO: data file many not be consistant with program, how to solve this problem?
+        // TODO: data file may be outdated, support online bench on start?
         // TODO: add command line arg (e.g --mulmat-tune) ?
-        if (ctx->model.type == MODEL_7B || ctx->model.type == MODEL_13B) {
-            const char * model_name = NULL;
-            if (ctx->model.type == MODEL_7B) {
-                model_name = "7b";
-            } else if (ctx->model.type == MODEL_13B) {
-                model_name = "13b";
-            }
-
-            char buf[200];
-            memset(buf, 0, sizeof(buf));
-            snprintf(buf, sizeof(buf), "mulmat-tune.%s.txt", model_name);
-            FILE *fp = fopen(buf, "r");
+        {
+            const char *file = "mulmat-tune.txt";
+            FILE *fp = fopen(file, "r");
             if (!fp) {
-                fprintf(stderr, "\nWARN: failed to open the mulmat tune file %s\n", buf);
+                fprintf(stderr, "\nWARN: failed to open file %s\n", file);
             } else {
-                int rc = ggml_mulmat_read_tune_data(&ctx->mm_tune, fp);
+                int rc = ggml_mulmat_tune_read_data(&ctx->mm_tune, fp);
+                fclose(fp);
+
                 if (rc != 0) {
-                    fprintf(stderr, "failed to load mulmat tune from file %s\n", buf);
+                    fprintf(stderr, "\nERROR: failed to load file %s, error code: %d\n", file, rc);
                     return nullptr;
                 }
-                fclose(fp);
-                printf("\n=== loaded mulmat tune from %s ===\n", buf);
+
+                fprintf(stderr, "\nINFO: loaded file %s\n", file);
+
+                rc = ggml_mulmat_tune_validate(&ctx->mm_tune, NULL, -1);
+                if (rc != 0) {
+                    fprintf(stderr, "\nERROR: failed to validate file %s, error code: %d\n", file, rc);
+                    return nullptr;
+                }
             }
         }
     }

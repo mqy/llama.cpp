@@ -5,11 +5,10 @@
 #include "ggml-opencl.h"
 #endif
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <inttypes.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -30,32 +29,32 @@
 static int tune_time_min(int *a, int len);
 static void print_blas_build_tips(void);
 static void progress(int i, int max);
-static void print_envs_for_build(enum ggml_blas_type, char *buf, int buf_len);
+static void print_envs_for_build(enum ggml_backend, char *buf, int buf_len);
 static bool prompt_yes_no(const char *prompt);
 
-static void cmd_tune(struct ggml_mulmat_tune *b);
+static void cmd_tune(struct ggml_mulmat_tune *b, bool verbose);
 static void cmd_analyze(struct ggml_mulmat_tune *b);
 static void cmd_test(void);
 
-static void test__estimate_time(void);
-static void test__choose_device(void);
+static void test_select_profile(void);
 
 static void usage(char *prog) {
     const char *usage_lines[] = {
-        "usage: %s [tune ...] | [analyze FILE] | test | help\n\n",
-        "tune [-m MODEL] [-t TYPE] [-f FILE] [-y]\n",
-        "-model  MODEL   7B | 13B | 30B | 64B\n",
-        "                default 7B\n",
-        "-q_type TYPE    Q4_0 | Q4_1 | Q5_0 | Q5_1 | Q8_0 | Q8_1\n",
-        "                default Q4_0\n",
-        "-step_m STEP_M  the step of M, also as start value\n",
-        "                suggest STEP_M %% 8 == 0\n",
-        "                default 8\n",
-        "-num_m  NUM_M   number of M, total M = STEP_M * NUM_M\n",
-        "                default 16\n",
-        "-file   FILE    data file to write\n",
-        "                default stdout\n",
-        "-y              always answer \"yes\" to all prompts\n",
+        "usage: %s [bench ...] | [analyze FILE] | test | help\n",
+        "\n",
+        "bench [-m MODEL] [-t TYPE] [-f FILE] [-y]\n",
+        "-model  MODEL  7B | 13B | 30B | 64B\n",
+        "               default 7B\n",
+        "-type   TYPE   Q4_0 |  Q4_1 | Q5_0 | Q5_1 | Q8_0 | Q8_1 | F16_F32 | F32\n",
+        "               default Q4_0\n",
+        "-m_step M_STEP the step of M, also as start value\n",
+        "               suggest M_STEP %% 8 == 0\n",
+        "               default 8\n",
+        "-m_num  M_NUM  number of M, total M = M_STEP * M_NUM\n",
+        "               default 16\n",
+        "-file   FILE   data file to write\n",
+        "               default stdout\n",
+        "-y             always answer \"yes\" to all prompts\n",
     };
 
     int len = (int)(sizeof(usage_lines) / sizeof(char *));
@@ -71,37 +70,40 @@ static void usage(char *prog) {
 
 // main
 int main(int argc, char **argv) {
-    if (!ggml_cpu_has_blas()) {
+    enum ggml_backend gpu_backend = ggml_get_backend();
+    if (gpu_backend == GGML_BACKEND_CPU) {
         print_blas_build_tips();
         exit(1);
     }
 
     char *cmd = NULL;
     if (argc == 1) {
-        cmd = "tune";
+        cmd = "bench";
     } else {
         cmd = argv[1];
     }
 
-    if (strcmp(cmd, "tune") == 0) {
+    if (strcmp(cmd, "bench") == 0) {
         struct ggml_mulmat_tune tune = {
             .version = 1,
-            .n_groups = 0,
-            .step_m = 8,
-            .num_m = 16,
-            .cpu_only_stages = {GGML_TASK_FLAG_T1, GGML_TASK_FLAG_TN, 0},
-#if defined(GGML_USE_ACCELERATE) || defined(GGML_USE_OPENBLAS)
-            .use_blas_stages = {GGML_TASK_FLAG_TN, GGML_TASK_FLAG_T1_WAIT, 0},
-#elif defined(GGML_USE_CUBLAS) || defined(GGML_USE_CLBLAST)
-            .use_blas_stages = {0, GGML_TASK_FLAG_T1, 0},
-#endif
-            .groups = NULL,
+            .n_shapes = 0,
+            .m_step = 8,
+            .m_num = 16,
+            .gpu_backend = gpu_backend,
         };
+
+        {
+            const char *name = ggml_get_backend_name();
+            int n = sizeof(tune.gpu_backend_name);
+            strncpy(tune.gpu_backend_name, name, n);
+        }
+
+        ggml_mulmat_tune_setup_task_conf(&tune);
 
         const char *arg_model = NULL;
         const char *arg_q_type = NULL;
-        const char *arg_step_m = NULL;
-        const char *arg_num_m = NULL;
+        const char *arg_m_step = NULL;
+        const char *arg_m_num = NULL;
         const char *arg_file = NULL;
         bool always_yes = false;
 
@@ -116,14 +118,14 @@ int main(int argc, char **argv) {
                     arg_q_type = argv[i + 1];
                     ++i;
                 }
-            } else if (strcmp(argv[i], "-step_m") == 0) {
+            } else if (strcmp(argv[i], "-m_step") == 0) {
                 if (i + 1 < argc) {
-                    arg_step_m = argv[i + 1];
+                    arg_m_step = argv[i + 1];
                     ++i;
                 }
-            } else if (strcmp(argv[i], "-num_m") == 0) {
+            } else if (strcmp(argv[i], "-m_num") == 0) {
                 if (i + 1 < argc) {
-                    arg_num_m = argv[i + 1];
+                    arg_m_num = argv[i + 1];
                     ++i;
                 }
             } else if (strcmp(argv[i], "-file") == 0) {
@@ -134,7 +136,7 @@ int main(int argc, char **argv) {
             } else if (strcmp(argv[i], "-y") == 0) {
                 always_yes = true;
             } else {
-                fprintf(stderr, "[%s]: invalid arg: %s\n", cmd, argv[i]);
+                fprintf(stderr, "invalid arg: %s\n", argv[i]);
                 usage(argv[0]);
                 exit(1);
             }
@@ -150,8 +152,7 @@ int main(int argc, char **argv) {
                 size_t len = strlen(arg_file) + 50;
                 char *prompt = malloc(len);
                 GGML_ASSERT(prompt);
-                snprintf(prompt, len,
-                         "[%s]: data file '%s' exists, override? (Y|n)", cmd,
+                snprintf(prompt, len, "data file '%s' exists, override? (Y|n)",
                          arg_file);
 
                 if (!prompt_yes_no(prompt)) {
@@ -168,146 +169,65 @@ int main(int argc, char **argv) {
         if (arg_model == NULL) {
             arg_model = "7B";
         }
+        ggml_mulmat_tune_setup_model(&tune, arg_model);
 
-        if (strcmp(arg_model, "7B") == 0) {
-            tune.n_groups = 4;
-            tune.groups =
-                malloc(tune.n_groups * sizeof(struct ggml_mulmat_tune_nk));
-            GGML_ASSERT(tune.groups);
-            tune.groups[0] = (struct ggml_mulmat_tune_nk){
-                .N = 4096, .K = 4096, .items = NULL};
-            tune.groups[1] = (struct ggml_mulmat_tune_nk){
-                .N = 4096, .K = 11008, .items = NULL};
-            tune.groups[2] = (struct ggml_mulmat_tune_nk){
-                .N = 11008, .K = 4096, .items = NULL};
-            tune.groups[3] = (struct ggml_mulmat_tune_nk){
-                .N = 32000, .K = 4096, .items = NULL};
-        } else if (strcmp(arg_model, "13B") == 0) {
-            tune.n_groups = 4;
-            tune.groups =
-                malloc(tune.n_groups * sizeof(struct ggml_mulmat_tune_nk));
-            GGML_ASSERT(tune.groups);
-            tune.groups[0] = (struct ggml_mulmat_tune_nk){
-                .N = 5120, .K = 5120, .items = NULL};
-            tune.groups[1] = (struct ggml_mulmat_tune_nk){
-                .N = 5120, .K = 13824, .items = NULL};
-            tune.groups[2] = (struct ggml_mulmat_tune_nk){
-                .N = 13824, .K = 5120, .items = NULL};
-            tune.groups[3] = (struct ggml_mulmat_tune_nk){
-                .N = 32000, .K = 5120, .items = NULL};
-        } else if (strcmp(arg_model, "30B") == 0) {
-            // TODO
-            abort();
-        } else if (strcmp(arg_model, "30B") == 0) {
-            // TODO
-            abort();
-        } else {
-            fprintf(stderr, "[%s]: error: unknown model: %s\n", cmd, arg_model);
-            usage(argv[0]);
-            exit(1);
-        }
-
-        enum ggml_type q_type;
         if (arg_q_type == NULL) {
             arg_q_type = "Q4_0";
-            q_type = GGML_TYPE_Q4_0;
         }
 
-        if (strcmp(arg_q_type, "Q4_0") == 0) {
-            q_type = GGML_TYPE_Q4_0;
-        } else if (strcmp(arg_q_type, "Q4_1") == 0) {
-            q_type = GGML_TYPE_Q4_1;
-        } else if (strcmp(arg_q_type, "Q5_0") == 0) {
-            q_type = GGML_TYPE_Q5_0;
-        } else if (strcmp(arg_q_type, "Q5_1") == 0) {
-            q_type = GGML_TYPE_Q5_1;
-        } else if (strcmp(arg_q_type, "Q8_0") == 0) {
-            q_type = GGML_TYPE_Q8_0;
-        } else if (strcmp(arg_q_type, "Q8_1") == 0) {
-            q_type = GGML_TYPE_Q8_1;
-        } else {
-            fprintf(stderr, "[%s]: error: unsupported q_type: %s\n", cmd,
-                    arg_q_type);
-            usage(argv[0]);
-            exit(1);
-        }
+        int n = sizeof(arg_q_type);
+        strncpy(tune.type_name, arg_q_type, n);
 
-        // tune.q_type, tune.arg_q_type
-        {
-            tune.q_type = q_type;
-            size_t n = sizeof(tune.q_type_name);
-            GGML_ASSERT(n > strlen(arg_q_type));
-            strncpy(tune.q_type_name, arg_q_type, n);
-        }
-
-        // tune.model
-        {
-            size_t n = sizeof(tune.model);
-            GGML_ASSERT(n > strlen(arg_model));
-            strncpy(tune.model, arg_model, n);
-        }
-
-        // tune.model
-        {
-            if (arg_step_m != NULL) {
-                int step_m = atoi(arg_step_m);
-                if (step_m <= 0) {
-                    fprintf(stderr, "[%s]: error: invalid step_m: %s\n", cmd,
-                            arg_step_m);
-                    usage(argv[0]);
-                    exit(1);
-                }
-                tune.step_m = step_m;
+        if (arg_m_step != NULL) {
+            int v = atoi(arg_m_step);
+            if (v <= 0) {
+                fprintf(stderr, "invalid m_step: %s\n", arg_m_step);
+                usage(argv[0]);
             }
-            if (arg_num_m != NULL) {
-                int num_m = atoi(arg_num_m);
-                if (num_m <= 0) {
-                    fprintf(stderr, "[%s]: error: invalid num_m: %s\n", cmd,
-                            arg_num_m);
-                    usage(argv[0]);
-                    exit(1);
-                }
-                tune.num_m = num_m;
+            tune.m_step = v;
+        }
+
+        if (arg_m_num != NULL) {
+            int v = atoi(arg_m_num);
+            if (v <= 0) {
+                fprintf(stderr, "invalid m_step: %s\n", arg_m_num);
+                usage(argv[0]);
             }
+            tune.m_num = v;
         }
 
-        // tune.model
         {
-            size_t n = sizeof(tune.model);
-            GGML_ASSERT(n > strlen(arg_model));
-            strncpy(tune.model, arg_model, n);
-        }
-
-        // tune.blas_name
-        {
-            const char *blas_name = ggml_get_blas_name();
-            GGML_ASSERT(blas_name);
-
-            size_t n = sizeof(tune.blas_name);
-            GGML_ASSERT(n > strlen(blas_name));
-            strncpy(tune.blas_name, blas_name, n);
+            size_t sz = sizeof(struct ggml_mulmat_tune_m) *
+                        (tune.n_shapes * tune.m_num * tune.n_profiles);
+            tune.items = malloc(sz);
+            GGML_ASSERT(tune.items);
+            memset(tune.items, 0, sz);
         }
 
 #if defined GGML_USE_CLBLAST
         ggml_cl_init();
 #endif
 
-        printf("[BENCH] model name: %s, q_type: %s, blas: %s.\n", tune.model,
-               tune.q_type_name, tune.blas_name);
+        printf("[BENCH] model: %s, type: %s, GPU backend: %s.\n\n", tune.model,
+               tune.type_name, tune.gpu_backend_name);
 
-        cmd_tune(&tune);
+        cmd_tune(&tune, true /* verbose */);
 
-        ggml_mulmat_write_tune_data(&tune, fp == NULL ? stdout : fp);
+        int rc = ggml_mulmat_tune_write_data(&tune, fp == NULL ? stdout : fp);
         if (fp != NULL) {
             fclose(fp);
         }
+        if (rc != 0) {
+            printf("failed to write bench result to %s\n", arg_file);
+            exit(1);
+        }
 
         if (arg_file != NULL) {
-            printf("[%s]: result was written to %s\n", cmd, arg_file);
+            printf("result was written to %s\n", arg_file);
         }
     } else if (strcmp(cmd, "analyze") == 0) {
         if (argc < 3) {
-            fprintf(stderr, "[%s]: error: too few args\n", cmd);
+            fprintf(stderr, "error: too few args\n");
             usage(argv[0]);
             exit(1);
         }
@@ -320,29 +240,28 @@ int main(int argc, char **argv) {
             int rc = stat(data_file, &st);
             UNUSED(st);
             if (rc != 0) {
-                fprintf(stderr, "[%s]: error: data file not exists: %s\n", cmd,
-                        data_file);
+                fprintf(stderr, "error: data file not exists: %s\n", data_file);
                 exit(1);
             }
         }
 
         FILE *fp = fopen(data_file, "r");
         GGML_ASSERT(fp);
-        int rc = ggml_mulmat_read_tune_data(&tune, fp);
+        int rc = ggml_mulmat_tune_read_data(&tune, fp);
         GGML_ASSERT(rc == 0);
         fclose(fp);
 
         cmd_analyze(&tune);
     } else if (strcmp(cmd, "test") == 0) {
         if (argc != 2) {
-            fprintf(stderr, "[%s]: error: invalid args\n", cmd);
+            fprintf(stderr, "error: invalid args\n");
             usage(argv[0]);
             exit(1);
         }
         cmd_test();
     } else if (strcmp(cmd, "help") == 0) {
         if (argc != 2) {
-            fprintf(stderr, "[%s]: error: invalid args\n", cmd);
+            fprintf(stderr, "error: invalid args\n");
             usage(argv[0]);
             exit(1);
         }
@@ -356,7 +275,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void cmd_tune(struct ggml_mulmat_tune *tune) {
+void cmd_tune(struct ggml_mulmat_tune *tune, bool verbose) {
     size_t wsize = 0;
     void *q_buf = NULL;
     void *wdata = NULL;
@@ -364,21 +283,19 @@ void cmd_tune(struct ggml_mulmat_tune *tune) {
     // alloc q4_0_buf and wdata with max size.
     {
         int max_NxK = 0;
-        for (int i = 0; i < tune->n_groups; i++) {
-            int sz = tune->groups[i].N * tune->groups[i].K;
+        for (int i = 0; i < tune->n_shapes; i++) {
+            int sz = tune->shapes[i].N * tune->shapes[i].K;
             if (sz > max_NxK) {
                 max_NxK = sz;
             }
         }
 
         size_t q_buf_size;
-        switch (tune->q_type) {
-        case GGML_TYPE_Q4_0:
-        case GGML_TYPE_Q4_1:
+        if (strcmp(tune->type_name, "Q4_0") == 0) {
             q_buf_size = 2 * max_NxK * sizeof(int64_t);
-            break;
-        default:
-            // TODO
+        } else if (strcmp(tune->type_name, "Q4_1") == 0) {
+            q_buf_size = 2 * max_NxK * sizeof(int64_t);
+        } else {
             abort();
         }
 
@@ -399,31 +316,28 @@ void cmd_tune(struct ggml_mulmat_tune *tune) {
         }
     }
 
-    for (int i = 0; i < tune->n_groups; i++) {
-        struct ggml_mulmat_tune_nk *group = &tune->groups[i];
+    for (int i_shape = 0; i_shape < tune->n_shapes; i_shape++) {
         int M;
-        int N = group->N;
-        int K = group->K;
-
-        {
-            size_t sz = sizeof(struct ggml_mulmat_tune_m) * tune->num_m;
-            group->items = malloc(sz);
-            GGML_ASSERT(group->items);
-            memset(group->items, 0, sz);
-        }
+        int N = tune->shapes[i_shape].N;
+        int K = tune->shapes[i_shape].K;
 
         char progress_line[20];
+        int line_len;
 
-        for (int im = 0; im < tune->num_m; im++) {
-            M = tune->step_m * (im + 1);
+        for (int i_m = 0; i_m < tune->m_num; i_m++) {
+            M = tune->m_step * (i_m + 1);
 
-            memset(progress_line, 0, sizeof(progress_line));
-            snprintf(progress_line, sizeof(progress_line), "%d %d %d ", N, K,
-                     M);
-            printf("%s", progress_line);
-            fflush(stdout);
+            if (verbose) {
+                memset(progress_line, 0, sizeof(progress_line));
+                snprintf(progress_line, sizeof(progress_line), "%d %d %d ", N,
+                         K, M);
+                printf("%s", progress_line);
+                fflush(stdout);
 
-            int line_len = strlen(progress_line);
+                line_len = strlen(progress_line);
+            }
+
+            // TODO: not use ctx?
 
             struct ggml_context *ctx = NULL;
             {
@@ -451,10 +365,18 @@ void cmd_tune(struct ggml_mulmat_tune *tune) {
                     ctx, GGML_TYPE_F32, (int64_t)K, (int64_t)N);
                 ggml_set_f32(src0_f32, 0.1f);
 
-                src0 = ggml_new_tensor_2d(ctx, tune->q_type, (int64_t)K,
-                                          (int64_t)N);
+                enum ggml_type q_type;
+                if (strcmp(tune->type_name, "Q4_0") == 0) {
+                    q_type = GGML_TYPE_Q4_0;
+                } else if (strcmp(tune->type_name, "Q4_1") == 0) {
+                    q_type = GGML_TYPE_Q4_1;
+                } else {
+                    abort();
+                }
 
-                switch (tune->q_type) {
+                src0 = ggml_new_tensor_2d(ctx, q_type, (int64_t)K, (int64_t)N);
+
+                switch (q_type) {
                 case GGML_TYPE_Q4_0:
                     ggml_quantize_q4_0((const float *)src0_f32->data,
                                        src0->data, N * K, K, (int64_t *)q_buf);
@@ -477,48 +399,55 @@ void cmd_tune(struct ggml_mulmat_tune *tune) {
                 dst = ggml_mul_mat(ctx, src0, src1);
             }
 
-            struct ggml_mulmat_tune_m *tune_item = &group->items[im];
-            tune_item->M = M;
+            for (int ip = 0; ip < tune->n_profiles; ip++) {
+                struct ggml_task_conf *conf = tune->conf[ip];
 
-            ggml_task_flag_set_blas(&dst->task_flag, 0);
-            for (int stage = 0; stage < 3; stage++) {
-                if (tune->cpu_only_stages[stage] > 0) {
-                    // without this, the first run may be significant slow.
+                int item_index =
+                    (i_shape * tune->m_num + i_m) * tune->n_profiles + ip;
+                struct ggml_mulmat_tune_m *item = &tune->items[item_index];
+
+                item->M = M;
+
+                for (int stage = 0; stage < 3; stage++) {
+                    item->stages_time[stage] = 0;
+                    if (conf[stage].backend == GGML_BACKEND_UNKNOWN) {
+                        continue;
+                    }
+
+                    // without memset, the first run may be significant slow.
                     memset(wdata, 0, wsize);
 
-                    for (int nb = 0; nb < NUM_BENCH; nb++) {
+                    int stage_time[NUM_BENCH];
+                    for (int i_bench = 0; i_bench < NUM_BENCH; i_bench++) {
                         int t0 = (int)ggml_time_us();
-                        ggml_internal_compute_forward_mul_mat_q_f32_for_fine_tune(
-                            stage, wsize, wdata, src0, src1, dst);
-                        tune_item->cpu_only_records[stage][nb] =
-                            (int)ggml_time_us() - t0;
-                        progress(nb, NUM_BENCH);
+
+                        ggml_internal_compute_forward_mul_mat(
+                            conf, stage, wsize, wdata, src0, src1, dst);
+
+                        stage_time[i_bench] = (int)ggml_time_us() - t0;
+                        if (verbose) {
+                            progress(i_bench, NUM_BENCH);
+                        }
                     }
-                    line_len++;
+
+                    item->stages_time[stage] =
+                        tune_time_min(stage_time, NUM_BENCH);
+
+                    if (verbose) {
+                        line_len++;
+                    }
                 }
             }
 
-            ggml_task_flag_set_blas(&dst->task_flag, 1);
-            for (int stage = 0; stage < 3; stage++) {
-                if (tune->use_blas_stages[stage] > 0) {
-                    for (int nb = 0; nb < NUM_BENCH; nb++) {
-                        int t0 = (int)ggml_time_us();
-                        ggml_internal_compute_forward_mul_mat_q_f32_for_fine_tune(
-                            stage, wsize, wdata, src0, src1, dst);
-                        tune_item->use_blas_records[stage][nb] =
-                            (int)ggml_time_us() - t0;
-                        progress(nb, NUM_BENCH);
-                    }
-                    line_len++;
+            if (verbose) {
+                // + 10: clear at most these additional chars that may be
+                // unexpectedly pressed or pasted.
+                line_len += 10;
+                for (int j = 0; j < line_len; j++) {
+                    printf("\b \b");
                 }
+                fflush(stdout);
             }
-
-            line_len += 20; // + 20: clear at most these additional chars that
-                            // user unexpectedly pressed or pasted.
-            for (int j = 0; j < line_len; j++) {
-                printf("\b \b");
-            }
-            fflush(stdout);
 
             ggml_free(ctx);
         }
@@ -526,23 +455,6 @@ void cmd_tune(struct ggml_mulmat_tune *tune) {
 
     free(wdata);
     free(q_buf);
-
-    // collect stat records.
-    for (int i = 0; i < tune->n_groups; i++) {
-        for (int j = 0; j < tune->num_m; j++) {
-            struct ggml_mulmat_tune_m *item = &tune->groups[i].items[j];
-            for (int stage = 0; stage < 3; stage++) {
-                if (tune->cpu_only_stages[stage] > 0) {
-                    item->cpu_only_time[stage] =
-                        tune_time_min(item->cpu_only_records[stage], NUM_BENCH);
-                }
-                if (tune->use_blas_stages[stage] > 0) {
-                    item->use_blas_time[stage] =
-                        tune_time_min(item->use_blas_records[stage], NUM_BENCH);
-                }
-            }
-        }
-    }
 }
 
 static void print_blas_build_tips(void) {
@@ -551,28 +463,28 @@ static void print_blas_build_tips(void) {
     fprintf(stderr, "error: this program was not built with any BLAS. tips:\n");
 
     char buf[100];
-    print_envs_for_build(GGML_BLAS_TYPE_ACCELERATE, buf, 100);
+    print_envs_for_build(GGML_BACKEND_ACCELERATE, buf, 100);
     fprintf(stderr, "* to build with Accelerate: make clean; %s make %s\n", buf,
             make_target);
-    print_envs_for_build(GGML_BLAS_TYPE_OPENBLAS, buf, 100);
+    print_envs_for_build(GGML_BACKEND_OPENBLAS, buf, 100);
     fprintf(stderr, "* to build with openBLAS:   make clean; %s make %s\n", buf,
             make_target);
-    print_envs_for_build(GGML_BLAS_TYPE_CUBLAS, buf, 100);
+    print_envs_for_build(GGML_BACKEND_CUDA, buf, 100);
     fprintf(stderr, "* to build with cuBLAS:     make clean; %s make %s\n", buf,
             make_target);
-    print_envs_for_build(GGML_BLAS_TYPE_CLBLAST, buf, 100);
+    print_envs_for_build(GGML_BACKEND_CLBLAST, buf, 100);
     fprintf(stderr, "* to build with CLBLast:    make clean; %s make %s\n", buf,
             make_target);
 }
 
-static void print_envs_for_build(enum ggml_blas_type blas, char *buf,
+static void print_envs_for_build(enum ggml_backend backend, char *buf,
                                  int buf_len) {
     memset(buf, 0, buf_len);
     const char *LLAMA_NO_ACCELERATE =
-        blas == GGML_BLAS_TYPE_ACCELERATE ? " " : "1";
-    const char *LLAMA_OPENBLAS = blas == GGML_BLAS_TYPE_OPENBLAS ? "1" : " ";
-    const char *LLAMA_CUBLAS = blas == GGML_BLAS_TYPE_CUBLAS ? "1" : " ";
-    const char *LLAMA_CLBLAST = blas == GGML_BLAS_TYPE_CLBLAST ? "1" : " ";
+        backend == GGML_BACKEND_ACCELERATE ? " " : "1";
+    const char *LLAMA_OPENBLAS = backend == GGML_BACKEND_OPENBLAS ? "1" : " ";
+    const char *LLAMA_CUBLAS = backend == GGML_BACKEND_CUDA ? "1" : " ";
+    const char *LLAMA_CLBLAST = backend == GGML_BACKEND_CLBLAST ? "1" : " ";
 
     snprintf(buf, buf_len,
              "LLAMA_NO_ACCELERATE=%s LLAMA_OPENBLAS=%s LLAMA_CUBLAS=%s "
@@ -631,315 +543,112 @@ static int tune_time_min(int *a, int len) {
     return min;
 }
 
-// TODO: write as column-wise CSV format.
 static void cmd_analyze(struct ggml_mulmat_tune *tune) {
-    printf("== gpu compute stage for all NK groups ==\n\n");
-    {
-        int num_m = tune->num_m;
+    int m_num = tune->m_num;
 
-        printf("#M");
-        for (int i = 0; i < num_m; i++) {
-            printf(";%3d", tune->groups[0].items[i].M);
-        }
-        printf("\n");
+    for (int i_shape = 0; i_shape < tune->n_shapes; i_shape++) {
+        struct ggml_mulmat_tune_shape *shape = &tune->shapes[i_shape];
 
-        // Nothing but for pretty align.
-        size_t buf_slot_size = 24;
-        char *buf = malloc(buf_slot_size * tune->n_groups);
+        const int nth_arr[] = {1, 2, 4, 6, 8};
+        int nth_arr_len = (int)(sizeof(nth_arr) / sizeof(int));
+        for (int i = 0; i < nth_arr_len; i++) {
+            int nth = nth_arr[i];
 
-        size_t max_nxk_len = 0;
-        for (int i = 0; i < tune->n_groups; i++) {
-            struct ggml_mulmat_tune_nk *group = &tune->groups[i];
-            size_t offset = i * buf_slot_size;
-            snprintf(&buf[offset], buf_slot_size, "NxK=%dx%d", group->N,
-                     group->K);
-            size_t len = strlen(&buf[offset]);
-            if (len > max_nxk_len) {
-                max_nxk_len = len;
-            }
-        }
+            printf("N=%d,K=%d,nth=%d\n\n", shape->N, shape->K, nth);
 
-        for (int i = 0; i < tune->n_groups; i++) {
-            struct ggml_mulmat_tune_nk *group = &tune->groups[i];
-
-            size_t offset = i * buf_slot_size;
-            printf("%s", &buf[offset]);
-            for (int j = 0; j < (int)(max_nxk_len - strlen(&buf[offset]));
-                 j++) {
-                printf(" ");
-            }
-
-            for (int j = 0; j < num_m; j++) {
-                printf(";%8.3f", group->items[j].use_blas_time[1] / 1000.0);
-            }
-            printf("\n");
-        }
-
-        free(buf);
-    }
-
-    printf("\n== details for each NK group ==\n\n");
-    {
-        for (int i = 0; i < tune->n_groups; i++) {
-            struct ggml_mulmat_tune_nk *group = &tune->groups[i];
-            printf("#M@%dx%d", group->N, group->K);
-
-            for (int j = 0; j < tune->num_m; j++) {
-                printf(";%3d", group->items[j].M);
+            printf("#M      ");
+            for (int i_m = 0; i_m < m_num; i_m++) {
+                int item_index =
+                    (i_shape * tune->m_num + i_m) * tune->n_profiles;
+                printf(";%7d", tune->items[item_index].M);
             }
             printf("\n");
 
-            for (int j = 0; j < 3; j++) {
-                if (tune->cpu_only_stages[j] > 0) {
-                    printf("cpu_only_%d", j);
-                    for (int k = 0; k < tune->num_m; k++) {
-                        printf(";%8.3f",
-                               group->items[k].cpu_only_time[j] / 1000.0);
+            for (int ip = 0; ip < tune->n_profiles; ip++) {
+                struct ggml_task_conf *task_conf = tune->conf[ip];
+                int *total_time = malloc(sizeof(int) * m_num);
+                for (int k = 0; k < 3; k++) {
+                    enum ggml_backend backend = task_conf[k].backend;
+                    if (backend == GGML_BACKEND_UNKNOWN) {
+                        continue;
+                    }
+                    char *backend_name =
+                        backend == GGML_BACKEND_CPU ? "CPU" : "GPU";
+                    printf("#%d_%d_%s", ip, k, backend_name);
+
+                    for (int im = 0; im < m_num; im++) {
+                        int item_index =
+                            (i_shape * tune->m_num + im) * tune->n_profiles +
+                            ip;
+                        int stage_time = tune->items[item_index].stages_time[k];
+                        if (task_conf[k].parallel) {
+                            stage_time /= nth;
+                        }
+                        printf(";%7d", stage_time);
+                        total_time[im] += stage_time;
                     }
                     printf("\n");
                 }
-            }
 
-            for (int j = 0; j < 3; j++) {
-                if (tune->use_blas_stages[j] > 0) {
-                    printf("use_blas_%d", j);
-                    for (int k = 0; k < tune->num_m; k++) {
-                        printf(";%8.3f",
-                               group->items[k].use_blas_time[j] / 1000.0);
-                    }
-                    printf("\n");
+                printf("#%d_total", ip);
+                for (int im = 0; im < m_num; im++) {
+                    printf(";%7d", total_time[im]);
                 }
-            }
-
-            printf("\n");
-        }
-    }
-
-    printf("== n_threads affects ==\n\n");
-    {
-        const int nth_list[5] = {1, 2, 4, 6, 8};
-        int num_nth = (int)(sizeof(nth_list) / sizeof(int));
-
-        for (int i = 0; i < tune->n_groups; i++) {
-            if (i > 0) {
                 printf("\n");
-            }
-            struct ggml_mulmat_tune_nk *group = &tune->groups[i];
-            printf("#M@%dx%d", group->N, group->K);
-
-            for (int j = 0; j < tune->num_m; j++) {
-                printf(";%3d", group->items[j].M);
+                free(total_time);
             }
             printf("\n");
-
-            for (int k = 0; k < num_nth; k++) {
-                int nth = nth_list[k];
-
-                printf("cpu_nth_%d", nth);
-                for (int j = 0; j < tune->num_m; j++) {
-                    double total = 0.0;
-                    for (int stage = 0; stage < 3; stage++) {
-                        if (tune->cpu_only_stages[stage] > 0) {
-                            int t = group->items[j].cpu_only_time[stage];
-                            if (tune->cpu_only_stages[stage] & ((1 << 1))) {
-                                t /= nth;
-                            }
-                            total += t / 1000.0;
-                        }
-                    }
-                    printf(";%8.3f", total);
-                }
-                printf("\n");
-
-                printf("gpu_nth_%d", nth);
-                for (int j = 0; j < tune->num_m; j++) {
-                    double total = 0.0;
-                    for (int stage = 0; stage < 3; stage++) {
-                        if (tune->use_blas_stages[stage] > 0) {
-                            int t = group->items[j].use_blas_time[stage];
-                            if (tune->use_blas_stages[stage] ==
-                                GGML_TASK_FLAG_TN) {
-                                t /= nth;
-                            }
-                            total += t / 1000.0;
-                        }
-                    }
-                    printf(";%8.3f", total);
-                }
-                printf("\n");
-            }
         }
     }
 }
 
 static void cmd_test(void) {
-    printf("=== test estimate_time\n\n");
-    test__estimate_time();
-
-    printf("\n=== test choose_device\n\n");
-    test__choose_device();
+    printf("\n=== test select profile\n\n");
+    test_select_profile();
 }
 
-struct test__estimate_time_data {
+struct test_select_profile_data {
     int nth;
     int M;
-    int expected_cpu_time;
-    int expected_gpu_time;
+    int profile_0_time;
+    int profile_1_time;
 };
 
-static void test__estimate_time(void) {
+static void test_select_profile(void) {
     struct ggml_mulmat_tune tune = {
         .version = 1,
-        .model = "7B",
-        .blas_name = "OpenBLAS",
-        .n_groups = 1,
-        .step_m = 8,
-        .num_m = 2,
-        .cpu_only_stages = {GGML_TASK_FLAG_T1, GGML_TASK_FLAG_TN, 0},
-        .use_blas_stages = {GGML_TASK_FLAG_TN, GGML_TASK_FLAG_T1_WAIT, 0},
+        .type_name = "Q4_0",
+        .gpu_backend = GGML_BACKEND_OPENBLAS,
+        .gpu_backend_name = "OpenBLAS",
+        .m_step = 2,
+        .m_num = 2,
     };
-    tune.groups = malloc(sizeof(struct ggml_mulmat_tune_nk) * tune.n_groups);
-    tune.groups[0] = (struct ggml_mulmat_tune_nk){
-        .N = 4096,
-        .K = 4096,
-    };
-    tune.groups[0].items =
-        malloc(sizeof(struct ggml_mulmat_tune_m) * tune.num_m);
-    tune.groups[0].items[0] = (struct ggml_mulmat_tune_m){
-        .M = 8,
-        .cpu_only_time = {10, 20, 0},
-        .use_blas_time = {30, 40, 0},
-    };
-    tune.groups[0].items[1] = (struct ggml_mulmat_tune_m){
-        .M = 16,
-        .cpu_only_time = {50, 60, 0},
-        .use_blas_time = {70, 80, 0},
-    };
+    ggml_mulmat_tune_setup_model(&tune, "7B");
+    ggml_mulmat_tune_setup_task_conf(&tune);
 
-    const int N = tune.groups[0].N;
-    const int K = tune.groups[0].K;
+    size_t sz = sizeof(struct ggml_mulmat_tune_m) *
+                (tune.n_shapes * tune.m_num * tune.n_profiles);
+    tune.items = malloc(sz);
+    GGML_ASSERT(tune.items);
+    memset(tune.items, 0, sz);
 
-    const int nth = 1;
+    // shape 0, profile 0
+    tune.items[0] =
+        (struct ggml_mulmat_tune_m){.M = 2, .stages_time = {2, 4, 0}};
+    tune.items[1] =
+        (struct ggml_mulmat_tune_m){.M = 2, .stages_time = {4, 4, 0}};
+    // shape 0, profile 1
+    tune.items[2] =
+        (struct ggml_mulmat_tune_m){.M = 4, .stages_time = {4, 8, 0}};
+    tune.items[3] =
+        (struct ggml_mulmat_tune_m){.M = 4, .stages_time = {4, 4, 0}};
 
-    // Test exact M equals.
-
-    for (int i = 0; i < 2; i++) {
-        bool is_cpu = (i == 0);
-        for (int j = 0; j < tune.num_m; j++) {
-            struct ggml_mulmat_tune_m *item = &tune.groups[0].items[j];
-            int M = item->M;
-
-            int t = (i == 0)
-                        ? ggml_mulmat_estimate_time(&tune, M, N, K, nth, true)
-                        : ggml_mulmat_estimate_time(&tune, M, N, K, nth, false);
-            if (is_cpu) {
-                BENCH_ASSERT_EQUAL(
-                    t, item->cpu_only_time[0] + item->cpu_only_time[1],
-                    "#(i: %d, j: %d)", i, j);
-            } else {
-                BENCH_ASSERT_EQUAL(
-                    t, item->use_blas_time[0] + item->use_blas_time[1],
-                    "#(i: %d, j: %d)", i, j);
-            }
-        }
-    }
-
-    // Test M out of range
-    {
-        const int M_arr[2] = {tune.groups[0].items[0].M - 1,
-                              tune.groups[0].items[1].M + 1};
-        int n = (int)(sizeof(M_arr) / sizeof(int));
-
-        for (int i = 0; i < 2; i++) {
-            bool is_cpu = (i == 0);
-            for (int j = 0; j < n; j++) {
-                int t = ggml_mulmat_estimate_time(&tune, M_arr[j], N, K, nth,
-                                                  is_cpu);
-                BENCH_ASSERT_EQUAL(t, -1, "#(i: %d, j: %d)", i, j);
-            }
-        }
-    }
-
-    // Test M in range
-    {
-        const struct test__estimate_time_data test_data[] = {
-            {
-                .nth = 1,
-                .M = 12,
-                .expected_cpu_time = 70,
-                .expected_gpu_time = 110,
-            },
-            {
-                .nth = 1,
-                .M = 14,
-                .expected_cpu_time = 90,
-                .expected_gpu_time = 130,
-            },
-        };
-
-        int n =
-            (int)(sizeof(test_data) / sizeof(struct test__estimate_time_data));
-
-        for (int i = 0; i < 2; i++) {
-            bool is_cpu = (i == 0);
-            for (int j = 0; j < n; j++) {
-                int t = ggml_mulmat_estimate_time(&tune, test_data[j].M, N, K,
-                                                  test_data[j].nth, is_cpu);
-                if (is_cpu) {
-                    BENCH_ASSERT_EQUAL(t, test_data[j].expected_cpu_time,
-                                       "#(i: %d, j: %d)", i, j);
-                } else {
-                    BENCH_ASSERT_EQUAL(t, test_data[j].expected_gpu_time,
-                                       "#(i: %d, j: %d)", i, j);
-                }
-            }
-        }
-    }
-}
-
-struct test__choose_device_data {
-    int nth;
-    int M;
-    int cpu_only_time;
-    int use_blas_time;
-};
-
-static void test__choose_device(void) {
-    struct ggml_mulmat_tune tune = {
-        .version = 1,
-        .model = "7B",
-        .blas_name = "OPENBLAS",
-        .n_groups = 1,
-        .step_m = 8,
-        .num_m = 2,
-        .cpu_only_stages = {GGML_TASK_FLAG_T1, GGML_TASK_FLAG_TN, 0},
-        .use_blas_stages = {GGML_TASK_FLAG_TN, GGML_TASK_FLAG_T1, 0},
-    };
-    tune.groups = malloc(sizeof(struct ggml_mulmat_tune_nk) * tune.n_groups);
-    tune.groups[0] = (struct ggml_mulmat_tune_nk){
-        .N = 4096,
-        .K = 4096,
-    };
-    tune.groups[0].items =
-        malloc(sizeof(struct ggml_mulmat_tune_m) * tune.num_m);
-    tune.groups[0].items[0] = (struct ggml_mulmat_tune_m){
-        .M = 8,
-        .cpu_only_time = {2, 4, 0},
-        .use_blas_time = {4, 4, 0},
-    };
-    tune.groups[0].items[1] = (struct ggml_mulmat_tune_m){
-        .M = 16,
-        .cpu_only_time = {4, 8, 0},
-        .use_blas_time = {4, 4, 0},
-    };
-
-    const int N = tune.groups[0].N;
-    const int K = tune.groups[0].K;
+    const int N = tune.shapes[0].N;
+    const int K = tune.shapes[0].K;
 
     // When M out of range.
     {
-        const int M_arr[2] = {tune.groups[0].items[0].M - 1,
-                              tune.groups[0].items[1].M + 1};
+        const int M_arr[2] = {tune.items[0].M - 1, tune.items[2].M + 1};
         int n = (int)(sizeof(M_arr) / sizeof(int));
 
         for (int i = 1; i <= 8; i++) {
@@ -955,57 +664,57 @@ static void test__choose_device(void) {
 
     // When M in range.
     {
-        const struct test__choose_device_data test_data[] = {
+        const struct test_select_profile_data test_data[] = {
             {
                 .nth = 1,
-                .M = 8,
-                .cpu_only_time = 6,
-                .use_blas_time = 8,
-            },
-            {
-                .nth = 1,
-                .M = 12,
-                .cpu_only_time = 9,
-                .use_blas_time = 8,
+                .M = 2,
+                .profile_0_time = 6,
+                .profile_1_time = 8,
             },
             {
                 .nth = 1,
-                .M = 16,
-                .cpu_only_time = 12,
-                .use_blas_time = 8,
+                .M = 4,
+                .profile_0_time = 12,
+                .profile_1_time = 8,
+            },
+            {
+                .nth = 1,
+                .M = 3,
+                .profile_0_time = 9,
+                .profile_1_time = 8,
             },
             {
                 .nth = 2,
-                .M = 8,
-                .cpu_only_time = 4,
-                .use_blas_time = 6,
+                .M = 2,
+                .profile_0_time = 4,
+                .profile_1_time = 6,
             },
             {
                 .nth = 2,
-                .M = 12,
-                .cpu_only_time = 6,
-                .use_blas_time = 6,
+                .M = 4,
+                .profile_0_time = 8,
+                .profile_1_time = 6,
             },
             {
                 .nth = 2,
-                .M = 16,
-                .cpu_only_time = 8,
-                .use_blas_time = 6,
+                .M = 3,
+                .profile_0_time = 6,
+                .profile_1_time = 6,
             }};
 
         int n =
-            (int)(sizeof(test_data) / sizeof(struct test__choose_device_data));
+            (int)(sizeof(test_data) / sizeof(struct test_select_profile_data));
 
         for (int i = 0; i < n; i++) {
-            const struct test__choose_device_data *e = &test_data[i];
+            const struct test_select_profile_data *e = &test_data[i];
             struct ggml_mulmat_tune_time_stats time_stats;
             int rc = ggml_mulmat_tune_time_stats(&tune, e->M, N, K, e->nth,
                                                  &time_stats);
             BENCH_ASSERT_EQUAL(rc, 0, "#(i: %d)", i);
-            BENCH_ASSERT_EQUAL(time_stats.cpu_only_total, e->cpu_only_time,
-                               "#(i: %d)", i);
-            BENCH_ASSERT_EQUAL(time_stats.use_blas_total, e->use_blas_time,
-                               "#(i: %d)", i);
+            BENCH_ASSERT_EQUAL(time_stats.profile_time[0].total_time,
+                               e->profile_0_time, "#(i: %d)", i);
+            BENCH_ASSERT_EQUAL(time_stats.profile_time[1].total_time,
+                               e->profile_1_time, "#(i: %d)", i);
         }
     }
 }
