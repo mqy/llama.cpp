@@ -277,17 +277,17 @@ int ggml_mulmat_tune_time_stats(
 static const char *ggml_backend_names[] = {
     [GGML_BACKEND_UNKNOWN] = "UNKNOWN",
     [GGML_BACKEND_CPU] = "CPU",
-    [GGML_BACKEND_CUDA] = "CUDA", // CUBLAS
+    [GGML_BACKEND_CUDA] = "CUDA",
+    [GGML_BACKEND_CL] = "CL", // OPENCL
     [GGML_BACKEND_ACCELERATE] = "ACCELERATE",
     [GGML_BACKEND_OPENBLAS] = "OPENBLAS",
-    [GGML_BACKEND_CLBLAST] = "CLBLAST",
 };
 
 const char *ggml_get_backend_name(void) {
 #if defined(GGML_USE_ACCELERATE)
     return ggml_backend_names[GGML_BACKEND_ACCELERATE];
 #elif defined(GGML_USE_CLBLAST)
-    return ggml_backend_names[GGML_BACKEND_CLBLAST];
+    return ggml_backend_names[GGML_BACKEND_CL];
 #elif defined(GGML_USE_CUBLAS)
     return ggml_backend_names[GGML_BACKEND_CUBLAS];
 #elif defined(GGML_USE_OPENBLAS)
@@ -306,7 +306,7 @@ int ggml_get_backend(void) {
 #elif defined(GGML_USE_OPENBLAS)
     return GGML_BACKEND_OPENBLAS;
 #elif defined(GGML_USE_CLBLAST)
-    return GGML_BACKEND_CLBLAST;
+    return GGML_BACKEND_CL;
 #else
     return GGML_BACKEND_CPU;
 #endif
@@ -333,10 +333,26 @@ void ggml_mulmat_tune_setup_task_conf(struct ggml_mulmat_tune *tune) {
         .backend = tune->gpu_backend,
         .wait = true,
     };
-#elif defined(GGML_USE_CUBLAS) || defined(GGML_USE_CLBLAST)
+#elif defined(GGML_USE_CUBLAS)
     tune->n_profiles++;
     // gpu only: compute
     tune->conf[1][1] = (struct ggml_task_conf){
+        .backend = tune->gpu_backend,
+        .wait = true,
+    };
+#elif defined(GGML_USE_CLBLAST)
+    tune->n_profiles += 2;
+    // gpu only: compute
+    tune->conf[1][1] = (struct ggml_task_conf){
+        .backend = tune->gpu_backend,
+        .wait = true,
+    };
+    // cpu init + gpu compute
+    tune->conf[2][0] = (struct ggml_task_conf){
+        .backend = GGML_BACKEND_CPU,
+        .parallel = true,
+    };
+    tune->conf[2][1] = (struct ggml_task_conf){
         .backend = tune->gpu_backend,
         .wait = true,
     };

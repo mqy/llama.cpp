@@ -583,9 +583,9 @@ void ggml_cl_sgemm_wrapper(
         if (dequant) {
             CL_CHECK(clSetKernelArg(kernel, 0, sizeof(cl_mem), &cl_buffer_qb));
             CL_CHECK(clSetKernelArg(kernel, 1, sizeof(cl_mem), &cl_buffer_b));
-            CL_CHECK(clEnqueueWriteBuffer(queue, cl_buffer_qb, blocking_write, 0, size_qb, host_b + (pass * size_b/sizeof(float)), 0, NULL, &ev_qb));
+            CL_CHECK(clEnqueueWriteBuffer(queue, cl_buffer_qb, blocking_write, 0, size_qb, (const char *)host_b + size_qb * pass, 0, NULL, &ev_qb));
         } else {
-            CL_CHECK(clEnqueueWriteBuffer(queue, cl_buffer_b, blocking_write, 0, size_b, host_b + (pass * size_b/sizeof(float)), 0, NULL, &ev_b));
+            CL_CHECK(clEnqueueWriteBuffer(queue, cl_buffer_b, blocking_write, 0, size_b, (const char *)host_b + size_b * pass, 0, NULL, &ev_b));
         }
 
         CL_CHECK(clEnqueueWriteBuffer(queue, cl_buffer_a, blocking_write, 0, size_a, host_a, 0, NULL, &ev_a));

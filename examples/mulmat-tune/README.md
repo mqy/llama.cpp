@@ -12,34 +12,60 @@ large prompt and avoid spinning, the master code force 1-thread when (M >=32).
 In `master` branch, the `mul_mat` codes run in several implicit profiles.
 
 - pure cpu: INIT: very fast, COMPUTE: the computation time is proportional to M.
-- CUDA(cuBLAS)/ClBlast: COMPUTE: de-quantization and mul_mat in GPU.
+- CUDA/CL: COMPUTE: de-quantization and mul_mat in GPU.
 - Accelerate/OpenBLAS: COMPUTE: de-quantization in CPU, mul_mat in GPU.
 
-I observed the following "facts" for Accelerate/OpenBLAS:
+I observed the following "facts" on Accelerate/OpenBLAS:
 
-- Whatever the M is, given N and K, the de-quantization time is constant in theory.
+- Whatever the M is, given N and K, the de-quantization time is constant (in theory).
 - The mul_mat time in GPU is heavy (tens to hundreds ms), goes up very slow when
   M doubles.
 - In the large M range, the de-quantization time accounts for a large proportion
   of the total calculation time. For example, for 7B, Q4_0, NxK=4096x4096, when
-  about M < 100, the proportion of de-quantization time is far more than `50%`.
-  Other NxK combinations have a similar situation, except that the range of M is
-  not as large as NxK=4096x4096.
+  M is less than 100, the proportion of de-quantization time exceeds `50%`. Other
+  NxK combinations have similar situation, except that the range of M is not as
+  large as NxK=4096x4096.
 
 In theory, if we split COMPUTE stage as INIT + COMPUTE, we MAY speedup prompt
-eval time a lot: up to 50% for large M range (e.g. 32 - 128). The following
-diagram shows the times (INIT in CPU, COMPUTE in GPU) for 7B/Q4_0/Accelerate.
+eval time a lot: up to 50% for large M range (e.g. 32 - 128) when the `with GPU`
+profile competes `pure CPU` profile. The following diagram demonstrates the
+`with GPU` profile (7B/Q4_0/Accelerate, INIT in CPU, COMPUTE in GPU). We can see
+the trends of how computing time changes with M.
 
-<image src="images/q40-1-thread.png" with="600"></image>
+<image src="images/7b.q4_0.accelerate.png" with="600"></image>
 
-I manged to improve the `threading` problem(s) since Apr this year. I dropped two
-pull requests because they did not solve the key problem but introduced noisy.
-In the second pull request, @gerganov hinted me the `1-thread blas` problem, so
-I followed this direction since then.
+Apart from a bit slow (10% or so), OpenBLAS behaves similar to Accelerate, so I
+will not show the images. You may have a look at [bench-out](bench-out/).
+
+ClBlast is about 5x slower than Accelerate, I manged to make it run on my device,
+and split the COMPUTE stage into INIT + COMPUTE for demonstration purpose. Since
+the CPU de-quantization time is fairly smaller than the GPU time, the overall
+gain of running CPU INIT + GPU COMPUTE is small: about 10% ~ 20% for M in range
+\[32, 128\]. Anyway, Let me show you the picture below.
+
+<image src="images/7b.q4_0.cl.png" with="600"></image>
+
+The next two pictures demonstrate how does `n_threads` affects the overall time
+among two config profiles. `#0` is CPU INIT + CPU COMPUTE, `#1` is CPU INIT + GPU
+COMPUTE. From these diagrams, given M, we could easily recognize the best config
+profile.
+
+4096x4096 and 4096x11008:
+
+<image src="images/7b.q4_0.accelerate.nth-1.png" with="600"></image>
+
+11008x4096 and 32000x4096:
+
+<image src="images/7b.q4_0.accelerate.nth-2.png" with="600"></image>
+
+I have been focused on the `threading` problem(s) since Apr this year. I dropped
+two simple pull requests because they are not solutions but noises. In the second
+pull request, @gerganov hinted me the `1-thread blas` problem, so I followed this
+direction since then.
 
 At first I implemented the new threading framework that supports `wait/notify`,
-subtle and fragile to dead lock. I'm happy that it works. I had tried bench online
-by comparing CPU/GPU time, finally I replace that with offline bench. To explicitly
+subtle and fragile to dead lock. I'm happy that it works. I had tried to bench online
+by comparing CPU/GPU time, finally I replaced that with offline bench. To explicitly
 control details (how to parallel, when to wait, how to select the best executing plan),
 I had to define task config, task profiles. Finally I got the demo solution as follows.
 
@@ -50,7 +76,7 @@ Tests for broad prompt size show speed up of 10% - 40%.
 The key factor for speeding up is parallelism, followed by more accurate profile
 selection. The latter, although secondary, is necessary in the case of multithreading.
 
-Just like Accelerate/OpenBLAS, the de-quantization time in CUDA/ClBlast MAY NOT
+Just like Accelerate/OpenBLAS, the de-quantization time in CUDA/CL MAY NOT
 compete multiple CPU threads on some devices. In case of this, we can add profiles
 for them to run de-quantization in CPU and run mul_mat in GPU.
 
@@ -61,34 +87,30 @@ CUDA and COMPUTE in Accelerate -- if the overall speed competes other profiles.
 Anyway, current solution is in demo stage and is incomplete due to various reasons,
 you will read them in the following sections.
 
+The mul_mat related codes keep changing, It's a bit hard for me to follow up.
 I'm new to machine learning this year and have almost no knowledge of AI models
-and algorithms. There must be a lot of problems with this CL, please do not
-hesitate to advise. Thanks!
+and algorithms. There must be a lot of problems with this pull request, please
+do not hesitate to advise. Thanks!
 
 ## Solutions
 
-- Update mul_mat BLAS codes: allow de-quantizing in CPU or GPU (if possible).
-- Explicitly task config and profiles:
-  * define conf profiles (for example, init in CPU, compute in GPU);
-  * define for any stage: compute in parallel or not, idle wait or not.
-  Therefor the task stages with GPU backend are not limited to 1 thread.
-- New threading framework: combine `spin` + `cond-wait/broadcast`. Without wait,
-  workers busy spinning may causes overheat and slow down the overall speed.
-  The mul_mat compute time is long enough (often tens of ms), so the wait/notify
-  overhead (at most tens of us) is OK.
-- A tune tool for benching. With bench data, given N/K and n_threads, we could
-  estimate total computing time for any M (if within range), thus could select
-  the fastest profile.
+1. Update mul_mat BLAS codes: allow de-quantizing in CPU or GPU (if possible).
+2. Explicitly task config and profiles:
+   * define conf profiles (for example, init in CPU, compute in GPU);
+   * define for any stage: compute in parallel or not, idle wait or not.
+   * non-existing compute stages are not called.
+3. New threading framework: combine `spin` + `wait/notify`. Without wait, workers
+   busy spinning may causes overheat and slow down the overall speed. The mul_mat
+   compute time is long enough (often tens of ms), so the wait/notify overhead
+   (at most tens of us) is OK.
+4. A tune tool for benching. With bench data, given N/K and n_threads, we could
+   estimate total computing time for any M (if within range), thus could select
+   the fastest profile.
+5. On llama start, it loads the bench data from file (if exists). Before computing
+   node, we select the fastest profile. When compute, the `dst->task_conf` along
+   with `params` controls which part of the codes to run.
 
-We do bench and save bench results. Every llama model defines limited (N, K) pairs. 
-Given M/N/K, we can run every compute stage (if exists) for some times, choose
-the minimal overall time as reference value.
-
-On llama start, load bench data. Before compute node, we select the fastest profile.
-When compute, the `dst->task_conf` along with `params` controls which part of the
-codes to run.
-
-See section "**How To Estimate Execution Time**" for the reference algorithm.
+About how to select profile, see section "**How To Estimate Execution Time**".
 
 **Important data structures**
 
@@ -97,10 +119,10 @@ See section "**How To Estimate Execution Time**" for the reference algorithm.
 enum ggml_backend {
     GGML_BACKEND_UNKNOWN = 0, // new
     GGML_BACKEND_CPU = 1, // original value 0
-    GGML_BACKEND_CUDA = 2, // new
+    GGML_BACKEND_CUDA = 2, // original value 1
+    GGML_BACKEND_CL = 3, // original value 2
     GGML_BACKEND_ACCELERATE = 3, // new
     GGML_BACKEND_OPENBLAS = 4, // new
-    GGML_BACKEND_CLBLAST = 5, // new
 };
 
 // new
@@ -112,7 +134,7 @@ struct ggml_task_conf {
 
 struct ggml_tensor {
     //...
-    struct ggml_task_conf task_conf[3]; // new
+    struct ggml_task_conf task_conf[3]; // new, 0: INIT, 1: COMPUTE, 2: FINALIZE
     //...
 }
 ```
@@ -142,9 +164,18 @@ void ggml_mulmat_tune_setup_task_conf(struct ggml_mulmat_tune *tune) {
         .wait = true,
     };
 #elif defined(GGML_USE_CUBLAS) || defined(GGML_USE_CLBLAST)
-    tune->n_profiles++;
+    tune->n_profiles += 2;
     // gpu only: compute
     tune->conf[1][1] = (struct ggml_task_conf){
+        .backend = tune->gpu_backend,
+        .wait = true,
+    };
+    // cpu init + gpu compute
+    tune->conf[2][0] = (struct ggml_task_conf){
+        .backend = GGML_BACKEND_CPU,
+        .parallel = true,
+    };
+    tune->conf[2][1] = (struct ggml_task_conf){
         .backend = tune->gpu_backend,
         .wait = true,
     };
@@ -158,10 +189,8 @@ void ggml_mulmat_tune_setup_task_conf(struct ggml_mulmat_tune *tune) {
 
 - Only tested models 7B and 13B with type Q4_0.
 - TODO: support Q5_0, Q5_1, Q8_0, ...
-- My OS/device can not use cuBLAS, so can not generate example bench result.
-  TODO: evaluate performance and energy for cuBlas and ClBlast.
-- Anti-inconsistency is not implemented.
-  TODO: validate model, type, stage settings.
+- My OS/device can not use CUDA, so did not generate example bench result for CUDA.
+- Anti-inconsistency (for example: outdated bench data) is not implemented.
 - The codes are in draft state, with many shortcomings and TODOs.
 - Big change, hard to review, evaluate and merge.
 
@@ -177,6 +206,10 @@ void ggml_mulmat_tune_setup_task_conf(struct ggml_mulmat_tune *tune) {
   ```
   make clean; LLAMA_NO_ACCELERATE=1 LLAMA_OPENBLAS=1 make
   ```
+- ClBlast
+  ```
+  make clean; LLAMA_NO_ACCELERATE=1 LLAMA_CLBLAST=1 make
+  ```
 
 **Bench**
 
@@ -185,7 +218,7 @@ void ggml_mulmat_tune_setup_task_conf(struct ggml_mulmat_tune *tune) {
 usage: ./mulmat-tune [bench ...] | [analyze FILE] | test | help
 
 bench [-m MODEL] [-t TYPE] [-f FILE] [-y]
--model  MODEL  7B | 13B | 30B | 64B
+-model  MODEL  7B | 13B | 30B | 65B
                default 7B
 -type   TYPE   Q4_0 |  Q4_1 | Q5_0 | Q5_1 | Q8_0 | ...
                default Q4_0
@@ -231,22 +264,22 @@ Place `mulmat-tune.txt` into the llama.cpp dir.
 Then run your favorite program: main, perplexity, etc.
 The program will print debug log when or when not found the file.
 
-I suggest do not use too many threads, 4 threads almost works best on my 5-year
-old device with total 12 cores (6 physical cores).
+I suggest you do not use too many threads. Four threads almost works best on my
+5-year old MacBook pro 2018 (2.6GHz 6-core Intel Core i7, Intel UHD Graphics 630).
 
 ## Bench Data Format
 
 **Example**
 
 ```
-1 7B Q4_0 3 ACCELERATE 4 8 3 2
+1 7B Q4_0 4 ACCELERATE 4 8 3 2
 1 0 0 1 1 0 0 0 0
-1 1 0 3 0 1 0 0 0
+1 1 0 4 0 1 0 0 0
 4096 4096
   8        8     7477 0    12438     6448 0
  16       22    14387 0    12468     7173 0
  24       31    18584 0    10948     6641 0
-4094 11008
+4096 11008
   8       24    16279 0    29243     8578 0
  16       48    32857 0    29370     9313 0
  24       73    51046 0    29593     9684 0
@@ -284,7 +317,7 @@ version: 1
 model: "7B" | "13B" | "30B" | "65B"
 type: "Q4_0" | "Q4_1" | "Q5_0" | "Q5_1" | "Q8_0" | ...
 gpu_backend: 1 | 2 | 3 | 4
-gpu_backend_name: "CUDA" | "ACCELERATE" | "OPENBLAS" | "CLBLAST"
+gpu_backend_name: "CUDA" | "CL" | "ACCELERATE" | "OPENBLAS"
 n_shapes: 4
 m_step: 8
 m_num: 16
@@ -307,9 +340,9 @@ Time unit is `us`. A column is all zeros when that stage does not exist.
 ## How To Estimate Execution Time
 
 For Accelerate/OpenBLAS, mul_mat_q_f32, the init stage is run on CPU, and is
-paralleled in this CL. The `cpu-only` approach runs init stage with 1 threads and
-compute stage in N threads. The `with_gpu` approach runs init stage in CPU with
-N threads, and run compute stage in GPU with 1 thread.
+paralleled in this pull request. The `cpu-only` approach runs init stage with 1
+threads and compute stage in N threads. The `with_gpu` approach runs init stage
+in CPU with N threads, and run compute stage in GPU with 1 thread.
 
 For any given M/N/K/n_threads, we interpolate time for M between two `M`s.
 When no bench to load or M out of range, fall back to original algorithm:
@@ -350,6 +383,8 @@ wait-notify overhead is acceptable.
   into ggml.c/ggml.h.
 - ggml.h: exposes a test function for mulmat-tune-bench.c; new fields and structs.
 - ggml.c: new threading framework, update to `ggml_compute_forward_mul_mat()`.
+  updated BLAS codes for the new task config/profile; split COMPUTE into INIT +
+  COMPUTE for Accelerate/OpenBLAS/ClBlast.
   Defined several macros for debugging.
 - llama.cpp: temp work-round to load mulmat tune file named `mulmat-tune.txt`.
 - ggml-opencl.c fixed OOM error -- for local testing only. Changes are not quite
@@ -361,19 +396,16 @@ wait-notify overhead is acceptable.
 
 I assume we agree that:
 
-1. discuss, improve, make decisions.
-2. If this CL makes sense, then split CLs and merge step by step, use feature flag.
+1. Discuss and evaluate, determine whether this pull request make sense.
+2. If it useful and being accepted, then split and merge step by step.
 
-Here is the assumed merge steps:
+Here is the possible merge steps I think:
 
-1. Add experimental mulmat tune tool.
-2. define feature flag `GGML_GRAPH_COMPUTE_V2`, apply the task config framework,
-   keep `tensor.n_tasks` for v1.
-3. Adjust `ggml_compute_forward_mul_mat` for Accelerate/OpenBLAS: add new
-   init stage that can parallel. Make existing compute functions compatible to
-   incoming `ggml_graph_compute v2`.
-4. Keep current implementation of `ggml_graph_compute`, add the experimental `v2`.
-5. Add command line args for v2: --mulmat-tune, load offline bench data from file.
-6. Optional: support bench on startup -- this can solve various problems caused
+1. Apply the task config/profile for incoming changes. Including update blas
+   codes to support task config.
+2. Add the experimental mulmat tune tool, so we are able to use and maintain it.
+3. Merge the new threading codes (as v2?). May have to keep original threading.
+   With this we can evaluate and maintain the v2, fade out the v1 once v2 is ready.
+4. Add command line args for v2: --mulmat-tune, load offline bench data from file.
+5. Optional: support bench on startup -- this can solve various problems caused
    by mismatching between llama/mulmat-tune, llama/data.
-

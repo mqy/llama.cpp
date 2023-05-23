@@ -9982,12 +9982,53 @@ static void ggml_compute_forward_mul_mat_q_f32(
 #else
         GGML_ASSERT(false);
 #endif
-    } else if (compute_backend == GGML_BACKEND_CLBLAST) {
+    } else if (compute_backend == GGML_BACKEND_CL) {
 #if defined(GGML_USE_CLBLAST)
         enum ggml_backend init_backend = dst->task_conf[GGML_TASK_INIT].backend;
         if (init_backend == GGML_BACKEND_CPU) {
-            // TODO: init: dequantize_row_q with cpu; compute: mul_mat with GPU.
-            // Ref: accelerate/openblas.
+            GGML_ASSERT(params->type == GGML_TASK_INIT || params->type == GGML_TASK_COMPUTE);
+
+            float * const wdata = params->wdata;
+            dequantize_row_q_t const dequantize_row_q = quantize_fns[type].dequantize_row_q;
+
+            if (params->type == GGML_TASK_INIT) {
+                // rows per thread
+                const int dr = (ne01 + nth - 1)/nth;
+
+                // row range for this thread
+                const int ir0 = dr*ith;
+                int ir1 = MIN(ir0 + dr, ne01);
+
+                for (int64_t i03 = 0; i03 < ne03; i03++) {
+                    for (int64_t i02 = 0; i02 < ne02; i02++) {
+                        char  * data0_offset = (char *) src0->data + i03*nb03 + i02*nb02;
+                        float * wdata_offset = wdata + i03*ne03 + i02*ne02;
+                        for (int64_t i = ir0; i < ir1; ++i) {
+                            dequantize_row_q(data0_offset + i*nb01, wdata_offset + i*ne00, ne00);
+                        }
+                    }
+                }
+                return;
+            }
+
+            GGML_ASSERT(params->nth == 1);
+            GGML_ASSERT(params->type == GGML_TASK_COMPUTE);
+
+            for (int64_t i03 = 0; i03 < ne03; i03++) {
+                for (int64_t i02 = 0; i02 < ne02; i02++) {
+                    const float * y = (float *) ((char *) src1->data + i02*nb12 + i03*nb13);
+                    const float * x = wdata;
+                    float * d = (float *) ((char *) dst->data + i02*nb2 + i03*nb3);
+
+                    // zT = y * xT
+                    ggml_cl_sgemm_wrapper(GGML_BLAS_ORDER_ROW_MAJOR, GGML_BLAS_OP_N, GGML_BLAS_OP_T,
+                            ne11, ne01, ne10,
+                            1.0f,    y, ne10,
+                                     x, ne10,
+                            0.0f,    d, ne01,
+                            GGML_TYPE_F32);
+                }
+            }
         } else {
             GGML_ASSERT(params->nth == 1);
             GGML_ASSERT(params->type == GGML_TASK_COMPUTE);
@@ -10002,7 +10043,7 @@ static void ggml_compute_forward_mul_mat_q_f32(
                     ggml_cl_sgemm_wrapper(GGML_BLAS_ORDER_ROW_MAJOR, GGML_BLAS_OP_N, GGML_BLAS_OP_T,
                             ne11, ne01, ne10,
                             1.0f,    y, ne10,
-                                    x, ne10,
+                                     x, ne10,
                             0.0f,    d, ne01,
                             type);
                 }
@@ -14328,9 +14369,15 @@ void ggml_graph_compute_mul_mat_set_task_conf(struct ggml_cgraph *cgraph) {
             if (cgraph->mm_tune == NULL) {
                 // NOTE: assume all M are same within this comput egraph.
                 if (M >= 32 && N >= 32 && K >= 32) {
-                    cgraph->n_threads = 1;
-                    GGML_PRINT_THREAD_DEBUG(">>>> n_threads was set to 1");
-                    task_conf = cgraph->mm_tune->conf[1];
+                    // NOTE: copied from llama.cpp to here. But I assue that CUDA
+                    // or CL run in 1 OS-thread as well.
+                    if (ggml_cpu_has_blas()) {
+                        //if (!ggml_cpu_has_gpublas()) {
+                            cgraph->n_threads = 1;
+                            GGML_PRINT_THREAD_DEBUG(">>>> n_threads was set to 1");
+                        //}
+                        task_conf = cgraph->mm_tune->conf[1];
+                    }
                 }
             } else {
                 int slot = ggml_mulmat_tune_cache_hash(M, N, K) % mm_cache_len;

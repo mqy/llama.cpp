@@ -43,7 +43,7 @@ static void usage(char *prog) {
         "usage: %s [bench ...] | [analyze FILE] | test | help\n",
         "\n",
         "bench [-m MODEL] [-t TYPE] [-f FILE] [-y]\n",
-        "-model  MODEL  7B | 13B | 30B | 64B\n",
+        "-model  MODEL  7B | 13B | 30B | 65B\n",
         "               default 7B\n",
         "-type   TYPE   Q4_0 |  Q4_1 | Q5_0 | Q5_1 | Q8_0 | ...\n",
         "               default Q4_0\n",
@@ -472,7 +472,7 @@ static void print_blas_build_tips(void) {
     print_envs_for_build(GGML_BACKEND_CUDA, buf, 100);
     fprintf(stderr, "* to build with cuBLAS:     make clean; %s make %s\n", buf,
             make_target);
-    print_envs_for_build(GGML_BACKEND_CLBLAST, buf, 100);
+    print_envs_for_build(GGML_BACKEND_CL, buf, 100);
     fprintf(stderr, "* to build with CLBLast:    make clean; %s make %s\n", buf,
             make_target);
 }
@@ -484,7 +484,7 @@ static void print_envs_for_build(enum ggml_backend backend, char *buf,
         backend == GGML_BACKEND_ACCELERATE ? " " : "1";
     const char *LLAMA_OPENBLAS = backend == GGML_BACKEND_OPENBLAS ? "1" : " ";
     const char *LLAMA_CUBLAS = backend == GGML_BACKEND_CUDA ? "1" : " ";
-    const char *LLAMA_CLBLAST = backend == GGML_BACKEND_CLBLAST ? "1" : " ";
+    const char *LLAMA_CLBLAST = backend == GGML_BACKEND_CL ? "1" : " ";
 
     snprintf(buf, buf_len,
              "LLAMA_NO_ACCELERATE=%s LLAMA_OPENBLAS=%s LLAMA_CUBLAS=%s "

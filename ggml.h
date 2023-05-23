@@ -254,9 +254,9 @@ extern "C" {
         GGML_BACKEND_UNKNOWN = 0,
         GGML_BACKEND_CPU = 1,
         GGML_BACKEND_CUDA = 2,
-        GGML_BACKEND_ACCELERATE = 3,
-        GGML_BACKEND_OPENBLAS = 4,
-        GGML_BACKEND_CLBLAST = 5,
+        GGML_BACKEND_CL = 3,
+        GGML_BACKEND_ACCELERATE = 4,
+        GGML_BACKEND_OPENBLAS = 5,
     };
 
     // model file types
