@@ -5,15 +5,21 @@
 GGML defines three task types(stages): INIT, COMPUTE, FINALIZE. All nodes has
 COMPUTE stage, some has INIT stage, the FINALIZE is never used.
 
-General speaking, codes run in GPU(BLAS) are not suitable to run with multi OS
+General speaking, codes run in GPU(BLAS) MAY not suitable to run with multi OS
 threads -- sometimes very slow, but CPU could and scales well. So to speedup
 large prompt and avoid spinning, the master code force 1-thread when (M >=32).
 
-In `master` branch, the `mul_mat` codes run in several implicit profiles.
+In current `master` branch, the `mul_mat` codes run in several implicit profiles.
 
 - pure cpu: INIT: very fast, COMPUTE: the computation time is proportional to M.
 - CUDA/CL: COMPUTE: de-quantization and mul_mat in GPU.
 - Accelerate/OpenBLAS: COMPUTE: de-quantization in CPU, mul_mat in GPU.
+
+All data will be shown are generated in  MacBook Pro 2018:
+
+- OS: macOS Version 13.3.1 (a)
+- Memory: 32 GB 2400 MHz DDR4
+- CPU: 2.6 GHz 6-Core Intel Core i7-8850H @2.60GHz, with integrated Intel UHD Graphics 630 1536 MB
 
 I observed the following "facts" on Accelerate/OpenBLAS:
 
@@ -198,7 +204,7 @@ void ggml_mulmat_tune_setup_task_conf(struct ggml_mulmat_tune *tune) {
 
 **Build**
 
-- Accelerate:
+- Accelerate (on Mac):
   ```
   make clean; LLAMA_NO_ACCELERATE= make
   ```
@@ -264,9 +270,6 @@ Place `mulmat-tune.txt` into the llama.cpp dir.
 Then run your favorite program: main, perplexity, etc.
 The program will print debug log when or when not found the file.
 
-I suggest you do not use too many threads. Four threads almost works best on my
-5-year old MacBook pro 2018 (2.6GHz 6-core Intel Core i7, Intel UHD Graphics 630).
-
 ## Bench Data Format
 
 **Example**
@@ -293,13 +296,7 @@ I suggest you do not use too many threads. Four threads almost works best on my
  24       24   141918 0    83565    71988 0
  ```
 
-See files in dir [bench-out](bench-out) for details.
-
-These files are generated on Macbook Pro 2018:
-
-- OS: macOS Version 13.3.1 (a)
-- Memory: 32 GB 2400 MHz DDR4
-- CPU: 2.6 GHz 6-Core Intel Core i7-8850H @2.60GHz, with integrated Intel UHD Graphics 630 1536 MB
+See example files in dir [bench-out](bench-out) for details.
 
 **Informal Explanation**
 
@@ -372,7 +369,7 @@ time goes down to about 10 us.
 
 Each call is about 10 us, may vary 5x. Since every mul_mat that run with-gpu
 takes several ms to hundreds of ms, and the average boost is large, so the
-wait-notify overhead is acceptable. 
+wait-notify overhead is acceptable.
 
 ## High Level Guide to Code Review
 
