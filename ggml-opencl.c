@@ -146,14 +146,6 @@ __kernel void dequantize_row_q8_0(__global struct block_q8_0* x, __global float*
         }                                                           \
     } while (0)
 
-#define ASSERT(cond)                                                           \
-    do {                                                                       \
-        if (!(cond)) {                                                         \
-            fprintf(stderr, "Assert failed at %s:%d\n", __FILE__, __LINE__);   \
-            exit(1);                                                           \
-        }                                                                      \
-    } while (0)
-
 #define MIN(x, y) (x) < (y) ? (x) : (y)
 #define MAX(x, y) (x) > (y) ? (x) : (y)
 
@@ -536,11 +528,11 @@ void ggml_cl_sgemm_wrapper(
     int LDC = ldc;
 
     if (n_pass > 1) {
-        ASSERT(size_b % n_pass == 0);
-        ASSERT(size_c % n_pass == 0);
-        ASSERT(size_qb % n_pass == 0);
-        ASSERT(n % n_pass == 0);
-        ASSERT(ldc % n_pass == 0);
+        GGML_ASSERT(size_b % n_pass == 0);
+        GGML_ASSERT(size_c % n_pass == 0);
+        GGML_ASSERT(size_qb % n_pass == 0);
+        GGML_ASSERT(n % n_pass == 0);
+        GGML_ASSERT(ldc % n_pass == 0);
 
         size_b /= n_pass;
         size_c /= n_pass;
@@ -548,7 +540,8 @@ void ggml_cl_sgemm_wrapper(
         N = n / n_pass;
         LDC = ldc / n_pass;
 
-        // To avoid OOM, release buffers when we are not going to use that many.
+        // To avoid OOM, release buffers when we do not need that many memories.
+        // This may be unnecessary.
 
         if (size_a < cl_size_a) {
             clReleaseMemObject(cl_buffer_a);

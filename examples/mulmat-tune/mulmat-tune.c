@@ -12,7 +12,7 @@ int ggml_mulmat_tune_setup_model(struct ggml_mulmat_tune *tune,
         tune->n_shapes = 4;
         tune->shapes[0] = (struct ggml_mulmat_tune_shape){.N = 4096, .K = 4096};
         tune->shapes[1] =
-            (struct ggml_mulmat_tune_shape){.N = 4094, .K = 11008};
+            (struct ggml_mulmat_tune_shape){.N = 4096, .K = 11008};
         tune->shapes[2] =
             (struct ggml_mulmat_tune_shape){.N = 11008, .K = 4096};
         tune->shapes[3] =
@@ -212,7 +212,8 @@ int ggml_mulmat_tune_time_stats(
     }
 
     if (shape_index < 0) {
-        return -1;
+        fprintf(stderr, "%s: shape not found, N: %d, K: %d\n", __func__, N, K);
+        abort();
     }
 
     struct ggml_mulmat_tune_m *prev = NULL;
